@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
 
   if (!WEBHOOK_SECRET) {
-    console.error("❌ Missing Clerk Webhook Secret");
+    console.error("Missing Clerk Webhook Secret");
     return new Response("Webhook secret not configured", { status: 500 });
   }
 
@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
 
   let evt: ClerkUserCreatedEvent;
   try {
+    console.log("svix tk chal rha ha");
     evt = svix.verify(payload, {
       "svix-id": headerPayload.get("svix-id")!,
       "svix-timestamp": headerPayload.get("svix-timestamp")!,
@@ -44,6 +45,7 @@ export async function POST(req: NextRequest) {
   const eventType = evt.type;
 
   if (eventType === "user.created") {
+    console.log("event a rha ha");
     const {
       id,
       email_addresses,
@@ -64,9 +66,14 @@ export async function POST(req: NextRequest) {
       photo: image_url || "",
       passwordEnabled: String(password_enabled),
     };
-
+    console.log("user a rha ha");
     console.log("✅ New user data:", user);
-    await createUser(user);
+    try {
+      await createUser(user);
+    } catch (error) {
+      console.error("❌ Failed to create user from webhook:", error);
+      return new Response("Error creating user", { status: 500 });
+    }
   }
 
   return new Response("Webhook received", { status: 200 });
