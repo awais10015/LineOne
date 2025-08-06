@@ -77,7 +77,7 @@ export function AppSidebar({ children }) {
               <SidebarLink
                 link={{
                   label: "Manu Arora",
-                  href: "#",
+                  href: "/profile",
                   icon: (
                     <img
                       src="https://assets.aceternity.com/manu.png"
