@@ -7,8 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ThemeProvider } from "@/components/theme-provider";
-
-
+import NextTopLoader from "nextjs-toploader";
 
 const Layout = ({
   children,
@@ -19,31 +18,28 @@ const Layout = ({
   const isAuthPage = pathname === "/login" || pathname === "/signup";
 
   return (
-    
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {isAuthPage ? (
-            <>
-              {children}
-              <Toaster />
-            </>
-          ) : (
-            <SidebarProvider>
-              <div className="flex h-screen w-full overflow-hidden">
-                <AppSidebar children={children} />
-                {/* <main className="flex-1 overflow-y-auto">
-                {children}
-              </main> */}
-              </div>
-              <Toaster />
-            </SidebarProvider>
-          )}
-        </ThemeProvider>
-      
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      {isAuthPage ? (
+        <>
+          <NextTopLoader color="#800080" showSpinner={false} />
+          {children}
+          <Toaster />
+        </>
+      ) : (
+        <SidebarProvider>
+          <div className="flex h-screen w-full overflow-hidden">
+            <NextTopLoader color="#B200FF" showSpinner={false} />
+            <AppSidebar children={children} />
+          </div>
+          <Toaster />
+        </SidebarProvider>
+      )}
+    </ThemeProvider>
   );
 };
 
