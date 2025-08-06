@@ -1,7 +1,7 @@
 import mongoose, { Mongoose } from "mongoose";
 
 const MONGODB_URL = process.env.MONGODB_URL;
-console.log(MONGODB_URL)
+
 if (!MONGODB_URL) {
   throw new Error("Please define MONGODB_URL in your .env.local");
 }

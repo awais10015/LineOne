@@ -1,3 +1,4 @@
+// "use client"
 import React from "react";
 import { auth } from "@/auth";
 import SignOutButton from "@/components/client/SignOutButton";
