@@ -2,12 +2,12 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import NextTopLoader from "nextjs-toploader";
+
 
 const Layout = ({
   children,
@@ -18,12 +18,14 @@ const Layout = ({
   const isAuthPage = pathname === "/login" || pathname === "/signup";
 
   return (
+    
     <ThemeProvider
       attribute="class"
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
     >
+      
       {isAuthPage ? (
         <>
           <NextTopLoader color="#800080" showSpinner={false} />
@@ -32,14 +34,16 @@ const Layout = ({
         </>
       ) : (
         <SidebarProvider>
-          <div className="flex h-screen w-full overflow-hidden">
+          <div className="flex h-screen w-full overflow-hidden srollbar-hide">
             <NextTopLoader color="#B200FF" showSpinner={false} />
-            <AppSidebar children={children} />
+            <AppSidebar>{children}</AppSidebar>
           </div>
           <Toaster />
         </SidebarProvider>
       )}
+      
     </ThemeProvider>
+   
   );
 };
 

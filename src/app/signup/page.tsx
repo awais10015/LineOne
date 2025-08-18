@@ -1,9 +1,7 @@
 import React from "react";
 import {
   Card,
-  CardAction,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -15,7 +13,6 @@ import { User } from "@/models/userModel";
 import { hash } from "bcryptjs";
 import { redirect } from "next/navigation";
 import { connect } from "@/lib/db";
-import { toast } from "sonner"
 import GoogleSignInButton from "@/components/client/GoogleSignInButton";
 
 const Page = () => {

@@ -1,20 +1,14 @@
 import React from "react";
 import {
   Card,
-  CardAction,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { auth, signIn } from "@/auth";
-import { CredentialsSignin } from "next-auth";
-import { toast } from "sonner";
-import LoginForm from "@/components/client/form";
+import { auth } from "@/auth";
+import LoginForm from "@/components/client/Form";
 import { redirect } from "next/navigation";
 import GoogleSignInButton from "@/components/client/GoogleSignInButton";
 
@@ -34,7 +28,8 @@ const Page = async () => {
           <span>Or</span>
           <GoogleSignInButton />
 
-          <Link href="/signup">Don't have an Account? Signup</Link>
+          <Link href="/signup">Don&apos;t have an Account? Signup</Link>
+
         </CardFooter>
       </Card>
     </div>

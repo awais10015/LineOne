@@ -1,9 +1,11 @@
 "use client";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
-
+import { ModeToggle } from "../ModeToggle";
+import Link from "next/link";
 interface Links {
   label: string;
   href: string;
@@ -88,11 +90,11 @@ export const DesktopSidebar = ({
     <>
       <motion.div
         className={cn(
-          "h-full px-4 py-4 hidden  md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] shrink-0",
+          "h-full px-4 py-4 hidden  md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[180px] shrink-0",
           className
         )}
         animate={{
-          width: animate ? (open ? "300px" : "60px") : "300px",
+          width: animate ? (open ? "180px" : "60px") : "180px",
         }}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
@@ -114,15 +116,22 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-10 px-4 py-4 flex flex-row md:hidden  items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
+          "h-10 px-4 py-4 flex flex-row md:hidden  items-center justify-between bg-none dark:bg-none w-full "
         )}
         {...props}
       >
-        <div className="flex justify-end z-20 w-full">
-          <IconMenu2
-            className="text-neutral-800 dark:text-neutral-200"
-            onClick={() => setOpen(!open)}
-          />
+        <div className="flex justify-between items-center z-20 w-full">
+          <div className="flex justify-center items-center gap-2">
+            <Image src="/logo.svg" alt="logo" width={30} height={30} />
+            <h1 className="font-medium text-lg">LineOne</h1>
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <ModeToggle />
+            <IconMenu2
+              className="text-neutral-800 dark:text-neutral-200"
+              onClick={() => setOpen(!open)}
+            />
+          </div>
         </div>
         <AnimatePresence>
           {open && (
@@ -164,7 +173,7 @@ export const SidebarLink = ({
 }) => {
   const { open, animate } = useSidebar();
   return (
-    <a
+    <Link
       href={link.href}
       className={cn(
         "flex items-center justify-start gap-2  group/sidebar py-2",
@@ -183,6 +192,6 @@ export const SidebarLink = ({
       >
         {link.label}
       </motion.span>
-    </a>
+    </Link>
   );
 };
