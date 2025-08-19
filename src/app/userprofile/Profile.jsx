@@ -51,8 +51,8 @@ const Profile = () => {
   }, []);
 
   useEffect(() => {
-    console.log(currentLoggedInUser?.following);
-  }, [currentLoggedInUser]);
+    getUser()
+  }, []);
 
   return (
     <div className="flex flex-col w-full items-center ">

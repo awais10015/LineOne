@@ -5,6 +5,8 @@ import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { credentialsLogin } from "@/actions/login";
 import { useRouter } from "nextjs-toploader/app";
+import { Mail, } from "lucide-react";
+import PasswordInput from "@/components/client/PasswordInput";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -29,19 +31,20 @@ const LoginForm = () => {
       }}
       className="flex flex-col gap-4"
     >
-      <Input
-        type="email"
-        placeholder="Enter Your Email"
-        id="email"
-        name="email"
-      />
-      <Input
-        type="password"
-        placeholder="Enter Your Password"
-        id="password"
-        name="password"
-      />
-      <Button type="submit">Login</Button>
+      <div className="relative">
+        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <Input
+          type="email"
+          placeholder="Enter Your Email"
+          id="email"
+          name="email"
+          className="pl-10"
+        />
+      </div>
+      <PasswordInput />
+      <Button type="submit" className="w-full bg-[#ff6500] hover:bg-[#ff5f00]">
+        Log In
+      </Button>
     </form>
   );
 };

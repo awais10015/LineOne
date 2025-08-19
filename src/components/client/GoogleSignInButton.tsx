@@ -1,5 +1,5 @@
 "use client";
-
+import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";
 import { Button } from "../ui/button";
 
@@ -13,6 +13,7 @@ const GoogleSignInButton = () => {
         });
       }}
     >
+      <FcGoogle />
       Continue with Google
     </Button>
   );

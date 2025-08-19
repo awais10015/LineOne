@@ -56,13 +56,13 @@ const Home = () => {
               {posts.map((post) => (
                 <div
                   key={post._id}
-                  className="w-full rounded-xl p-5 transition-shadow  backdrop-blur-lg bg-white/10  shadow-md bordershadow-lg  dark:bg-white/5 dark:border-white/10 light:border-gray-500"
+                  className="w-full rounded-2xl p-2 transition-shadow  backdrop-blur-lg bg-white/10  shadow-md bordershadow-lg  dark:bg-white/5 dark:border-white/10 light:border-gray-500"
                 >
                   <Link href={`/userprofile/${post?.postBy?._id}`}>
                     <div className="flex gap-3 w-full justify-start items-center">
                       <div className="">
                         <img
-                          className="h-10 w-10 rounded-full object-cover object-top"
+                          className="h-10 w-10 rounded-2xl object-cover object-top"
                           src={
                             post?.postBy?.profilePic ||
                             (post?.postBy?.gender === "male"

@@ -7,10 +7,12 @@ const commentSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
-  comments: {
-    type: [String],
-    default: []
-  }
+  comments: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Comment",
+        },
+      ],
 });
 
 export const Comment = mongoose.models?.Comment || mongoose.model("Comment", commentSchema);

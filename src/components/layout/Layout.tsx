@@ -28,14 +28,14 @@ const Layout = ({
       
       {isAuthPage ? (
         <>
-          <NextTopLoader color="#800080" showSpinner={false} />
+          <NextTopLoader color="#ff6500" showSpinner={false} />
           {children}
           <Toaster />
         </>
       ) : (
         <SidebarProvider>
           <div className="flex h-screen w-full overflow-hidden srollbar-hide">
-            <NextTopLoader color="#B200FF" showSpinner={false} />
+            <NextTopLoader color="#ff6500" showSpinner={false} />
             <AppSidebar>{children}</AppSidebar>
           </div>
           <Toaster />

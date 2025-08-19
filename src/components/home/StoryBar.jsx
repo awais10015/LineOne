@@ -7,7 +7,7 @@ export default function StoryBar() {
   const { currentLoggedInUser } = useContext(CurrentUserContext);
 
   // add story state
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState("");
   const [preview, setPreview] = useState(null);
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -127,7 +127,7 @@ export default function StoryBar() {
               <>
                 <button
                   onClick={() => fileInputRef.current.click()}
-                  className="px-4 py-2 bg-white text-blue-500 rounded-xl"
+                  className="px-4 py-2 bg-white/20 text-white rounded-xl"
                 >
                   Create Story
                 </button>
@@ -169,7 +169,7 @@ export default function StoryBar() {
                 <button
                   onClick={handleUpload}
                   disabled={loading}
-                  className="px-4 py-2 bg-white text-blue-500 rounded-xl"
+                  className="px-4 py-2 bg-white/20 text-white rounded-xl"
                 >
                   {loading ? "Uploading..." : "Add Story"}
                 </button>
@@ -220,7 +220,7 @@ export default function StoryBar() {
             }}
             className="fixed w-full inset-0 bg-black/80 flex items-center justify-center z-50"
           >
-            <div className="w-[400px] h-[600px] bg-black rounded-2xl flex items-center justify-center overflow-hidden relative">
+            <div className="w-[400px] h-[660px]  bg-black rounded-2xl flex items-center justify-center overflow-hidden relative">
               {viewer.stories[currentIndex].type === "video" ? (
                 <video
                   src={viewer.stories[currentIndex].mediaUrl}

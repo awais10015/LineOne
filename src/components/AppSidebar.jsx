@@ -68,7 +68,7 @@ export function AppSidebar({ children }) {
     <div className="h-screen w-screen bg-background border-r">
       <div
         className={cn(
-          " flex flex-1 flex-col overflow-scroll srollbar-hide rounded-tl-md rounded-tr-2xl border-none border-neutral-200 bg-gray-100 md:flex-row dark:border-neutral-700 dark:bg-neutral-800",
+          " flex flex-1 flex-col overflow-scroll srollbar-hide rounded-tl-md rounded-tr-2xl md:flex-row dark:border-neutral-700 dark:bg-neutral-800",
           // for your use case, use `h-screen` instead of `h-[60vh]`
           "h-screen"
         )}
@@ -152,7 +152,7 @@ export const LogoIcon = () => {
 const Dashboard = ({ children }) => {
   return (
     <div className="flex-1 min-w-0 top-0">
-      <div className="h-full w-full flex flex-col  gap-2 rounded-tl-2xl rounded-tr-2xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900 overflow-auto scrollbar-hide">
+      <div className="h-full w-full flex flex-col border-l shadow-xl gap-2 rounded-tl-2xl rounded-tr-2xl bg-white dark:border-neutral-700 dark:bg-neutral-900 overflow-auto scrollbar-hide">
         <div className="flex flex-1 gap-2 flex-wrap">{children}</div>
       </div>
     </div>

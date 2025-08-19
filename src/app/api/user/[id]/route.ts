@@ -11,7 +11,10 @@ export async function GET(
   try {
     await connect();
     const { id } = await params;
-    const user = await User.findById(id).populate("posts");
+    const user = await User.findById(id)
+      .populate("posts")
+      .populate("followers" )
+      .populate("following"); 
 
     return new Response(JSON.stringify(user), { status: 200 });
   } catch {

@@ -14,6 +14,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import FollowButton from "@/components/profile/FollowButton";
@@ -38,16 +40,19 @@ const Profile = () => {
 
   const getUsers = async () => {
     try {
-      const res = await fetch("/api/users");
+      const res = await fetch(`/api/user/${id}`);
       const data = await res.json();
 
-      let user = data.users.find((user) => user._id === id);
+      // let user = data?.users?.find((user) => user._id === id);
 
-      setAnotherUser(user);
+      setAnotherUser(data);
     } catch (err) {
       console.error("Failed to fetch users:", err);
     }
   };
+useEffect(() => {
+  console.log(AnotherUser)
+}, [AnotherUser])
 
   useEffect(() => {
     getUsers();
@@ -130,35 +135,143 @@ const Profile = () => {
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                      <DialogTitle>Follow and Following List</DialogTitle>
-
-                      <p>View your followers and following</p>
+                      <DialogTitle></DialogTitle>
                     </DialogHeader>
+                    <Tabs
+                      defaultValue="followers"
+                      className="w-full flex items-center justify-center flex-col"
+                    >
+                      <TabsList>
+                        <TabsTrigger value="followers">Followers</TabsTrigger>
+                        <TabsTrigger value="following">Following</TabsTrigger>
+                      </TabsList>
 
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button variant="outline">Cancel</Button>
-                      </DialogClose>
-                    </DialogFooter>
+                      {/* Followers List */}
+                      <TabsContent
+                        value="followers"
+                        className="w-full mt-4 space-y-3"
+                      >
+                        {AnotherUser?.followers?.map((follower) => (
+                          <div
+                            key={follower._id}
+                            className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100"
+                          >
+                            {/* Left: Profile picture */}
+                            <Link href={`/userprofile/${follower._id}`}>
+                              <div className="flex items-center gap-3">
+                                <img
+                                  src={
+                                    follower?.profilePic ||
+                                    "/default-avatar.png"
+                                  }
+                                  alt={follower?.name}
+                                  className="w-10 h-10 rounded-full object-cover object-top"
+                                />
+                                {/* Middle: Name + Username */}
+                                <div>
+                                  <p className="font-medium">
+                                    {follower?.name}
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    {follower?.username}
+                                  </p>
+                                </div>
+                              </div>
+                            </Link>
+
+                            {/* Right: Action Button */}
+                            {follower?.followers?.includes(
+                              currentLoggedInUser?._id
+                            ) ? (
+                              <UnfollowButton
+                                id={follower._id}
+                                currentLoggedInUser={currentLoggedInUser._id}
+                                refresh={getUsers}
+                              />
+                            ) : (
+                              <FollowButton
+                                id={follower._id}
+                                currentLoggedInUser={currentLoggedInUser._id}
+                                refresh={getUsers}
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </TabsContent>
+
+                      {/* Following List */}
+                      <TabsContent
+                        value="following"
+                        className="w-full mt-4 space-y-3"
+                      >
+                        {AnotherUser?.following?.map((following) => (
+                          <div
+                            key={following._id}
+                            className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100"
+                          >
+                            <Link href={`/userprofile/${following._id}`}>
+                              <div className="flex items-center gap-3">
+                                <img
+                                  src={
+                                    following?.profilePic ||
+                                    "/default-avatar.png"
+                                  }
+                                  alt={following?.name}
+                                  className="w-10 h-10 rounded-full object-cover object-top"
+                                />
+                                <div>
+                                  <p className="font-medium">
+                                    {following?.name}
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    {following?.username}
+                                  </p>
+                                </div>
+                              </div>
+                            </Link>
+
+                            {following?.followers?.includes(
+                              currentLoggedInUser?._id
+                            ) ? (
+                              <UnfollowButton
+                                id={following._id}
+                                currentLoggedInUser={currentLoggedInUser._id}
+                                refresh={getUsers}
+                              />
+                            ) : (
+                              <FollowButton
+                                id={following._id}
+                                currentLoggedInUser={currentLoggedInUser._id}
+                                refresh={getUsers}
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </TabsContent>
+                    </Tabs>
+
+                    <DialogFooter></DialogFooter>
                   </DialogContent>
                 </Dialog>
               </div>
 
               {/* Message aur Follow/Unfollow Button */}
               <div className="mt-5 flex gap-5 w-full justify-center items-center">
-                {AnotherUser?.followers?.includes(currentLoggedInUser?._id) ? (
-                  <UnfollowButton
-                    id={AnotherUser?._id}
-                    currentLoggedInUser={currentLoggedInUser?._id}
-                    refresh={getUsers}
-                  />
-                ) : (
-                  <FollowButton
-                    id={AnotherUser?._id}
-                    currentLoggedInUser={currentLoggedInUser?._id}
-                    refresh={getUsers}
-                  />
-                )}
+                {AnotherUser?.followers?.some(
+                              (f) => f._id === currentLoggedInUser?._id
+                            ) ? (
+                              <UnfollowButton
+                                id={AnotherUser?._id}
+                                currentLoggedInUser={currentLoggedInUser._id}
+                                refresh={getUsers}
+                              />
+                            ) : (
+                              <FollowButton
+                                id={AnotherUser?._id}
+                                currentLoggedInUser={currentLoggedInUser._id}
+                                refresh={getUsers}
+                              />
+                            )}
                 <MessageButton />
               </div>
             </div>

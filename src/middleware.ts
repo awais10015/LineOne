@@ -2,8 +2,9 @@
 // export { auth as middleware } from "@/auth";
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|logo.svg|login|signup).*)",
+   matcher: [
+    // apply middleware to everything except these paths
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.svg$|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.webp$|login|signup).*)",
   ],
   runtime: "nodejs", 
 };
