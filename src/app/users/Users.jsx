@@ -7,11 +7,10 @@ import Loader from "@/components/Loader";
 import AnotherUserContext from "@/context/AnotherUserContext";
 import { useRouter } from "nextjs-toploader/app";
 import { Button } from "@/components/ui/button";
-import FollowButton from "@/components/profile/FollowButton";
-import UnfollowButton from "@/components/profile/UnfollowButton";
+
 import CurrentUserContext from "@/context/CurrentUserContext";
-// import FollowButton from "@/components/profile/FollowButton";
-// import UnfollowButton from "@/components/profile/UnfollowButton";
+
+import FollowUnfollowButton from "@/components/profile/FollowUnfollowButton"
 import Link from "next/link";
 import {
   Dialog,
@@ -132,21 +131,8 @@ export default function UserList() {
                             </div>
                           </Link>
 
-                          {userFound?.followers?.includes(
-                            currentLoggedInUser?._id
-                          ) ? (
-                            <UnfollowButton
-                              id={userFound._id}
-                              currentLoggedInUser={currentLoggedInUser._id}
-                              refresh={getUsers}
-                            />
-                          ) : (
-                            <FollowButton
-                              id={userFound._id}
-                              currentLoggedInUser={currentLoggedInUser._id}
-                              refresh={getUsers}
-                            />
-                          )}
+                         
+                           <FollowUnfollowButton currentLoggedInUser={currentLoggedInUser} id={userFound?._id} refresh={getUsers}/>
                         </div>
                       ))}
                     </div>
@@ -206,19 +192,7 @@ export default function UserList() {
                   </div>
                   {/* Action Buttons */}
                   <div className="mt-4 mb-4 flex gap-3 p-5">
-                    {user?.followers?.includes(currentLoggedInUser?._id) ? (
-                      <UnfollowButton
-                        id={user._id}
-                        currentLoggedInUser={currentLoggedInUser._id}
-                        refresh={getUsers}
-                      />
-                    ) : (
-                      <FollowButton
-                        id={user._id}
-                        currentLoggedInUser={currentLoggedInUser._id}
-                        refresh={getUsers}
-                      />
-                    )}
+                    <FollowUnfollowButton id={user._id} currentLoggedInUser={currentLoggedInUser} refresh={getUsers}/>
                     <Button
                       variant={"ghost"}
                       className="px-4 py-2 cursor-pointer hover:scale-105"

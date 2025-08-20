@@ -5,10 +5,10 @@ import { useRouter } from "nextjs-toploader/app";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import FollowButton from "@/components/profile/FollowButton";
-import UnfollowButton from "@/components/profile/UnfollowButton";
+
+import FollowUnfollowButton from "@/components/profile/FollowUnfollowButton";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+
 import {
   Dialog,
   DialogClose,
@@ -154,22 +154,7 @@ const Profile = () => {
                             </div>
                           </Link>
 
-                          {/* Right: Action Button */}
-                          {follower?.followers?.includes(
-                            currentLoggedInUser?._id
-                          ) ? (
-                            <UnfollowButton
-                              id={follower._id}
-                              currentLoggedInUser={currentLoggedInUser._id}
-                              refresh={getUser}
-                            />
-                          ) : (
-                            <FollowButton
-                              id={follower._id}
-                              currentLoggedInUser={currentLoggedInUser._id}
-                              refresh={getUser}
-                            />
-                          )}
+                           <FollowUnfollowButton currentLoggedInUser={currentLoggedInUser} id={follower?._id} refresh={getUser}/>
                         </div>
                       ))}
                     </TabsContent>
@@ -202,21 +187,8 @@ const Profile = () => {
                             </div>
                           </Link>
 
-                          {following?.followers?.includes(
-                            currentLoggedInUser?._id
-                          ) ? (
-                            <UnfollowButton
-                              id={following._id}
-                              currentLoggedInUser={currentLoggedInUser._id}
-                              refresh={getUser}
-                            />
-                          ) : (
-                            <FollowButton
-                              id={following._id}
-                              currentLoggedInUser={currentLoggedInUser._id}
-                              refresh={getUser}
-                            />
-                          )}
+                        
+                           <FollowUnfollowButton currentLoggedInUser={currentLoggedInUser} id={following?._id} refresh={getUser}/>
                         </div>
                       ))}
                     </TabsContent>

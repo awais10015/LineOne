@@ -236,7 +236,7 @@ export default function StoryBar() {
                 />
               )}
               {viewer.stories[currentIndex].user && (
-                <div className="absolute top-0 flex items-center gap-2 w-full p-2 bg-black/40">
+                <div className="absolute top-0 flex items-center gap-4 w-full p-2 bg-black/40">
                   <div className="w-10 h-10 rounded-full overflow-hidden">
                     <Image
                       src={
@@ -249,11 +249,11 @@ export default function StoryBar() {
                       className="object-cover"
                     />
                   </div>
-                  <div>
-                    <h1 className="font-semibold">
+                  <div className="text-white">
+                    <h1 className="font-medium text-sm">
                       {viewer.stories[currentIndex]?.user?.name}
                     </h1>
-                    <h2 className="text-sm ">
+                    <h2 className="text-sm font-light">
                       {viewer.stories[currentIndex]?.user?.username}
                     </h2>
                   </div>

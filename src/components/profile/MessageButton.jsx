@@ -1,15 +1,18 @@
-"use client"
-import React from 'react'
-import { Button } from '../ui/button'
+"use client";
+import React from "react";
+import { Button } from "../ui/button";
 
-const MessageButton = ({id}) => {
+const MessageButton = ({ id }) => {
   return (
     <>
-    <Button className='' >
-      Message
-    </Button>
+      <Button
+        variant={"ghost"}
+        className="px-4 py-2 cursor-pointer hover:scale-105"
+      >
+        Message
+      </Button>
     </>
-  )
-}
+  );
+};
 
-export default MessageButton
+export default MessageButton;
