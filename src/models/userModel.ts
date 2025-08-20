@@ -1,8 +1,16 @@
 import mongoose from "mongoose";
-
+import validator from "validator";
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator: (value:string) => validator.isEmail(value),
+      message: "Invalid email format",
+    },
+  },
   password: { type: String, select: false },
   googleId: { type: String },
 

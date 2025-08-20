@@ -1,6 +1,7 @@
 "use client";
 import { useContext, useEffect, useState, useRef } from "react";
 import CurrentUserContext from "@/context/CurrentUserContext";
+import Image from "next/image";
 
 export default function StoryBar() {
   const [stories, setStories] = useState([]);
@@ -122,12 +123,12 @@ export default function StoryBar() {
         {/* Story List */}
         <div className="h-full w-full flex gap-3 overflow-x-auto scrollbar-hide">
           {/* Story Add Box */}
-          <div className="h-[200px] w-[120px] flex-shrink-0 bg-[#ff6500] flex items-center justify-center gap-2 flex-col rounded-xl p-3">
+          <div className="h-[200px] w-[120px] flex-shrink-0 bg-gray-500/20 flex items-center justify-center gap-2 flex-col rounded-xl p-3">
             {!file ? (
               <>
                 <button
                   onClick={() => fileInputRef.current.click()}
-                  className="px-4 py-2 bg-white/20 text-white rounded-xl"
+                  className="px-4 py-2 bg-white/20 rounded-xl"
                 >
                   Create Story
                 </button>
@@ -215,7 +216,7 @@ export default function StoryBar() {
               if (currentIndex < viewer.stories.length - 1) {
                 setCurrentIndex((prev) => prev + 1);
               } else {
-                setViewer(null); // close after last story
+                setViewer(null);
               }
             }}
             className="fixed w-full inset-0 bg-black/80 flex items-center justify-center z-50"
@@ -231,13 +232,37 @@ export default function StoryBar() {
                 <img
                   src={viewer.stories[currentIndex].mediaUrl}
                   alt="story"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
+              )}
+              {viewer.stories[currentIndex].user && (
+                <div className="absolute top-0 flex items-center gap-2 w-full p-2 bg-black/40">
+                  <div className="w-10 h-10 rounded-full overflow-hidden">
+                    <Image
+                      src={
+                        viewer.stories[currentIndex]?.user?.profilePic ||
+                        "/default-avatar.png"
+                      }
+                      alt="user profile"
+                      width={40}
+                      height={40}
+                      className="object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h1 className="font-semibold">
+                      {viewer.stories[currentIndex]?.user?.name}
+                    </h1>
+                    <h2 className="text-sm ">
+                      {viewer.stories[currentIndex]?.user?.username}
+                    </h2>
+                  </div>
+                </div>
               )}
 
               {/* Description overlay */}
               {viewer.stories[currentIndex].description && (
-                <p className="absolute h-[50px] bottom-3 w-full flex items-center justify-center filter: blur(80px) bg-black/40 text-white text-sm px-2">
+                <p className="absolute h-[50px] bottom-0 w-full flex items-center justify-center filter: blur(80px) bg-black/40 text-white text-sm px-2">
                   {viewer.stories[currentIndex].description}
                 </p>
               )}

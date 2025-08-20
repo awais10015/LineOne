@@ -108,9 +108,9 @@ export default function CreatePostPage() {
       body: JSON.stringify(postData),
     });
 
-     toast.success("Post Created Successfully", {
-          icon: <CheckCircle className="text-green-500" />,
-        });
+    toast.success("Post Created Successfully", {
+      icon: <CheckCircle className="text-green-500" />,
+    });
 
     router.push("/userprofile");
   };
@@ -124,13 +124,14 @@ export default function CreatePostPage() {
         <h2 className="text-2xl font-bold ">Create Post</h2>
 
         {/* Description */}
-        <Textarea
+        <textarea
           name="description"
           placeholder="Write your post description..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full h-35 p-3 rounded-lg bg-white/10 backdrop-blur-sm "
-          rows="4"
+          className="w-full h-35 p-3 rounded-lg bg-white/10 backdrop-blur-sm"
+          rows={4}
+          required
         />
 
         {/* Tag Users */}
@@ -265,11 +266,10 @@ export default function CreatePostPage() {
             onChange={handleMediaChange}
           />
           {/* Submit */}
-        <Button type="submit" className="flex-1 h-10 text-md font-light">
-          Post
-        </Button>
+          <Button type="submit" className="flex-1 h-10 text-md font-light cursor-pointer">
+            Post
+          </Button>
         </div>
-        
       </form>
     </div>
   );

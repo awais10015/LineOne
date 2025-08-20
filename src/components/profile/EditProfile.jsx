@@ -178,6 +178,7 @@ const EditProfile = () => {
                   id="changename"
                   name="changename"
                   placeholder={currentLoggedInUser?.name}
+                  defaultValue={currentLoggedInUser?.name}
                 />
               </div>
               <div className="grid gap-3">
@@ -186,6 +187,7 @@ const EditProfile = () => {
                   id="changeusername"
                   name="changeusername"
                   placeholder={currentLoggedInUser?.username}
+                  defaultValue={currentLoggedInUser?.username}
                 />
               </div>
               <div className="grid gap-3">
@@ -194,6 +196,7 @@ const EditProfile = () => {
                   id="changebio"
                   name="changebio"
                   placeholder={currentLoggedInUser?.bio}
+                  defaultValue={currentLoggedInUser?.bio}
                 />
               </div>
             </div>

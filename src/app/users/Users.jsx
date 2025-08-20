@@ -220,6 +220,7 @@ export default function UserList() {
                       />
                     )}
                     <Button
+                      variant={"ghost"}
                       className="px-4 py-2 cursor-pointer hover:scale-105"
                       onClick={() => {
                         setTheContext(user);

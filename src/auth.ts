@@ -4,6 +4,7 @@ import CredentialProvider from "next-auth/providers/credentials";
 import { User } from "./models/userModel";
 import { compare } from "bcryptjs";
 import { connect } from "./lib/db";
+import validator from "validator";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -23,6 +24,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       authorize: async (credentials) => {
         const email = credentials.email as string | undefined;
         const password = credentials.password as string | undefined;
+
+        // Validation kra ga k email hi ha na
+        if (!email || !validator.isEmail(email)) {
+          throw new Error("Invalid email address");
+        }
 
         if (!email || !password)
           throw new CredentialsSignin("Please provide both Email and Password");
@@ -51,6 +57,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       try {
         if (account?.provider === "google") {
           const { email, name, id } = user;
+          // validation for email
+           if (!email || !validator.isEmail(email)) {
+          throw new Error("Invalid email address");
+        }
           await connect();
           const alreadyUser = await User.findOne({ email });
 

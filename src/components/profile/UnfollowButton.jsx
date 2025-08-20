@@ -26,7 +26,7 @@ const UnfollowButton = ({id , currentLoggedInUser , refresh}) => {
   };
   return (
     <>
-    <Button onClick={unfollow} className='cursor-pointer' >Unfollow</Button>
+    <Button onClick={unfollow} className='cursor-pointer text-white bg-gray-600 hover:bg-gray-400' >Unfollow</Button>
     </>
   )
 }

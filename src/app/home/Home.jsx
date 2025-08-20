@@ -84,16 +84,17 @@ const Home = () => {
                   <p className="text-base mt-5">{post.description}</p>
 
                   {/* tagged users */}
-                  <div className="flex gap-1  text-gray-400">
+                 
+                  {post?.taggedUsers.length > 0 && (
+                  <div className="flex gap-1 text-gray-400">
                     tagged
                     {post?.taggedUsers?.map((taggedUser) => (
                       <div key={taggedUser._id}>
-                        <Link href={`/userprofile/${taggedUser._id}`}>
-                          <p>{taggedUser.username}</p>
-                        </Link>
+                        <p>{taggedUser.username}</p>
                       </div>
                     ))}
                   </div>
+                )}
                   {/* Hashtags */}
                   {post.hashtags?.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
