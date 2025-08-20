@@ -4,12 +4,14 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import StoryBar from "@/components/home/StoryBar";
-
+import Loader from "@/components/Loader";
 const Home = () => {
   const { currentLoggedInUser } = useContext(CurrentUserContext);
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false)
   const getPosts = async () => {
     try {
+      setLoading(true)
       const res = await fetch("/api/allposts");
       const data = await res.json();
       console.log("data.posts", data.posts);
@@ -28,7 +30,9 @@ const Home = () => {
       });
 
       setPosts(filteredPosts);
+      setLoading(false)
     } catch (err) {
+      setLoading(false)
       console.error("Failed to fetch posts:", err);
     }
   };
@@ -51,7 +55,11 @@ const Home = () => {
             <h2 className="text-xl font-bold">Posts</h2>
           </div>
 
-          {posts?.length > 0 ? (
+          {posts.length === 0 && loading ? (
+            <div className="w-full h-full flex items-start justify-start p-10">
+              <Loader />
+            </div>
+          ) : posts?.length > 0 ? (
             <div className="w-full px-2 flex flex-col items-center gap-2 max-w-4xl  rounded-2xl overflow-hidden srollbar-hide">
               {posts.map((post) => (
                 <div
@@ -84,17 +92,22 @@ const Home = () => {
                   <p className="text-base mt-5">{post.description}</p>
 
                   {/* tagged users */}
-                 
+
                   {post?.taggedUsers.length > 0 && (
-                  <div className="flex gap-1 text-gray-400">
-                    tagged
-                    {post?.taggedUsers?.map((taggedUser) => (
-                      <div key={taggedUser._id}>
-                        <p>{taggedUser.username}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                    <div className="flex gap-1 text-gray-400">
+                      tagged
+                      {post?.taggedUsers?.map((taggedUser) => (
+                        <Link
+                          key={taggedUser._id}
+                          href={`/userprofile/${taggedUser._id}`}
+                        >
+                          <div>
+                            <p>{taggedUser.username}</p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                   {/* Hashtags */}
                   {post.hashtags?.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
@@ -136,6 +149,7 @@ const Home = () => {
               </p>
             </div>
           )}
+          {}
         </div>
       </div>
     </>

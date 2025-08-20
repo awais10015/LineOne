@@ -2,10 +2,14 @@
 import { useContext, useEffect, useState, useRef } from "react";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import Image from "next/image";
+import Loader from "../Loader";
 
 export default function StoryBar() {
   const [stories, setStories] = useState([]);
   const { currentLoggedInUser } = useContext(CurrentUserContext);
+
+// state for Loader
+const [loader, setLoader] = useState(false)
 
   // add story state
   const [file, setFile] = useState("");
@@ -97,6 +101,7 @@ export default function StoryBar() {
 
   // get stories
   const fetchStories = async () => {
+    setLoader(true)
     const res = await fetch(`/api/stories?userId=${currentLoggedInUser._id}`);
     const data = await res.json();
 
@@ -107,10 +112,12 @@ export default function StoryBar() {
         acc[userId] = { user: story.user, stories: [] };
       }
       acc[userId].stories.push(story);
+      
       return acc;
     }, {});
 
     setStories(Object.values(grouped)); // [{ user, stories: [] }]
+    setLoader(false)
   };
 
   useEffect(() => {
@@ -123,7 +130,7 @@ export default function StoryBar() {
         {/* Story List */}
         <div className="h-full w-full flex gap-3 overflow-x-auto scrollbar-hide">
           {/* Story Add Box */}
-          <div className="h-[200px] w-[120px] flex-shrink-0 bg-gray-500/20 flex items-center justify-center gap-2 flex-col rounded-xl p-3">
+          <div className="h-[200px] w-[120px] flex-shrink-0 bg-black/20 flex items-center justify-center gap-2 flex-col rounded-xl p-3">
             {!file ? (
               <>
                 <button
@@ -178,36 +185,41 @@ export default function StoryBar() {
             )}
           </div>
 
-          {stories.map((group, index) => {
-            // If it's grouped, pick first story, else use direct mediaUrl
-            const previewUrl = group.stories
-              ? group.stories[0]?.mediaUrl
-              : null;
+          {stories.length === 0 && loader ? (
+            <div className="h-[200px] w-[120px] flex items-center justify-center"><Loader /></div>
+            
+          ) : (
+            stories.map((group, index) => {
+              // If it's grouped, pick first story, else use direct mediaUrl
+              const previewUrl = group.stories
+                ? group.stories[0]?.mediaUrl
+                : null;
 
-            const userData = group.user || group.stories?.[0]?.user;
+              const userData = group.user || group.stories?.[0]?.user;
 
-            return (
-              <div
-                key={userData?._id || index}
-                className="h-[200px] w-[120px] flex-shrink-0 rounded-2xl flex justify-center items-end bg-cover bg-center cursor-pointer"
-                style={{ backgroundImage: `url(${previewUrl})` }}
-                onClick={() => openStoryViewer(group)}
-              >
-                <div className="flex flex-col items-center gap-1 cursor-pointer">
-                  <div className="w-16 h-16 rounded-full overflow-hidden">
-                    <img
-                      src={userData?.profilePic}
-                      alt={userData?.name}
-                      className="w-full h-full object-cover object-top"
-                    />
+              return (
+                <div
+                  key={userData?._id || index}
+                  className="h-[200px] w-[120px] flex-shrink-0 rounded-2xl flex justify-center items-end bg-cover bg-center cursor-pointer"
+                  style={{ backgroundImage: `url(${previewUrl})` }}
+                  onClick={() => openStoryViewer(group)}
+                >
+                  <div className="flex flex-col items-center  cursor-pointer">
+                    <div className="w-16 h-16 rounded-full border-2 border-[#ff6500] overflow-hidden">
+                      <img
+                        src={userData?.profilePic}
+                        alt={userData?.name}
+                        className="w-full h-full object-cover object-top"
+                      />
+                    </div>
+                    <p className="text-xs filter: blur(80px) bg-black/60 px-2 py-1 mb-1 text-white font-medium rounded-2xl">
+                      {userData?.username}
+                    </p>
                   </div>
-                  <p className="text-xs filter: blur(80px) bg-black/60 px-1 rounded-2xl">
-                    {userData?.username}
-                  </p>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
 
         {viewer && (

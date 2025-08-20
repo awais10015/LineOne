@@ -11,7 +11,8 @@ export async function GET(req, { params }) {
     
     // Find posts where postBy === id
     const posts = await Post.find({ postBy: new mongoose.Types.ObjectId(id) })
-  .sort({ createdAt: -1 });
+       .populate("taggedUsers")
+       .sort({ createdAt: -1 });
     
     return NextResponse.json({ success: true, posts });
   } catch (error) {

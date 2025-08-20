@@ -73,8 +73,8 @@ const FollowUnfollowButton = ({ id, currentLoggedInUser, refresh }) => {
       onClick={toggleFollow}
       className={
         isFollowing
-          ? "cursor-pointer text-white bg-gray-600 hover:bg-gray-400"
-          : "bg-[#ff6500] hover:bg-[#ff5f00] cursor-pointer"
+          ? "cursor-pointer text-white bg-gray-600 hover:scale-105 hover:bg-gray-400"
+          : "bg-[#ff6500] hover:bg-[#ff5f00] hover:scale-105 cursor-pointer"
       }
     >
       {isFollowing ? "Unfollow" : "Follow Me"}

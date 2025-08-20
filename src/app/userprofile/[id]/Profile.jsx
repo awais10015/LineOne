@@ -18,7 +18,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import CurrentUserContext from "@/context/CurrentUserContext";
-
 import MessageButton from "@/components/profile/MessageButton";
 import FollowUnfollowButton from "@/components/profile/FollowUnfollowButton";
 
@@ -34,33 +33,22 @@ const Profile = () => {
     (AnotherUser?.gender === "male" ? "/Mdp.jpg" : "/Fdp.jpg");
   let userCoverPic = AnotherUser?.coverPic || "/cover.jpg";
 
-  // useEffect(() => {
-  //   console.log(params);
-  // }, [params]);
-
   const getUsers = async () => {
     try {
       const res = await fetch(`/api/user/${id}`);
       const data = await res.json();
-
-      // let user = data?.users?.find((user) => user._id === id);
 
       setAnotherUser(data);
     } catch (err) {
       console.error("Failed to fetch users:", err);
     }
   };
-  // useEffect(() => {
-  //   console.log(AnotherUser);
-  // }, [AnotherUser]);
 
   useEffect(() => {
     getUsers();
   }, []);
 
   useEffect(() => {
-    // console.log("ID I'm sending to API:", id);
-
     if (!id) return;
     const getPosts = async () => {
       try {
@@ -180,8 +168,12 @@ const Profile = () => {
                             </Link>
 
                             {/* Right: Action Button */}
-                           
-                             <FollowUnfollowButton currentLoggedInUser={currentLoggedInUser} id={follower?._id} refresh={getUsers}/>
+
+                            <FollowUnfollowButton
+                              currentLoggedInUser={currentLoggedInUser}
+                              id={follower?._id}
+                              refresh={getUsers}
+                            />
                           </div>
                         ))}
                       </TabsContent>
@@ -217,7 +209,11 @@ const Profile = () => {
                               </div>
                             </Link>
 
-                            <FollowUnfollowButton currentLoggedInUser={currentLoggedInUser} id={following?._id} refresh={getUsers}/>
+                            <FollowUnfollowButton
+                              currentLoggedInUser={currentLoggedInUser}
+                              id={following?._id}
+                              refresh={getUsers}
+                            />
                           </div>
                         ))}
                       </TabsContent>
@@ -230,8 +226,11 @@ const Profile = () => {
 
               {/* Message aur Follow/Unfollow Button */}
               <div className="mt-5 flex gap-5 w-full justify-center items-center">
-               
-                <FollowUnfollowButton currentLoggedInUser={currentLoggedInUser} id={AnotherUser?._id} refresh={getUsers}/>
+                <FollowUnfollowButton
+                  currentLoggedInUser={currentLoggedInUser}
+                  id={AnotherUser?._id}
+                  refresh={getUsers}
+                />
                 <MessageButton />
               </div>
             </div>
@@ -273,18 +272,22 @@ const Profile = () => {
                     {/* Post Description */}
                     <p className="text-base mt-5">{post.description}</p>
 
+                    
                     {/* tagged users */}
-
                     {post?.taggedUsers?.length > 0 && (
                       <div className="flex gap-1 text-gray-400">
                         tagged
                         {post?.taggedUsers?.map((taggedUser) => (
-                          <div key={taggedUser?._id}>
+                          <Link
+                            key={taggedUser?._id} // <-- key on the first element returned
+                            href={`/userprofile/${taggedUser._id}`}
+                          >
                             <p>{taggedUser.username}</p>
-                          </div>
+                          </Link>
                         ))}
                       </div>
                     )}
+
                     {/* Hashtags */}
                     {post.hashtags?.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">

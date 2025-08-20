@@ -177,7 +177,7 @@ export default function UserList() {
                   </div>
 
                   {/* name and username */}
-                  <div className="mt-14 flex flex-col justify-center items-center">
+                  <div className="mt-20 flex flex-col justify-center items-center">
                     <p className="text-lg font-medium text-neutral-800 dark:text-white">
                       {user.name}
                     </p>
@@ -191,11 +191,11 @@ export default function UserList() {
                     </div>
                   </div>
                   {/* Action Buttons */}
-                  <div className="mt-4 mb-4 flex gap-3 p-5">
+                  <div className=" mb-4 flex gap-3 p-5">
                     <FollowUnfollowButton id={user._id} currentLoggedInUser={currentLoggedInUser} refresh={getUsers}/>
                     <Button
                       variant={"ghost"}
-                      className="px-4 py-2 cursor-pointer hover:scale-105"
+                      className="px-4 py-2 cursor-pointer hover:scale-105 bg-gray-300 dark:bg-accent hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50"
                       onClick={() => {
                         setTheContext(user);
                         router.push(`/userprofile/${user._id}`);

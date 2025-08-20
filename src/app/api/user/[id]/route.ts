@@ -14,7 +14,7 @@ export async function GET(
     const user = await User.findById(id)
       .populate("posts")
       .populate("followers" )
-      .populate("following"); 
+      .populate("following") 
 
     return new Response(JSON.stringify(user), { status: 200 });
   } catch {

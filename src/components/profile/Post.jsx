@@ -2,6 +2,7 @@
 import CurrentUserContext from "@/context/CurrentUserContext";
 import React, { useContext } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 const Post = () => {
   const { currentLoggedInUser } = useContext(CurrentUserContext);
@@ -48,7 +49,9 @@ const Post = () => {
                     tagged
                     {post?.taggedUsers?.map((taggedUser) => (
                       <div key={taggedUser._id}>
-                        <p>{taggedUser.username}</p>
+                        <Link href={`/userprofile/${taggedUser._id}`}>
+                          <p>{taggedUser.username}</p>
+                        </Link>
                       </div>
                     ))}
                   </div>
