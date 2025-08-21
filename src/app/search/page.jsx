@@ -1,9 +1,11 @@
-import React from 'react'
-
+import React from "react";
+import Search from "./Search";
 const page = () => {
   return (
-    <div>Search</div>
-  )
-}
+    <>
+      <Search />
+    </>
+  );
+};
 
-export default page
+export default page;
