@@ -68,7 +68,7 @@ export function AppSidebar({ children }) {
     <div className="h-screen w-screen bg-background border-r">
       <div
         className={cn(
-          " flex flex-1 flex-col overflow-hide srollbar-hide rounded-tl-md rounded-tr-2xl md:flex-row dark:border-neutral-700 dark:bg-neutral-800",
+          " flex flex-1 flex-col overflow-scroll scrollbar-hide rounded-tl-md rounded-tr-2xl md:flex-row dark:border-neutral-700 dark:bg-neutral-800",
           // for your use case, use `h-screen` instead of `h-[60vh]`
           "h-screen"
         )}
