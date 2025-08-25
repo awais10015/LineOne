@@ -104,7 +104,7 @@ const Post = () => {
         <div className="relative min-h-screen w-full max-w-4xl flex flex-col items-center px-0.5">
           {postData ? (
             <>
-              <div className="w-full rounded-xl pt-5 px-5 transition-shadow backdrop-blur-lg shadow-md border dark:border-white/10 light:border-gray-500 relative">
+              <div className="w-full rounded-xl pt-5 px-5 transition-shadow backdrop-blur-lg shadow-md border-none  relative">
                 {/* User Info */}
                 <Link href={`/userprofile/${postData.postBy._id}`}>
                   <div className="flex gap-3 w-full justify-start items-center">
