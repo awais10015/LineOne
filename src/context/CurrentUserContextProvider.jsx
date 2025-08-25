@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react";
 import CurrentUserContext from "./CurrentUserContext";
+import Loader from "@/components/Loader";
 
 const CurrentUserContextProvider = ({ children }) => {
   const [currentLoggedInUser, setCurrentLoggedInUser] = useState(null);
@@ -22,7 +23,7 @@ const CurrentUserContextProvider = ({ children }) => {
     getUser();
   }, []);
 
-  if (loading) return null; // or <Loader />
+  if (loading) return <Loader />
 
   return (
     <CurrentUserContext.Provider value={{ currentLoggedInUser, setCurrentLoggedInUser }}>

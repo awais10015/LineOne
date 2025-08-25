@@ -1,7 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-
+import Loader from "@/components/Loader";
 const Media = () => {
   const { id } = useParams();
   const [postData, setPostData] = useState(null);
@@ -19,9 +19,7 @@ const Media = () => {
 
   if (!postData) {
     return (
-      <div className="fixed top-0 left-0 w-screen h-screen bg-black flex items-center justify-center text-white">
-        Loading...
-      </div>
+      <Loader/>
     );
   }
 

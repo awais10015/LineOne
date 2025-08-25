@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import CommentItem from "@/components/post/CommentItem";
+import Loader from "@/components/Loader";
 
 const Post = () => {
   const { id } = useParams();
@@ -131,7 +132,7 @@ const Post = () => {
 
                 {/* Tagged Users */}
                 {postData?.taggedUsers?.length > 0 && (
-                  <div className="flex gap-1 text-gray-400">
+                  <div className="flex gap-1 text-gray-400 flex-wrap">
                     tagged
                     {postData?.taggedUsers?.map((taggedUser) => (
                       <Link
@@ -260,7 +261,7 @@ const Post = () => {
               </div>
             </>
           ) : (
-            <p>Loading</p>
+           <Loader/>
           )}
         </div>
       </div>

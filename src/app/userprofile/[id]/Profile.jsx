@@ -276,7 +276,7 @@ const Profile = () => {
 
                     {/* tagged users */}
                     {post?.taggedUsers?.length > 0 && (
-                      <div className="flex gap-1 text-gray-400">
+                      <div className="flex gap-1 text-gray-400 flex-wrap">
                         tagged
                         {post?.taggedUsers?.map((taggedUser) => (
                           <Link
