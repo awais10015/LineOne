@@ -174,7 +174,7 @@ const Post = () => {
                           <img
                             src={postData.media}
                             alt="Post media"
-                            className="mt-4 rounded-2xl w-full object-cover max-h-96"
+                            className="mt-4 rounded-2xl w-full object-contain max-h-96"
                           />
                         )}
                       </Link>
