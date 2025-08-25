@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 export async function GET(req, { params }) {
   try {
     await connect();
-    const { id } = params; 
+    const { id } = await params; 
     
     // Find posts where postBy === id
     const posts = await Post.find({ postBy: new mongoose.Types.ObjectId(id) })

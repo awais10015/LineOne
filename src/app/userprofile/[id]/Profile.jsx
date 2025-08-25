@@ -305,12 +305,21 @@ const Profile = () => {
 
                     {/* Media */}
                     {post.media && (
-                      <Link href={`/post/${post._id}`}>
-                        <img
-                          src={post.media}
-                          alt="Post media"
-                          className="mt-4 rounded-2xl w-full object-cover max-h-96"
-                        />
+                      <Link href={`/media/${post._id}`}>
+                        {/\.(mp4|webm|ogg)$/i.test(post.media) ? (
+                          <video
+                            src={post.media}
+                            className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
+                            muted
+                            playsInline
+                          />
+                        ) : (
+                          <img
+                            src={post.media}
+                            alt="Post media"
+                            className="mt-4 rounded-2xl w-full object-cover max-h-96"
+                          />
+                        )}
                       </Link>
                     )}
 

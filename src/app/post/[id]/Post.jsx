@@ -161,11 +161,23 @@ const Post = () => {
                 <div className="flex flex-col gap-5">
                   {/* Media */}
                   {postData.media && (
-                    <img
-                      src={postData.media}
-                      alt="Post media"
-                      className="mt-4 rounded-2xl w-full object-contain max-h-96"
-                    />
+                    <>
+                      <Link href={`/media/${postData._id}`}>
+                        {/\.(mp4|webm|ogg)$/i.test(postData.media) ? (
+                          <video
+                            src={postData.media}
+                            controls
+                            className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
+                          />
+                        ) : (
+                          <img
+                            src={postData.media}
+                            alt="Post media"
+                            className="mt-4 rounded-2xl w-full object-cover max-h-96"
+                          />
+                        )}
+                      </Link>
+                    </>
                   )}
 
                   {/* Actions */}
@@ -186,7 +198,7 @@ const Post = () => {
                   {/* Comments Section */}
                   {isCommentsOpen && (
                     <div className="mt-4">
-                      <div className="pr-2 overflow-y-auto space-y-4">
+                      <div className="overflow-y-auto space-y-4">
                         {buildCommentTree(comments).map((comment) => (
                           <CommentItem
                             key={comment._id}
@@ -204,34 +216,39 @@ const Post = () => {
                       <div className="sticky bottom-0 left-0 w-full px-2 py-2">
                         <form
                           onSubmit={postComment}
-                          className="flex bottom-0 left-0 w-full px-2 py-2 gap-2"
+                          className="flex bottom-0 left-0 w-full px-2 py-2 gap-2 items-end"
                         >
-                          {parentId && (
-                            <div className="text-sm text-gray-500 flex items-center gap-2">
-                              replying to{" "}
-                              <span className="font-medium">{parentName}</span>
-                              <button
-                                type="button"
-                                className="text-red-500 hover:underline"
-                                onClick={() => {
-                                  setparentId(null);
-                                  setparentName("");
-                                }}
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          )}
-                          <Input
-                            value={commentText}
-                            onChange={(e) => setcommentText(e.target.value)}
-                            placeholder="Write a comment..."
-                            className="flex-1 rounded-full bg-white dark:bg-gray-800 px-4 py-2 focus-visible:ring-0 focus-visible:ring-offset-0"
-                          />
+                          <div className="flex-1 flex flex-col">
+                            {parentId && (
+                              <div className="text-sm text-gray-500 flex flex-wrap items-center gap-2 pl-4">
+                                replying to{" "}
+                                <span className="font-medium">
+                                  {parentName}
+                                </span>
+                                <button
+                                  type="button"
+                                  className="text-red-500 hover:underline"
+                                  onClick={() => {
+                                    setparentId(null);
+                                    setparentName("");
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            )}
+                            <Input
+                              value={commentText}
+                              onChange={(e) => setcommentText(e.target.value)}
+                              placeholder="Write a comment..."
+                              className="flex-1 min-w-[150px] rounded-full bg-white dark:bg-gray-800 px-4 py-2 focus-visible:ring-0 focus-visible:ring-offset-0"
+                            />
+                          </div>
+
                           <Button
                             type="submit"
                             size="icon"
-                            className="rounded-full bg-[#ff6500]"
+                            className="rounded-full bg-[#ff6500] flex"
                           >
                             <Send className="h-4 w-4 text-white" />
                           </Button>

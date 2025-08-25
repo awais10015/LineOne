@@ -266,7 +266,7 @@ export default function CreatePostPage() {
             onChange={handleMediaChange}
           />
           {/* Submit */}
-          <Button type="submit" className="flex-1 h-10 text-md font-light cursor-pointer">
+          <Button type="submit" className="flex-1 text-white dark:text-black h-10 text-md font-light cursor-pointer">
             Post
           </Button>
         </div>

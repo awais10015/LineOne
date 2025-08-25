@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 
 const CommentItem = ({ comment, replies, onReply }) => {
   const [showReplies, setShowReplies] = useState(false);
@@ -21,16 +22,19 @@ const CommentItem = ({ comment, replies, onReply }) => {
 
       <div className="flex flex-col">
         {/* User Info */}
-        <div className="flex items-center gap-2">
-          <Link className="flex gap-1" href={`/userprofile/${comment?.commentBy?._id}`}>
-          <span className="font-medium text-gray-800 dark:text-gray-200">
-            {comment?.commentBy?.name || "User"}
-          </span>
-          <span className="text-gray-500 dark:text-gray-400">
-            {comment?.commentBy?.username || "user"}
-          </span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link
+            className="flex gap-1"
+            href={`/userprofile/${comment?.commentBy?._id}`}
+          >
+            <span className="font-medium text-gray-800 dark:text-gray-200">
+              {comment?.commentBy?.name || "User"}
+            </span>
+            <span className="text-gray-500 dark:text-gray-400">
+              {comment?.commentBy?.username || "user"}
+            </span>
           </Link>
-          
+
           <span className="text-xs text-gray-400">
             {new Date(comment?.createdAt).toLocaleString()}
           </span>
@@ -52,17 +56,26 @@ const CommentItem = ({ comment, replies, onReply }) => {
 
           {replies?.length > 0 && (
             <button
-              className="hover:text-[#ff6500] transition"
+              className="flex items-center gap-1 hover:text-[#ff6500] transition"
               onClick={() => setShowReplies(!showReplies)}
             >
-              {showReplies ? "Hide replies" : `See replies (${replies.length})`}
+              <span>
+                {showReplies
+                  ? "Hide replies"
+                  : `See replies (${replies.length})`}
+              </span>
+              <ChevronDown
+                className={`h-4 w-4 transform transition-transform duration-300 ${
+                  showReplies ? "rotate-180" : "rotate-0"
+                }`}
+              />
             </button>
           )}
         </div>
 
         {/* Replies (conditionally rendered) */}
         {showReplies && (
-          <div className="ml-8 mt-2 space-y-2">
+          <div className="mt-2">
             {replies.map((reply) => (
               <CommentItem
                 key={reply._id}

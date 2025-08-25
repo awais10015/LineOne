@@ -36,7 +36,7 @@ const Search = () => {
   const [activeTab, setActiveTab] = useState("posts");
 
   useEffect(() => {
-    if (!searchWord && activeTab==="hashtags") {
+    if (!searchWord && activeTab === "hashtags") {
       setActiveTab("posts");
     }
   }, [searchWord]);
@@ -192,11 +192,23 @@ const Search = () => {
 
                         {/* Media */}
                         {post.media && (
-                          <img
-                            src={post.media}
-                            alt="Post media"
-                            className="mt-4 rounded-2xl w-full object-cover max-h-96"
-                          />
+                          <>
+                            <Link href={`/media/${post._id}`}>
+                              {/\.(mp4|webm|ogg)$/i.test(post.media) ? (
+                                <video
+                                  src={post.media}
+                                  controls
+                                  className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
+                                />
+                              ) : (
+                                <img
+                                  src={post.media}
+                                  alt="Post media"
+                                  className="mt-4 rounded-2xl w-full object-cover max-h-96"
+                                />
+                              )}
+                            </Link>
+                          </>
                         )}
                         {/* Actions */}
                         <div className="flex gap-5 mt-5">
@@ -347,12 +359,40 @@ const Search = () => {
 
                             {/* Media */}
                             {post.media && (
-                              <img
-                                src={post.media}
-                                alt="Post media"
-                                className="mt-4 rounded-2xl w-full object-cover max-h-96"
-                              />
+                              <>
+                                <Link href={`/media/${post._id}`}>
+                                  {/\.(mp4|webm|ogg)$/i.test(post.media) ? (
+                                    <video
+                                      src={post.media}
+                                      controls
+                                      className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
+                                    />
+                                  ) : (
+                                    <img
+                                      src={post.media}
+                                      alt="Post media"
+                                      className="mt-4 rounded-2xl w-full object-cover max-h-96"
+                                    />
+                                  )}
+                                </Link>
+                              </>
                             )}
+
+                            {/* Actions */}
+                            <div className="flex gap-5 mt-5">
+                              <LikeDislike postId={post._id} />
+                              <Link href={`/post/${post._id}`}>
+                                <button className="flex items-center justify-center gap-2">
+                                  <IoChatbox
+                                    className={"text-gray-400 cursor-pointer"}
+                                    size={22}
+                                  />{" "}
+                                  <span className="text-gray-400">
+                                    {post?.comments.length}
+                                  </span>
+                                </button>
+                              </Link>
+                            </div>
                           </div>
                         ))}
                     </CardContent>

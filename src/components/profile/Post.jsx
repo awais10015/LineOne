@@ -75,11 +75,21 @@ const Post = () => {
 
                 {/* Media */}
                 {post.media && (
-                  <img
-                    src={post.media}
-                    alt="Post media"
-                    className="mt-4 rounded-2xl w-full object-cover max-h-96"
-                  />
+                  <>
+                    {/\.(mp4|webm|ogg)$/i.test(post.media) ? (
+                      <video
+                        src={post.media}
+                        controls
+                        className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
+                      />
+                    ) : (
+                      <img
+                        src={post.media}
+                        alt="Post media"
+                        className="mt-4 rounded-2xl w-full object-cover max-h-96"
+                      />
+                    )}
+                  </>
                 )}
                 {/* Actions */}
                 <div className="flex gap-5 mt-5">
