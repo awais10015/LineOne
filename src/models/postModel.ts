@@ -24,6 +24,12 @@ const postSchema = new mongoose.Schema(
         ref: "User", // name of your user model
       },
     ],
+    dislikedBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // name of your user model
+      },
+    ],
     comments: [
       {
         type: mongoose.Schema.Types.ObjectId,

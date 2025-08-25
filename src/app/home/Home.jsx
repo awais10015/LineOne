@@ -5,13 +5,16 @@ import Link from "next/link";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import StoryBar from "@/components/home/StoryBar";
 import Loader from "@/components/Loader";
+import LikeDislike from "@/components/post/LikeDislike";
+import { IoChatbox } from "react-icons/io5";
+
 const Home = () => {
   const { currentLoggedInUser } = useContext(CurrentUserContext);
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const getPosts = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await fetch("/api/allposts");
       const data = await res.json();
       console.log("data.posts", data.posts);
@@ -30,9 +33,9 @@ const Home = () => {
       });
 
       setPosts(filteredPosts);
-      setLoading(false)
+      setLoading(false);
     } catch (err) {
-      setLoading(false)
+      setLoading(false);
       console.error("Failed to fetch posts:", err);
     }
   };
@@ -64,7 +67,7 @@ const Home = () => {
               {posts.map((post) => (
                 <div
                   key={post._id}
-                  className="w-full rounded-2xl p-2 transition-shadow  backdrop-blur-lg bg-white/10  shadow-md bordershadow-lg  dark:bg-white/5 dark:border-white/10 light:border-gray-500"
+                  className="w-full rounded-2xl p-3 transition-shadow  backdrop-blur-lg bg-white/10  shadow-md bordershadow-lg  dark:bg-white/5 dark:border-white/10 light:border-gray-500"
                 >
                   <Link href={`/userprofile/${post?.postBy?._id}`}>
                     <div className="flex gap-3 w-full justify-start items-center">
@@ -130,6 +133,22 @@ const Home = () => {
                       className="mt-4 rounded-2xl w-full object-cover max-h-96"
                     />
                   )}
+
+                  {/* Actions */}
+                  <div className="flex gap-5 mt-5">
+                    <LikeDislike postId={post._id} />
+                    <Link href={`/post/${post._id}`}>
+                      <button className="flex items-center justify-center gap-2">
+                        <IoChatbox
+                          className={"text-gray-400 cursor-pointer"}
+                          size={22}
+                        />{" "}
+                        <span className="text-gray-400">
+                          {post?.comments.length}
+                        </span>
+                      </button>
+                    </Link>
+                  </div>
                 </div>
               ))}
 

@@ -17,6 +17,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import Link from "next/link";
 import FollowUnfollowButton from "@/components/profile/FollowUnfollowButton";
+import LikeDislike from "@/components/post/LikeDislike";
+import { IoChatbox } from "react-icons/io5";
 
 const Search = () => {
   const { currentLoggedInUser } = useContext(CurrentUserContext);
@@ -31,6 +33,13 @@ const Search = () => {
   );
   const [searchedUsers, setSearchedUsers] = useState([]);
   const [searchedPosts, setSearchedPosts] = useState([]);
+  const [activeTab, setActiveTab] = useState("posts");
+
+  useEffect(() => {
+    if (!searchWord && activeTab==="hashtags") {
+      setActiveTab("posts");
+    }
+  }, [searchWord]);
 
   useEffect(() => {
     console.log("searched hashtagged posts : ", postsHavingSearchedHashtag);
@@ -75,8 +84,8 @@ const Search = () => {
   }, []);
   const wordToSearch = () => {
     if (!searchWord) {
-      setSearchedUsers([]);
-      setSearchedPosts([]);
+      setSearchedUsers([...users]);
+      setSearchedPosts([...posts]);
 
       return;
     }
@@ -98,16 +107,22 @@ const Search = () => {
 
   return (
     <>
-      <div className="w-full flex items-start justify-center mt-10">
-        <div className="w-full max-w-4xl px-10 pb-10 flex items-center justify-center flex-col gap-10 rounded-2xl overflow-hidden srollbar-hide">
+      <div className="w-full flex items-start justify-center mt-5">
+        <div className="w-full max-w-4xl px-3 pb-5 flex items-center justify-center flex-col gap-10 rounded-2xl overflow-hidden srollbar-hide">
           <Input type="text" onChange={(e) => setSearchWord(e.target.value)} />
 
-          <div className="flex w-full max-w-sm flex-col gap-6">
-            <Tabs defaultValue="posts" className="items-center w-full">
+          <div className="flex w-full flex-col gap-6">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="items-center w-full"
+            >
               <TabsList>
                 <TabsTrigger value="posts">Posts</TabsTrigger>
                 <TabsTrigger value="users">Users</TabsTrigger>
-                <TabsTrigger value="hashtags">Hashtags</TabsTrigger>
+                {searchWord && (
+                  <TabsTrigger value="hashtags">Hashtags</TabsTrigger>
+                )}
               </TabsList>
               <TabsContent className="border-none bg-none w-full" value="posts">
                 <Card className="p-0 pt-4 border-none gap-1 shadow-none">
@@ -183,6 +198,21 @@ const Search = () => {
                             className="mt-4 rounded-2xl w-full object-cover max-h-96"
                           />
                         )}
+                        {/* Actions */}
+                        <div className="flex gap-5 mt-5">
+                          <LikeDislike postId={post._id} />
+                          <Link href={`/post/${post._id}`}>
+                            <button className="flex items-center justify-center gap-2">
+                              <IoChatbox
+                                className={"text-gray-400 cursor-pointer"}
+                                size={22}
+                              />{" "}
+                              <span className="text-gray-400">
+                                {post?.comments.length}
+                              </span>
+                            </button>
+                          </Link>
+                        </div>
                       </div>
                     ))}
                   </CardContent>
@@ -199,7 +229,7 @@ const Search = () => {
                     {searchedUsers?.map((user) => (
                       <div
                         key={user._id}
-                        className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100"
+                        className="flex items-center justify-between p-2 rounded-lg hover:text-black hover:bg-gray-100"
                       >
                         {/* Left: Profile picture */}
                         <Link href={`/userprofile/${user._id}`}>
@@ -230,100 +260,106 @@ const Search = () => {
                   {/* <CardFooter>This is the posts footer</CardFooter> */}
                 </Card>
               </TabsContent>
-              <TabsContent
-                className="border-none bg-none w-full"
-                value="hashtags"
-              >
-                <Card className="p-0 pt-4 border-none gap-1 shadow-none">
-                  <CardHeader className="p-0 pl-2">
-                    <CardTitle>Hashtags</CardTitle>
-                    <CardDescription>{}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="grid gap-1 p-1">
-                    <ul>
-                      {searchWord && (
-                        <li className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100">
-                          <span className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-md">
-                            #{searchWord}
-                          </span>
-                          <span>{postsHavingSearchedHashtag.length} Posts</span>
-                        </li>
-                      )}
-                    </ul>
-                    {postsHavingSearchedHashtag.length > 0 &&
-                      postsHavingSearchedHashtag?.map((post) => (
-                        <div
-                          key={post._id}
-                          className="w-full rounded-xl p-5 transition-shadow  backdrop-blur-lg bg-white/10  shadow-md bordershadow-lg  dark:bg-white/5 dark:border-white/10 light:border-gray-500"
-                        >
-                          <Link href={`/userprofile/${post?.postBy?._id}`}>
-                            <div className="flex gap-3 w-full justify-start items-center">
-                              <div className="">
-                                <img
-                                  className="h-10 w-10 rounded-full object-cover object-top"
-                                  src={
-                                    post.postBy?.profilePic ||
-                                    (post.postBy?.gender === "male"
-                                      ? "/Mdp.jpg"
-                                      : "/Fdp.jpg")
-                                  }
-                                  alt=""
-                                />
-                              </div>
-                              <div>
-                                <h1 className="">{post.postBy?.name}</h1>
-                                <p className="text-sm font-extralight">
-                                  {post.postBy?.username}
-                                </p>
-                              </div>
-                            </div>
-                          </Link>
-
-                          {/* Post Description */}
-                          <p className="text-base mt-5">{post.description}</p>
-
-                          {/* tagged users */}
-                          {post?.taggedUsers.length > 0 && (
-                            <div className="flex gap-1 text-gray-400">
-                              tagged
-                              {post?.taggedUsers?.map((taggedUser) => (
-                                <div key={taggedUser._id}>
-                                  <Link href={`/userprofile/${taggedUser._id}`}>
-                                    <p>{taggedUser.username}</p>
-                                  </Link>
+              {searchWord && (
+                <TabsContent
+                  className="border-none bg-none w-full"
+                  value="hashtags"
+                >
+                  <Card className="p-0 pt-4 border-none gap-1 shadow-none">
+                    <CardHeader className="p-0 pl-2">
+                      <CardTitle>Hashtags</CardTitle>
+                      <CardDescription>{}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-1 p-1">
+                      <ul>
+                        {searchWord && (
+                          <li className="flex items-center justify-between p-2 rounded-lg hover:text-black hover:bg-gray-100">
+                            <span className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-md">
+                              #{searchWord}
+                            </span>
+                            <span>
+                              {postsHavingSearchedHashtag.length} Posts
+                            </span>
+                          </li>
+                        )}
+                      </ul>
+                      {postsHavingSearchedHashtag.length > 0 &&
+                        postsHavingSearchedHashtag?.map((post) => (
+                          <div
+                            key={post._id}
+                            className="w-full rounded-xl p-5 transition-shadow  backdrop-blur-lg bg-white/10  shadow-md bordershadow-lg  dark:bg-white/5 dark:border-white/10 light:border-gray-500"
+                          >
+                            <Link href={`/userprofile/${post?.postBy?._id}`}>
+                              <div className="flex gap-3 w-full justify-start items-center">
+                                <div className="">
+                                  <img
+                                    className="h-10 w-10 rounded-full object-cover object-top"
+                                    src={
+                                      post.postBy?.profilePic ||
+                                      (post.postBy?.gender === "male"
+                                        ? "/Mdp.jpg"
+                                        : "/Fdp.jpg")
+                                    }
+                                    alt=""
+                                  />
                                 </div>
-                              ))}
-                            </div>
-                          )}
+                                <div>
+                                  <h1 className="">{post.postBy?.name}</h1>
+                                  <p className="text-sm font-extralight">
+                                    {post.postBy?.username}
+                                  </p>
+                                </div>
+                              </div>
+                            </Link>
 
-                          {/* Hashtags */}
-                          {post.hashtags?.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              {post.hashtags.map((hashtag, i) => (
-                                <span
-                                  key={i}
-                                  className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-md"
-                                >
-                                  #{hashtag}
-                                </span>
-                              ))}
-                            </div>
-                          )}
+                            {/* Post Description */}
+                            <p className="text-base mt-5">{post.description}</p>
 
-                          {/* Media */}
-                          {post.media && (
-                            <img
-                              src={post.media}
-                              alt="Post media"
-                              className="mt-4 rounded-2xl w-full object-cover max-h-96"
-                            />
-                          )}
-                        </div>
-                      ))}
-                  </CardContent>
-                  {/* <CardFooter>This is the posts footer</CardFooter> */}
-                </Card>
-              </TabsContent>
+                            {/* tagged users */}
+                            {post?.taggedUsers.length > 0 && (
+                              <div className="flex gap-1 text-gray-400">
+                                tagged
+                                {post?.taggedUsers?.map((taggedUser) => (
+                                  <div key={taggedUser._id}>
+                                    <Link
+                                      href={`/userprofile/${taggedUser._id}`}
+                                    >
+                                      <p>{taggedUser.username}</p>
+                                    </Link>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Hashtags */}
+                            {post.hashtags?.length > 0 && (
+                              <div className="flex flex-wrap gap-2 mt-2">
+                                {post.hashtags.map((hashtag, i) => (
+                                  <span
+                                    key={i}
+                                    className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-md"
+                                  >
+                                    #{hashtag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Media */}
+                            {post.media && (
+                              <img
+                                src={post.media}
+                                alt="Post media"
+                                className="mt-4 rounded-2xl w-full object-cover max-h-96"
+                              />
+                            )}
+                          </div>
+                        ))}
+                    </CardContent>
+                    {/* <CardFooter>This is the posts footer</CardFooter> */}
+                  </Card>
+                </TabsContent>
+              )}
             </Tabs>
           </div>
         </div>

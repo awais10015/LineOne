@@ -152,7 +152,7 @@ export const LogoIcon = () => {
 const Dashboard = ({ children }) => {
   return (
     <div className="flex-1 min-w-0 top-0">
-      <div className="h-full w-full flex flex-col border-l shadow-xl gap-2 rounded-tl-2xl rounded-tr-2xl bg-white dark:border-neutral-700 dark:bg-neutral-900 overflow-auto scrollbar-hide">
+      <div className="h-full w-full flex flex-col shadow-xl gap-2 rounded-tl-2xl rounded-tr-2xl bg-white dark:border-neutral-700 dark:bg-neutral-900 overflow-auto scrollbar-hide">
         <div className="flex flex-1 gap-2 flex-wrap">{children}</div>
       </div>
     </div>

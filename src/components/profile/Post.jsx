@@ -3,6 +3,8 @@ import CurrentUserContext from "@/context/CurrentUserContext";
 import React, { useContext } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import LikeDislike from "@/components/post/LikeDislike";
+import { IoChatbox } from "react-icons/io5";
 
 const Post = () => {
   const { currentLoggedInUser } = useContext(CurrentUserContext);
@@ -79,6 +81,21 @@ const Post = () => {
                     className="mt-4 rounded-2xl w-full object-cover max-h-96"
                   />
                 )}
+                {/* Actions */}
+                <div className="flex gap-5 mt-5">
+                  <LikeDislike postId={post._id} />
+                  <Link href={`/post/${post._id}`}>
+                    <button className="flex items-center justify-center gap-2">
+                      <IoChatbox
+                        className={"text-gray-400 cursor-pointer"}
+                        size={22}
+                      />{" "}
+                      <span className="text-gray-400">
+                        {post?.comments.length}
+                      </span>
+                    </button>
+                  </Link>
+                </div>
               </div>
             ))}
 

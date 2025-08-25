@@ -16,14 +16,13 @@ export async function POST(req) {
       type,
     });
 
-    console.log("Incoming userId:", userId);
+    
 
     await User.findByIdAndUpdate(userId, {
       $push: { stories: story._id },
     });
 
     const user = await User.findById(userId).populate("stories");
-    console.log("User with stories:", user);
 
     return NextResponse.json({ success: true, story }, { status: 201 });
   } catch (error) {

@@ -186,7 +186,7 @@ const [loader, setLoader] = useState(false)
           </div>
 
           {stories.length === 0 && loader ? (
-            <div className="h-[200px] w-[120px] flex items-center justify-center"><Loader /></div>
+            <div className="h-[200px] w-[120px] flex items-center justify-center"><Loader size={5}/></div>
             
           ) : (
             stories.map((group, index) => {

@@ -20,6 +20,8 @@ import { Button } from "@/components/ui/button";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import MessageButton from "@/components/profile/MessageButton";
 import FollowUnfollowButton from "@/components/profile/FollowUnfollowButton";
+import LikeDislike from "@/components/post/LikeDislike";
+import { IoChatbox } from "react-icons/io5";
 
 const Profile = () => {
   // const params = useParams();
@@ -272,7 +274,6 @@ const Profile = () => {
                     {/* Post Description */}
                     <p className="text-base mt-5">{post.description}</p>
 
-                    
                     {/* tagged users */}
                     {post?.taggedUsers?.length > 0 && (
                       <div className="flex gap-1 text-gray-400">
@@ -304,12 +305,30 @@ const Profile = () => {
 
                     {/* Media */}
                     {post.media && (
-                      <img
-                        src={post.media}
-                        alt="Post media"
-                        className="mt-4 rounded-2xl w-full object-cover max-h-96"
-                      />
+                      <Link href={`/post/${post._id}`}>
+                        <img
+                          src={post.media}
+                          alt="Post media"
+                          className="mt-4 rounded-2xl w-full object-cover max-h-96"
+                        />
+                      </Link>
                     )}
+
+                    {/* Actions */}
+                    <div className="flex gap-5 mt-5">
+                      <LikeDislike postId={post._id} />
+                      <Link href={`/post/${post._id}`}>
+                        <button className="flex items-center justify-center gap-2">
+                          <IoChatbox
+                            className={"text-gray-400 cursor-pointer"}
+                            size={22}
+                          />{" "}
+                          <span className="text-gray-400">
+                            {post?.comments.length}
+                          </span>
+                        </button>
+                      </Link>
+                    </div>
                   </div>
                 ))}
 
