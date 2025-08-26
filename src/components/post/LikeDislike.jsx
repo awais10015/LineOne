@@ -17,8 +17,8 @@ const LikeDislike = ({ postId, refresh }) => {
   const [post, setPost] = useState();
   const [isLiked, setisLiked] = useState(false);
   const [isDisliked, setisDisliked] = useState(false);
-  const [likeCount, setlikeCount] = useState();
-  const [dislikeCount, setdislikeCount] = useState();
+  const [likeCount, setlikeCount] = useState(0);
+  const [dislikeCount, setdislikeCount] = useState(0);
   const [initialLikeValue, setInitialLikeValue] = useState();
   const [initialDislikeValue, setInitialDislikeValue] = useState();
 

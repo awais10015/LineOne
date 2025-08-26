@@ -22,7 +22,7 @@ export async function POST(req) {
       $push: { stories: story._id },
     });
 
-    const user = await User.findById(userId).populate("stories");
+    
 
     return NextResponse.json({ success: true, story }, { status: 201 });
   } catch (error) {

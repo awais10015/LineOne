@@ -6,7 +6,7 @@ export async function POST(req, { params }) {
   try {
     await connect();
 
-    const { id } = await params;
+    const { id } = params; // ✅ no await
     const { currentLoggedInUser, toDo } = await req.json();
 
     const post = await Post.findById(id).populate("postBy");
@@ -16,41 +16,48 @@ export async function POST(req, { params }) {
         { status: 404 }
       );
     }
+
+    // prepare event data
     const eventData = {
       eventBy: currentLoggedInUser,
       eventFor: post?.postBy?._id,
-      event: "like",
+      event: toDo, // ✅ dynamic
     };
-    if (toDo === "like") {
-      if (post?.likedBy.includes(currentLoggedInUser)) {
-        post?.likedBy.pull(currentLoggedInUser);
-      } else {
-        post?.likedBy.push(currentLoggedInUser);
-        post?.dislikedBy.pull(currentLoggedInUser);
 
-        await fetch("http://localhost:3000/api/notification", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(eventData),
-        });
+    if (toDo === "like") {
+      if (post.likedBy.includes(currentLoggedInUser)) {
+        post.likedBy.pull(currentLoggedInUser);
+      } else {
+        post.likedBy.push(currentLoggedInUser);
+        post.dislikedBy.pull(currentLoggedInUser);
+
+        // ✅ don’t let notification failure break like/dislike
+        try {
+          await fetch(`${process.env.APP_URL}/api/notification`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(eventData),
+          });
+        } catch (err) {
+          console.error("Notification failed:", err.message);
+        }
       }
     }
 
     if (toDo === "dislike") {
-      if (post?.dislikedBy.includes(currentLoggedInUser)) {
-        post?.dislikedBy.pull(currentLoggedInUser);
+      if (post.dislikedBy.includes(currentLoggedInUser)) {
+        post.dislikedBy.pull(currentLoggedInUser);
       } else {
-        post?.dislikedBy.push(currentLoggedInUser);
-        post?.likedBy.pull(currentLoggedInUser);
+        post.dislikedBy.push(currentLoggedInUser);
+        post.likedBy.pull(currentLoggedInUser);
       }
     }
 
-    // 3. Save changes
     await post.save();
 
     return NextResponse.json({ success: true, post });
   } catch (error) {
-    console.error(error);
+    console.error("LikeDislike API Error:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }
