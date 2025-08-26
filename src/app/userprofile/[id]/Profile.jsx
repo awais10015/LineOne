@@ -139,12 +139,12 @@ const Profile = () => {
                       {/* Followers List */}
                       <TabsContent
                         value="followers"
-                        className="w-full mt-4 space-y-3"
+                        className="w-full max-h-[350px] mt-1 space-y-3 overflow-scroll scrollbar-hide"
                       >
                         {AnotherUser?.followers?.map((follower) => (
                           <div
                             key={follower._id}
-                            className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100"
+                            className="flex items-center justify-between p-2 rounded-lg hover:text-black hover:bg-gray-100"
                           >
                             {/* Left: Profile picture */}
                             <Link href={`/userprofile/${follower._id}`}>
@@ -183,12 +183,12 @@ const Profile = () => {
                       {/* Following List */}
                       <TabsContent
                         value="following"
-                        className="w-full mt-4 space-y-3"
+                        className="w-full max-h-[350px] mt-1 space-y-3 overflow-scroll scrollbar-hide"
                       >
                         {AnotherUser?.following?.map((following) => (
                           <div
                             key={following._id}
-                            className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100"
+                            className="flex items-center justify-between p-2 rounded-lg hover:text-black hover:bg-gray-100"
                           >
                             <Link href={`/userprofile/${following._id}`}>
                               <div className="flex items-center gap-3">
