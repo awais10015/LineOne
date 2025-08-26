@@ -76,7 +76,7 @@ const LikeDislike = ({ postId, refresh }) => {
     });
 
     try {
-      await fetch(`/api/likedislike/${post._id}`, {
+      await fetch(`/api/likedislike/${post?._id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -106,7 +106,7 @@ const LikeDislike = ({ postId, refresh }) => {
     });
 
     try {
-      await fetch(`/api/likedislike/${post._id}`, {
+      await fetch(`/api/likedislike/${post?._id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
