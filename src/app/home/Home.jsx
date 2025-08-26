@@ -18,12 +18,12 @@ const Home = () => {
       const res = await fetch("/api/allposts");
       const data = await res.json();
       console.log("data.posts", data.posts);
-      const filteredPosts = data.posts.filter((post) => {
-        const postUserId = post.postBy._id; // ID of the post owner
-        const followersIds = currentLoggedInUser.followers.map(
+      const filteredPosts = data?.posts.filter((post) => {
+        const postUserId = post?.postBy?._id; // ID of the post owner
+        const followersIds = currentLoggedInUser?.followers.map(
           (f) => f._id || f
         );
-        const followingIds = currentLoggedInUser.following.map(
+        const followingIds = currentLoggedInUser?.following.map(
           (f) => f._id || f
         );
 
@@ -92,7 +92,7 @@ const Home = () => {
                     </div>
                   </Link>
                   {/* Post Description */}
-                  <p className="text-base mt-5">{post.description}</p>
+                  <p className="text-base mt-5">{post?.description}</p>
 
                   {/* tagged users */}
 
@@ -101,20 +101,20 @@ const Home = () => {
                       tagged
                       {post?.taggedUsers?.map((taggedUser) => (
                         <Link
-                          key={taggedUser._id}
-                          href={`/userprofile/${taggedUser._id}`}
+                          key={taggedUser?._id}
+                          href={`/userprofile/${taggedUser?._id}`}
                         >
                           <div>
-                            <p>{taggedUser.username}</p>
+                            <p>{taggedUser?.username}</p>
                           </div>
                         </Link>
                       ))}
                     </div>
                   )}
                   {/* Hashtags */}
-                  {post.hashtags?.length > 0 && (
+                  {post?.hashtags?.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
-                      {post.hashtags.map((hashtag, i) => (
+                      {post?.hashtags.map((hashtag, i) => (
                         <span
                           key={i}
                           className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-md"
@@ -126,18 +126,18 @@ const Home = () => {
                   )}
 
                   {/* Media */}
-                  {post.media && (
+                  {post?.media && (
                     <>
-                    <Link href={`/media/${post._id}`}>
-                    {/\.(mp4|webm|ogg)$/i.test(post.media) ? (
+                    <Link href={`/media/${post?._id}`}>
+                    {/\.(mp4|webm|ogg)$/i.test(post?.media) ? (
                         <video
-                          src={post.media}
+                          src={post?.media}
                           controls
                           className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
                         />
                       ) : (
                         <img
-                          src={post.media}
+                          src={post?.media}
                           alt="Post media"
                           className="mt-4 rounded-2xl w-full object-cover max-h-96"
                         />
@@ -149,8 +149,8 @@ const Home = () => {
 
                   {/* Actions */}
                   <div className="flex gap-5 mt-5">
-                    <LikeDislike postId={post._id} />
-                    <Link href={`/post/${post._id}`}>
+                    <LikeDislike postId={post?._id} />
+                    <Link href={`/post/${post?._id}`}>
                       <button className="flex items-center justify-center gap-2">
                         <IoChatbox
                           className={"text-gray-400 cursor-pointer"}

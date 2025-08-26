@@ -48,12 +48,12 @@ const LikeDislike = ({ postId, refresh }) => {
   // }, []);
   useEffect(() => {
     if (!post) return;
-    setisLiked(post.likedBy.includes(currentLoggedInUser._id));
-    setInitialLikeValue(post.likedBy.includes(currentLoggedInUser._id));
+    setisLiked(post?.likedBy.includes(currentLoggedInUser?._id));
+    setInitialLikeValue(post?.likedBy.includes(currentLoggedInUser?._id));
     setlikeCount(post?.likedBy.length);
-    setisDisliked(post.dislikedBy.includes(currentLoggedInUser._id));
-    setInitialDislikeValue(post.dislikedBy.includes(currentLoggedInUser._id));
-    setdislikeCount(post.dislikedBy.length);
+    setisDisliked(post?.dislikedBy.includes(currentLoggedInUser?._id));
+    setInitialDislikeValue(post?.dislikedBy.includes(currentLoggedInUser?._id));
+    setdislikeCount(post?.dislikedBy.length);
   }, [post]);
 
   useEffect(() => {
@@ -80,7 +80,7 @@ const LikeDislike = ({ postId, refresh }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          currentLoggedInUser: currentLoggedInUser._id,
+          currentLoggedInUser: currentLoggedInUser?._id,
           toDo: "like",
         }),
       });
@@ -110,7 +110,7 @@ const LikeDislike = ({ postId, refresh }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          currentLoggedInUser: currentLoggedInUser._id,
+          currentLoggedInUser: currentLoggedInUser?._id,
           toDo: "dislike",
         }),
       });

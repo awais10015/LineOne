@@ -18,15 +18,15 @@ export async function POST(req, { params }) {
     }
     const eventData = {
       eventBy: currentLoggedInUser,
-      eventFor: post.postBy._id,
+      eventFor: post?.postBy?._id,
       event: "like",
     };
     if (toDo === "like") {
-      if (post.likedBy.includes(currentLoggedInUser)) {
-        post.likedBy.pull(currentLoggedInUser);
+      if (post?.likedBy.includes(currentLoggedInUser)) {
+        post?.likedBy.pull(currentLoggedInUser);
       } else {
-        post.likedBy.push(currentLoggedInUser);
-        post.dislikedBy.pull(currentLoggedInUser);
+        post?.likedBy.push(currentLoggedInUser);
+        post?.dislikedBy.pull(currentLoggedInUser);
 
         await fetch("http://localhost:3000/api/notification", {
           method: "POST",
@@ -37,11 +37,11 @@ export async function POST(req, { params }) {
     }
 
     if (toDo === "dislike") {
-      if (post.dislikedBy.includes(currentLoggedInUser)) {
-        post.dislikedBy.pull(currentLoggedInUser);
+      if (post?.dislikedBy.includes(currentLoggedInUser)) {
+        post?.dislikedBy.pull(currentLoggedInUser);
       } else {
-        post.dislikedBy.push(currentLoggedInUser);
-        post.likedBy.pull(currentLoggedInUser);
+        post?.dislikedBy.push(currentLoggedInUser);
+        post?.likedBy.pull(currentLoggedInUser);
       }
     }
 

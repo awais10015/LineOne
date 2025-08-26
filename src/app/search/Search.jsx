@@ -48,12 +48,12 @@ const Search = () => {
   const fetchPosts = async () => {
     const res = await fetch("/api/allposts");
     const data = await res.json();
-    setPosts(data.posts);
+    setPosts(data?.posts);
   };
   const fetchUsers = async () => {
     const res = await fetch("/api/users");
     const data = await res.json();
-    setUsers(data.users);
+    setUsers(data?.users);
   };
   const getHashtags = () => {
     if (!searchWord) {
@@ -62,7 +62,7 @@ const Search = () => {
     }
 
     const postWithHashtagHavingSearchWord = posts.filter((post) =>
-      post.hashtags?.some((h) => h.toLowerCase() === searchWord.toLowerCase())
+      post?.hashtags?.some((h) => h.toLowerCase() === searchWord.toLowerCase())
     );
 
     setPostsHavingSearchedHashtag(postWithHashtagHavingSearchWord);
@@ -91,10 +91,10 @@ const Search = () => {
     }
 
     const matchedPosts = posts.filter((post) =>
-      post.description?.toLowerCase().includes(searchWord.toLowerCase())
+      post?.description?.toLowerCase().includes(searchWord.toLowerCase())
     );
     const matchedUsers = users.filter((user) =>
-      user.name?.toLowerCase().includes(searchWord.toLowerCase())
+      user?.name?.toLowerCase().includes(searchWord.toLowerCase())
     );
 
     setSearchedPosts(matchedPosts);
@@ -142,8 +142,8 @@ const Search = () => {
                               <img
                                 className="h-10 w-10 rounded-full object-cover object-top"
                                 src={
-                                  post.postBy?.profilePic ||
-                                  (post.postBy?.gender === "male"
+                                  post?.postBy?.profilePic ||
+                                  (post?.postBy?.gender === "male"
                                     ? "/Mdp.jpg"
                                     : "/Fdp.jpg")
                                 }
@@ -151,25 +151,25 @@ const Search = () => {
                               />
                             </div>
                             <div>
-                              <h1 className="">{post.postBy?.name}</h1>
+                              <h1 className="">{post?.postBy?.name}</h1>
                               <p className="text-sm font-extralight">
-                                {post.postBy?.username}
+                                {post?.postBy?.username}
                               </p>
                             </div>
                           </div>
                         </Link>
 
                         {/* Post Description */}
-                        <p className="text-base mt-5">{post.description}</p>
+                        <p className="text-base mt-5">{post?.description}</p>
 
                         {/* tagged users */}
                         {post?.taggedUsers.length > 0 && (
                           <div className="flex gap-1 text-gray-400 flex-wrap">
                             tagged
                             {post?.taggedUsers?.map((taggedUser) => (
-                              <div key={taggedUser._id}>
-                                <Link href={`/userprofile/${taggedUser._id}`}>
-                                  <p>{taggedUser.username}</p>
+                              <div key={taggedUser?._id}>
+                                <Link href={`/userprofile/${taggedUser?._id}`}>
+                                  <p>{taggedUser?.username}</p>
                                 </Link>
                               </div>
                             ))}
@@ -177,9 +177,9 @@ const Search = () => {
                         )}
 
                         {/* Hashtags */}
-                        {post.hashtags?.length > 0 && (
+                        {post?.hashtags?.length > 0 && (
                           <div className="flex flex-wrap gap-2 mt-2">
-                            {post.hashtags.map((hashtag, i) => (
+                            {post?.hashtags.map((hashtag, i) => (
                               <span
                                 key={i}
                                 className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-md"
@@ -193,16 +193,16 @@ const Search = () => {
                         {/* Media */}
                         {post.media && (
                           <>
-                            <Link href={`/media/${post._id}`}>
-                              {/\.(mp4|webm|ogg)$/i.test(post.media) ? (
+                            <Link href={`/media/${post?._id}`}>
+                              {/\.(mp4|webm|ogg)$/i.test(post?.media) ? (
                                 <video
-                                  src={post.media}
+                                  src={post?.media}
                                   controls
                                   className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
                                 />
                               ) : (
                                 <img
-                                  src={post.media}
+                                  src={post?.media}
                                   alt="Post media"
                                   className="mt-4 rounded-2xl w-full object-cover max-h-96"
                                 />
@@ -212,8 +212,8 @@ const Search = () => {
                         )}
                         {/* Actions */}
                         <div className="flex gap-5 mt-5">
-                          <LikeDislike postId={post._id} />
-                          <Link href={`/post/${post._id}`}>
+                          <LikeDislike postId={post?._id} />
+                          <Link href={`/post/${post?._id}`}>
                             <button className="flex items-center justify-center gap-2">
                               <IoChatbox
                                 className={"text-gray-400 cursor-pointer"}
@@ -240,11 +240,11 @@ const Search = () => {
                   <CardContent className="grid gap-1 p-1">
                     {searchedUsers?.map((user) => (
                       <div
-                        key={user._id}
+                        key={user?._id}
                         className="flex items-center justify-between p-2 rounded-lg hover:text-black hover:bg-gray-100"
                       >
                         {/* Left: Profile picture */}
-                        <Link href={`/userprofile/${user._id}`}>
+                        <Link href={`/userprofile/${user?._id}`}>
                           <div className="flex items-center gap-3">
                             <img
                               src={user?.profilePic || "/default-avatar.png"}
