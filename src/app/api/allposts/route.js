@@ -10,7 +10,7 @@ export async function GET() {
       .populate("taggedUsers")
       .sort({ createdAt: -1 }); // newest first
 
-    return NextResponse.json({ posts });
+    return NextResponse.json({success: true , posts });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

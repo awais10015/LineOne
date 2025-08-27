@@ -17,7 +17,8 @@ const Home = () => {
       setLoading(true);
       const res = await fetch("/api/allposts");
       const data = await res.json();
-      console.log("data.posts", data.posts);
+      console.log("data", data);
+
       const filteredPosts = data?.posts.filter((post) => {
         const postUserId = post?.postBy?._id; // ID of the post owner
         const followersIds = currentLoggedInUser?.followers.map(
@@ -46,8 +47,10 @@ const Home = () => {
   }, [posts]);
 
   useEffect(() => {
-    getPosts();
-  }, []);
+    if (currentLoggedInUser) {
+      getPosts();
+    }
+  }, [currentLoggedInUser]);
 
   return (
     <>
@@ -128,22 +131,21 @@ const Home = () => {
                   {/* Media */}
                   {post?.media && (
                     <>
-                    <Link href={`/media/${post?._id}`}>
-                    {/\.(mp4|webm|ogg)$/i.test(post?.media) ? (
-                        <video
-                          src={post?.media}
-                          controls
-                          className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
-                        />
-                      ) : (
-                        <img
-                          src={post?.media}
-                          alt="Post media"
-                          className="mt-4 rounded-2xl w-full object-cover max-h-96"
-                        />
-                      )}
-                    </Link>
-                      
+                      <Link href={`/media/${post?._id}`}>
+                        {/\.(mp4|webm|ogg)$/i.test(post?.media) ? (
+                          <video
+                            src={post?.media}
+                            controls
+                            className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
+                          />
+                        ) : (
+                          <img
+                            src={post?.media}
+                            alt="Post media"
+                            className="mt-4 rounded-2xl w-full object-cover max-h-96"
+                          />
+                        )}
+                      </Link>
                     </>
                   )}
 

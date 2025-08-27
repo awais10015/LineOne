@@ -21,19 +21,19 @@ const postSchema = new mongoose.Schema(
     likedBy: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // name of your user model
+        ref: "User", 
       },
     ],
     dislikedBy: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // name of your user model
+        ref: "User", 
       },
     ],
     comments: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Comment", // name of your comment model
+        ref: "Comment", 
       },
     ],
   },
