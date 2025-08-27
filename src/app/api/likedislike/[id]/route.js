@@ -33,7 +33,7 @@ export async function POST(req, { params }) {
 
         // ✅ don’t let notification failure break like/dislike
         try {
-          await fetch(`${process.env.APP_URL}/api/notification`, {
+          await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notification`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(eventData),

@@ -17,7 +17,7 @@ export async function POST(req) {
       { $push: { followers: body.followedBy } },
       { new: true }
     );
-    await fetch("http://localhost:3000/api/notification", {
+    await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notification`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(eventData),
