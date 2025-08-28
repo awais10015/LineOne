@@ -63,7 +63,7 @@ const Profile = () => {
   }, []);
 
   useEffect(() => {
-    console.log("AnotherUser",AnotherUser._id)
+    console.log("AnotherUser",AnotherUser?._id)
   }, [AnotherUser]);
 
   useEffect(() => {
