@@ -10,6 +10,7 @@ const MessageButton = ({ id }) => {
   const router = useRouter()
 
   const createChat = async () => {
+    console.log("userIds" , userIds)
   try {
     const res = await fetch("/api/chat", {
       method: "POST",
@@ -23,7 +24,7 @@ const MessageButton = ({ id }) => {
 
     const data = await res.json();
     console.log("Chat:", data);
-    router.push(`/chat/${data._id}`)
+    // router.push(`/chat/${data._id}`)
   } catch (err) {
     console.error("Error creating chat:", err);
   }

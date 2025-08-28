@@ -63,6 +63,10 @@ const Profile = () => {
   }, []);
 
   useEffect(() => {
+    console.log("AnotherUser",AnotherUser._id)
+  }, [AnotherUser]);
+
+  useEffect(() => {
     if (!id) return;
     const getPosts = async () => {
       setpostloader(true);
@@ -251,7 +255,7 @@ const Profile = () => {
                     id={AnotherUser?._id}
                     refresh={getUsers}
                   />
-                  <MessageButton id={AnotherUser?.id} />
+                  <MessageButton id={AnotherUser?._id} />
                 </div>
               </div>
             </div>

@@ -6,7 +6,7 @@ export async function POST(req) {
   try {
     await connect();
     const { userIds } = await req.json(); // [currentUserId, otherUserId]
-
+    console.log("userIds",userIds)
     if (!userIds || userIds.length !== 2) {
       return NextResponse.json({ message: "Provide exactly two user IDs" }, { status: 400 });
     }
