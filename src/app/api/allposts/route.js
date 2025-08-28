@@ -1,5 +1,5 @@
 import { connect } from "@/lib/db";
-import { Post } from "@/models/postModel"; // adjust import path
+import { Post } from "@/models/postModel";
 import { NextResponse } from "next/server";
 import {User} from "@/models/userModel"
 
@@ -9,7 +9,7 @@ export async function GET() {
     const posts = await Post.find()
       .populate("postBy")
       .populate("taggedUsers")
-      .sort({ createdAt: -1 }); // newest first
+      .sort({ createdAt: -1 }); 
 
     const user = await User.findById("689d7a1e50f0ec15a52d131e")
     

@@ -3,13 +3,14 @@ import { useContext, useEffect, useState, useRef } from "react";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import Image from "next/image";
 import Loader from "../Loader";
+import { CgAddR } from "react-icons/cg";
 
 export default function StoryBar() {
   const [stories, setStories] = useState([]);
   const { currentLoggedInUser } = useContext(CurrentUserContext);
 
-// state for Loader
-const [loader, setLoader] = useState(false)
+  // state for Loader
+  const [loader, setLoader] = useState(false);
 
   // add story state
   const [file, setFile] = useState("");
@@ -47,6 +48,16 @@ const [loader, setLoader] = useState(false)
   // handle file selection
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    //  only allow images and videos
+    if (
+      !selectedFile.type.startsWith("image/") &&
+      !selectedFile.type.startsWith("video/")
+    ) {
+      alert("Only images and videos are allowed for stories!");
+      return;
+    }
     if (selectedFile) {
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
@@ -91,7 +102,7 @@ const [loader, setLoader] = useState(false)
       setFile(null);
       setPreview(null);
       setDescription("");
-      fetchStories(); // refresh stories after upload
+      fetchStories();
     } else {
       alert("Failed to add story");
     }
@@ -101,7 +112,7 @@ const [loader, setLoader] = useState(false)
 
   // get stories
   const fetchStories = async () => {
-    setLoader(true)
+    setLoader(true);
     const res = await fetch(`/api/stories?userId=${currentLoggedInUser._id}`);
     const data = await res.json();
 
@@ -112,12 +123,12 @@ const [loader, setLoader] = useState(false)
         acc[userId] = { user: story.user, stories: [] };
       }
       acc[userId].stories.push(story);
-      
+
       return acc;
     }, {});
 
-    setStories(Object.values(grouped)); // [{ user, stories: [] }]
-    setLoader(false)
+    setStories(Object.values(grouped));
+    setLoader(false);
   };
 
   useEffect(() => {
@@ -126,7 +137,7 @@ const [loader, setLoader] = useState(false)
 
   return (
     <div className="flex w-full justify-center items-center">
-      <div className="w-full mt-15 max-w-4xl rounded-2xl overflow-hidden flex p-2 gap-5">
+      <div className="w-full mt-3 max-w-4xl rounded-2xl overflow-hidden flex p-2 gap-5">
         {/* Story List */}
         <div className="h-full w-full flex gap-3 overflow-x-auto scrollbar-hide">
           {/* Story Add Box */}
@@ -135,9 +146,10 @@ const [loader, setLoader] = useState(false)
               <>
                 <button
                   onClick={() => fileInputRef.current.click()}
-                  className="px-4 py-2 bg-white/20 rounded-xl"
+                  className="flex cursor-pointer flex-col justify-center items-center gap-2 px-2 py-2 bg-white/20 text-sm rounded-md whitespace-nowrap"
                 >
-                  Create Story
+                  <CgAddR size={25} />
+                  Add Story
                 </button>
                 <input
                   ref={fileInputRef}
@@ -186,8 +198,9 @@ const [loader, setLoader] = useState(false)
           </div>
 
           {stories.length === 0 && loader ? (
-            <div className="h-[200px] w-[120px] flex items-center justify-center"><Loader size={5}/></div>
-            
+            <div className="h-[200px] w-[120px] flex items-center justify-center">
+              <Loader size={5} height="full"/>
+            </div>
           ) : (
             stories.map((group, index) => {
               // If it's grouped, pick first story, else use direct mediaUrl

@@ -22,6 +22,7 @@ import MessageButton from "@/components/profile/MessageButton";
 import FollowUnfollowButton from "@/components/profile/FollowUnfollowButton";
 import LikeDislike from "@/components/post/LikeDislike";
 import { IoChatbox } from "react-icons/io5";
+import { useRouter } from "next/navigation";
 
 const Profile = () => {
   // const params = useParams();
@@ -29,6 +30,7 @@ const Profile = () => {
   const { AnotherUser, setAnotherUser } = useContext(AnotherUserContext);
   const { currentLoggedInUser } = useContext(CurrentUserContext);
   const [posts, setPosts] = useState(null);
+  const router = useRouter();
 
   let userProfilePic =
     AnotherUser?.profilePic ||
@@ -37,6 +39,10 @@ const Profile = () => {
 
   const getUsers = async () => {
     try {
+      if (id === currentLoggedInUser._id) {
+        router.push("/userprofile");
+        return;
+      }
       const res = await fetch(`/api/user/${id}`);
       const data = await res.json();
 

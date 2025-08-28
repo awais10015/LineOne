@@ -17,10 +17,9 @@ const Home = () => {
       setLoading(true);
       const res = await fetch("/api/allposts");
       const data = await res.json();
-      console.log("data", data);
 
       const filteredPosts = data?.posts.filter((post) => {
-        const postUserId = post?.postBy?._id; // ID of the post owner
+        const postUserId = post?.postBy?._id; 
         const followersIds = currentLoggedInUser?.followers.map(
           (f) => f._id || f
         );
@@ -42,11 +41,6 @@ const Home = () => {
   };
 
   useEffect(() => {
-    console.log("currentLoggedInUser", currentLoggedInUser);
-    console.log("posts", posts);
-  }, [posts]);
-
-  useEffect(() => {
     if (currentLoggedInUser) {
       getPosts();
     }
@@ -56,14 +50,14 @@ const Home = () => {
     <>
       <StoryBar />
       <div className="w-full flex items-center justify-center">
-        <div className="w-full mt-5 max-w-4xl rounded-2xl overflow-hidden srollbar-hide">
+        <div className="w-full mt-3 max-w-4xl rounded-2xl overflow-hidden srollbar-hide">
           <div className="px-2 pb-3">
             <h2 className="text-xl font-bold">Posts</h2>
           </div>
 
           {posts.length === 0 && loading ? (
             <div className="w-full h-full flex items-start justify-start p-10">
-              <Loader />
+              <Loader height="full"/>
             </div>
           ) : posts?.length > 0 ? (
             <div className="w-full px-2 flex flex-col items-center gap-2 max-w-4xl  rounded-2xl overflow-hidden srollbar-hide">

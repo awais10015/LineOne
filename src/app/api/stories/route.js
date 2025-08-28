@@ -3,11 +3,21 @@ import Story from "@/models/storyModel";
 import { User } from "@/models/userModel";
 import { NextResponse } from "next/server";
 
-
 export async function POST(req) {
   try {
     await connect();
     const { userId, mediaUrl, type, description } = await req.json();
+
+    //  Validate type
+    if (type !== "image" && type !== "video") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid file type. Only images and videos are allowed.",
+        },
+        { status: 400 }
+      );
+    }
 
     const story = await Story.create({
       user: userId,
@@ -16,13 +26,9 @@ export async function POST(req) {
       type,
     });
 
-    
-
     await User.findByIdAndUpdate(userId, {
       $push: { stories: story._id },
     });
-
-    
 
     return NextResponse.json({ success: true, story }, { status: 201 });
   } catch (error) {
