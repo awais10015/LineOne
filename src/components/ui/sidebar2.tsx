@@ -1,0 +1,283 @@
+"use client";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import React, { useState, createContext, useContext, useRef, useEffect } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { IconMenu2, IconX } from "@tabler/icons-react";
+import { ModeToggle } from "../ModeToggle";
+import Link from "next/link";
+
+// import React, { useRef, useEffect } from "react";
+// import { useSidebar } from "./sidebar";
+// import { AnimatePresence, motion } from "motion/react";
+// import { cn } from "@/lib/utils";
+// import { IconMenu2, IconX } from "@tabler/icons-react";
+// import { ModeToggle } from "../ModeToggle";
+// import Image from "next/image";
+import { usePathname } from "next/navigation";
+
+
+
+
+interface Links {
+  label: string;
+  href: string;
+  icon: React.JSX.Element | React.ReactNode;
+}
+
+interface SidebarContextProps {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  animate: boolean;
+}
+
+const SidebarContext = createContext<SidebarContextProps | undefined>(
+  undefined
+);
+
+export const useSidebar = () => {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error("useSidebar must be used within a SidebarProvider");
+  }
+  return context;
+};
+
+export const SidebarProvider = ({
+  children,
+  open: openProp,
+  setOpen: setOpenProp,
+  animate = true,
+}: {
+  children: React.ReactNode;
+  open?: boolean;
+  setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  animate?: boolean;
+}) => {
+  const [openState, setOpenState] = useState(false);
+
+  const open = openProp !== undefined ? openProp : openState;
+  const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
+
+  return (
+    <SidebarContext.Provider value={{ open, setOpen, animate: animate }}>
+      {children}
+    </SidebarContext.Provider>
+  );
+};
+
+export const Sidebar = ({
+  children,
+  open,
+  setOpen,
+  animate,
+}: {
+  children: React.ReactNode;
+  open?: boolean;
+  setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  animate?: boolean;
+}) => {
+  return (
+    <SidebarProvider open={open} setOpen={setOpen} animate={animate}>
+      {children}
+    </SidebarProvider>
+  );
+};
+
+export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
+  return (
+    <>
+      <DesktopSidebar {...props} />
+      {/* <MobileSidebar {...(props as React.ComponentProps<"div">)} /> */}
+    </>
+  );
+};
+
+export const DesktopSidebar = ({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof motion.div>) => {
+  const { open, setOpen, animate } = useSidebar();
+  return (
+    <>
+      <motion.div
+        className={cn(
+          "h-full px-4 py-4 hidden md:flex md:flex-col w-[180px] shrink-0",
+          className
+        )}
+        animate={{
+          width: animate ? (open ? "180px" : "60px") : "180px",
+        }}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        {...props}
+      >
+        {children}
+      </motion.div>
+    </>
+  );
+};
+
+// export const MobileSidebar = ({
+//   className,
+//   children,
+//   ...props
+// }: React.ComponentProps<"div">) => {
+//   const { open, setOpen } = useSidebar();
+//   const sidebarRef = useRef<HTMLDivElement>(null);
+//   const pathname = usePathname();
+
+//   // ✅ Click outside handler
+//   useEffect(() => {
+//     const handleClickOutside = (event: MouseEvent) => {
+//       if (
+//         sidebarRef.current &&
+//         !sidebarRef.current.contains(event.target as Node)
+//       ) {
+//         setOpen(false);
+//       }
+//     };
+
+//     if (open) {
+//       document.addEventListener("mousedown", handleClickOutside);
+//     } else {
+//       document.removeEventListener("mousedown", handleClickOutside);
+//     }
+
+//     return () => {
+//       document.removeEventListener("mousedown", handleClickOutside);
+//     };
+//   }, [open, setOpen]);
+
+//   // ✅ Keep sidebar open after route change (don’t reset)
+//   useEffect(() => {
+//     // Do nothing → sidebar will stay open even after navigation
+//     // If you wanted to close it automatically, you’d call setOpen(false) here
+//     setOpen(false)
+//   }, [pathname]);
+
+//   return (
+//     <div
+//       className={cn(
+//         " px-4 py-4 flex flex-row md:hidden items-center justify-between",
+//         className
+//       )}
+//       {...props}
+//     >
+//       <div className="flex justify-between items-center z-20 w-full">
+//         <div className="flex justify-center items-center gap-2">
+//           <Image src="/chat.png" alt="logo" width={30} height={30} />
+//           <h1 onClick={() => setOpen(!open)} className="font-medium text-lg">Open Chat</h1>
+//         </div>
+
+//       </div>
+
+//       <AnimatePresence>
+//         {open && (
+//           <motion.div
+//             ref={sidebarRef}
+//             initial={{ x: "-100%", opacity: 0 }}
+//             animate={{ x: 0, opacity: 1 }}
+//             exit={{ x: "-100%", opacity: 0 }}
+//             transition={{ duration: 0.3, ease: "easeInOut" }}
+//             className={cn(
+//               "fixed h-full w-[200px] rounded-tr-2xl rounded-br-2xl border shadow-2xl inset-0 bg-white dark:bg-neutral-900 pl-4 pt-4 pb-2 z-[100] flex flex-col justify-start",
+//               className
+//             )}
+//           >
+//             <div
+//               className="absolute right-2 top-2 z-50 text-neutral-800 dark:text-neutral-200"
+//               onClick={() => setOpen(false)}
+//             >
+//               <IconX />
+//             </div>
+//             {children}
+//           </motion.div>
+//         )}
+//       </AnimatePresence>
+//     </div>
+//   );
+// };
+
+export const SidebarLink = ({
+  link,
+  className,
+  ...props
+}: {
+  link: Links;
+  className?: string;
+}) => {
+  const { open, animate } = useSidebar();
+  return (
+    <Link
+      href={link.href}
+      className={cn(
+        "flex items-center justify-start gap-2  group/sidebar py-2",
+        className
+      )}
+      {...props}
+    >
+      {link.icon}
+
+      <motion.span
+        animate={{
+          display: animate ? (open ? "inline-block" : "none") : "inline-block",
+          opacity: animate ? (open ? 1 : 0) : 1,
+        }}
+        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+      >
+        {link.label}
+      </motion.span>
+    </Link>
+  );
+};
+
+
+// userprofiles
+export const ProfilesLink = ({
+  id,
+  name,
+  profilePic,
+  className,
+  ...props
+}: {
+  id: string;   
+  name: string;
+  profilePic: string;
+  className?: string;
+}) => {
+  const { open, animate } = useSidebar();
+
+  return (
+    <Link
+      href={`/chat/${id}`}
+      className={cn(
+        "flex items-center justify-start gap-2 group/sidebar py-2",
+        className
+      )}
+      {...props}
+    >
+      {/* Profile Pic */}
+      <Image
+        src={profilePic}
+        width={30}
+        height={30}
+        alt={`${name}'s profile picture`}
+        className="rounded-full"
+      />
+
+      {/* Name (animated visibility) */}
+      <motion.span
+        animate={{
+          opacity: animate ? (open ? 1 : 0) : 1,
+          x: animate ? (open ? 0 : -10) : 0,
+        }}
+        transition={{ duration: 0.2 }}
+        className="text-neutral-700 dark:text-neutral-200 text-sm whitespace-pre inline-block"
+      >
+        {name}
+      </motion.span>
+    </Link>
+  );
+};

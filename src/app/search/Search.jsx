@@ -1,7 +1,7 @@
 "use client";
 import React, { useContext, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-
+import Loader from "@/components/Loader";
 import {
   Card,
   CardContent,
@@ -23,15 +23,14 @@ const Search = () => {
   const [posts, setPosts] = useState([]);
   const [users, setUsers] = useState([]);
   const [hashtags, setHashtags] = useState([]);
-
   const [searchWord, setSearchWord] = useState(null);
-
   const [postsHavingSearchedHashtag, setPostsHavingSearchedHashtag] = useState(
     []
   );
   const [searchedUsers, setSearchedUsers] = useState([]);
   const [searchedPosts, setSearchedPosts] = useState([]);
   const [activeTab, setActiveTab] = useState("posts");
+  const [loader, setloader] = useState(false);
 
   useEffect(() => {
     if (!searchWord && activeTab === "hashtags") {
@@ -40,15 +39,32 @@ const Search = () => {
   }, [searchWord]);
 
   const fetchPosts = async () => {
-    const res = await fetch("/api/allposts");
-    const data = await res.json();
-    setPosts(data?.posts);
+    setloader(true);
+    try {
+      const res = await fetch("/api/allposts");
+      const data = await res.json();
+      setPosts(data?.posts);
+      setloader(false);
+    } catch (error) {
+      console.log(error);
+      setloader(false);
+    }
   };
   const fetchUsers = async () => {
-    const res = await fetch("/api/users");
+    setloader(true)
+    try {
+      const res = await fetch("/api/users");
     const data = await res.json();
-    const filteredData =  data.users.filter((user)=> user._id !== currentLoggedInUser._id)
+    const filteredData = data.users.filter(
+      (user) => user._id !== currentLoggedInUser._id
+    );
     setUsers(filteredData);
+    setloader(false)
+    } catch (error) {
+      console.log(error)
+      setloader(false)
+    }
+    
   };
   const getHashtags = () => {
     if (!searchWord) {
@@ -106,7 +122,12 @@ const Search = () => {
         <div className="w-full max-w-4xl px-3 pb-5 flex items-center justify-center flex-col gap-10 rounded-2xl overflow-hidden srollbar-hide">
           {/* <Input type="text" placeholder="Search..." onChange={(e) => setSearchWord(e.target.value)} /> */}
           <div className="relative w-full max-w-sm">
-            <Input className="pl-10 focus:outline-none focus:ring-none" type="text" placeholder="Search..." onChange={(e) => setSearchWord(e.target.value)} />
+            <Input
+              className="pl-10 focus:outline-none focus:ring-none"
+              type="text"
+              placeholder="Search..."
+              onChange={(e) => setSearchWord(e.target.value)}
+            />
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -145,7 +166,8 @@ const Search = () => {
                     <CardDescription>{}</CardDescription>
                   </CardHeader>
                   <CardContent className="grid gap-1 p-1">
-                    {!searchWord ? (
+                    {loader ? (<Loader/>):(
+!searchWord ? (
                       // Default Grid of posts
                       <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
                         {posts?.map((post) => (
@@ -302,7 +324,9 @@ const Search = () => {
                           </div>
                         </div>
                       ))
+                    )
                     )}
+                    {}
                   </CardContent>
                 </Card>
               </TabsContent>
