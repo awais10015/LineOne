@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(req, { params }) {
   try {
     await connect();
-    const { id } = await params;   // <-- no need for await here
+    const { id } = await params;  
 
     // find all comments that belong to this post
     const comments = await Comment.find({ postId: id })

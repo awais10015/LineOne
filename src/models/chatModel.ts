@@ -4,7 +4,11 @@ const chatSchema = new mongoose.Schema(
   {
     isGroup: { type: Boolean, default: false },
     name: { type: String },
-    ChatPic: { type: String },
+    groupIcon: { type: String },
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     participants: [
       {
         type: mongoose.Schema.Types.ObjectId,

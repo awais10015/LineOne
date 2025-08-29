@@ -62,9 +62,9 @@ const Profile = () => {
     getUsers();
   }, []);
 
-  useEffect(() => {
-    console.log("AnotherUser",AnotherUser?._id)
-  }, [AnotherUser]);
+  // useEffect(() => {
+  //   console.log("AnotherUser",AnotherUser?._id)
+  // }, [AnotherUser]);
 
   useEffect(() => {
     if (!id) return;

@@ -1,49 +1,52 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Sidebar,
   SidebarBody,
   ProfilesLink,
   SidebarLink,
 } from "@/components/ui/sidebar2";
-import {
-  IconHome,
-  IconSearch,
-  IconBrandLine,
-  IconBellRinging,
-  IconUsers,
-} from "@tabler/icons-react";
 
-import { motion } from "motion/react";
+import { FaUser } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa";
+
+
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+// import Image from "next/image";
 
 import CurrentUserContext from "@/context/CurrentUserContext";
-import Link from "next/link";
-import { useSidebar } from "@/components/ui/sidebar2";
+
+
 
 export function ChatSidebar({ children }) {
   const { currentLoggedInUser } = useContext(CurrentUserContext);
+  const [chats, setchats] = useState([]);
+  const [groupChats, setgroupChats] = useState([]);
+  const [loader, setloader] = useState(false);
 
-  // const links = [
-  //   {
-  //     label: "Home",
-  //     href: "/home",
-  //     icon: (
-  //       <IconHome className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
-  //     ),
-  //   },
-  //   {
-  //     label: "Search",
-  //     href: "/search",
-  //     icon: (
-  //       <IconSearch className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
-  //     ),
-  //   },
+  const fetchChatsBasic = async () => {
+    setloader(true);
+    try {
+      const res = await fetch(`/api/chat/basic/${currentLoggedInUser?._id}`);
+      const data = await res.json();
+      console.log(data);
+      const filterBasicChats = data.filter((chat) => chat.isGroup === false);
+      const filterGroupChats = data.filter((chat) => chat.isGroup === true);
+      setchats([...filterBasicChats]);
+      setgroupChats([...filterGroupChats]);
+      setloader(false);
+    } catch (error) {
+      console.log(error);
+      setloader(false);
+    }
+  };
+  useEffect(() => {
+    if (!currentLoggedInUser) return;
+    fetchChatsBasic();
+  }, []);
 
-  // ];
   const [open, setOpen] = useState(false);
-  const { animate } = useSidebar();
+
   return (
     <div className="h-screen w-screen bg-background border-r">
       <div
@@ -59,18 +62,55 @@ export function ChatSidebar({ children }) {
           className={cn(open ? "w-64" : "w-20", "transition-all duration-300")}
         >
           <SidebarBody className="justify-between gap-10">
-            <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto srollbar-hide">
-              {open ? <Logo /> : <LogoIcon />}
-              {/* <div className="mt-8 flex flex-col gap-2">
-                {chats.map((chat, index) => (
+            <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto scrollbar-hide">
+             
+              <div className="flex flex-col gap-2 items-start">
+                <div>
+                  <SidebarLink
+                  className="pl-2"
+                    link={{
+                      label: "Chats",
+                      href: "#",
+                      icon: <FaUser size={27} className="text-[#ff6500]" />,
+                    }}
+                  />
+                </div>
+
+                {chats.map((chat) => {
+                  const otherUser = chat.participants.find(
+                    (p) => p._id !== currentLoggedInUser._id
+                  );
+
+                  return (
+                    <ProfilesLink
+                      key={chat._id}
+                      id={chat._id}
+                      name={otherUser?.name}
+                      profilePic={otherUser?.profilePic}
+                    />
+                  );
+                })}
+
+                <div>
+                  <SidebarLink
+                  className="pl-1"
+                    link={{
+                      label: "Groups",
+                      href: "#",
+                      icon: <FaUsers size={35} className="text-[#ff6500]" />,
+                    }}
+                  />
+                </div>
+
+                {groupChats.map((chat) => (
                   <ProfilesLink
-                    key={index}
+                    key={chat._id}
                     id={chat._id}
                     name={chat.name}
-                    profilePic={chat.profilePic}
+                    profilePic={chat.groupIcon || "/default-group.png"}
                   />
                 ))}
-              </div> */}
+              </div>
             </div>
           </SidebarBody>
         </Sidebar>
@@ -79,35 +119,35 @@ export function ChatSidebar({ children }) {
     </div>
   );
 }
-export const Logo = () => {
-  return (
-    <Link
-      href="/chat"
-      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
-    >
-      {/* <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" /> */}
-      <Image src="/chat.png" width={30} height={30} alt="logo" />
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="font-medium whitespace-pre text-black dark:text-white"
-      >
-        Chat
-      </motion.span>
-    </Link>
-  );
-};
-export const LogoIcon = () => {
-  return (
-    <Link
-      href="/chat"
-      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
-    >
-      {/* <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" /> */}
-      <Image src="/chat.png" width={30} height={30} alt="logo" />
-    </Link>
-  );
-};
+// export const Logo = () => {
+//   return (
+//     <Link
+//       href="/chat"
+//       className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
+//     >
+//       {/* <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" /> */}
+//       <Image src="/chat.png" width={30} height={30} alt="logo" />
+//       <motion.span
+//         initial={{ opacity: 0 }}
+//         animate={{ opacity: 1 }}
+//         className="font-medium whitespace-pre text-black dark:text-white"
+//       >
+//         Chat
+//       </motion.span>
+//     </Link>
+//   );
+// };
+// export const LogoIcon = () => {
+//   return (
+//     <Link
+//       href="/chat"
+//       className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
+//     >
+//       {/* <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" /> */}
+//       <Image src="/chat.png" width={30} height={30} alt="logo" />
+//     </Link>
+//   );
+// };
 
 // Dummy dashboard component with content
 const Dashboard = ({ children }) => {

@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server";
 import { Chat } from "@/models/chatModel";
-import { connectDB } from "@/lib/db";
+import { connect } from "@/lib/db";
 
 export async function POST(req) {
   try {
-    await connectDB();
-    const { name, userIds } = await req.json();
+    await connect();
+    const { name, participants, groupIcon, admin } = await req.json();
 
-    if (!name || !userIds || userIds.length < 3) {
-      return NextResponse.json({ message: "Group must have a name and at least 3 members" }, { status: 400 });
-    }
+  
 
     const groupChat = await Chat.create({
-      participants: userIds,
+      participants,
       isGroup: true,
+      groupIcon,
       name,
+      admin,
     });
 
     return NextResponse.json(groupChat, { status: 201 });

@@ -1,10 +1,14 @@
 "use client";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import React, { useState, createContext, useContext, useRef, useEffect } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import { IconMenu2, IconX } from "@tabler/icons-react";
-import { ModeToggle } from "../ModeToggle";
+import React, {
+  useState,
+  createContext,
+  useContext,
+} from "react";
+import { motion } from "motion/react";
+// import { IconMenu2, IconX } from "@tabler/icons-react";
+// import { ModeToggle } from "../ModeToggle";
 import Link from "next/link";
 
 // import React, { useRef, useEffect } from "react";
@@ -14,10 +18,7 @@ import Link from "next/link";
 // import { IconMenu2, IconX } from "@tabler/icons-react";
 // import { ModeToggle } from "../ModeToggle";
 // import Image from "next/image";
-import { usePathname } from "next/navigation";
-
-
-
+// import { usePathname } from "next/navigation";
 
 interface Links {
   label: string;
@@ -103,11 +104,11 @@ export const DesktopSidebar = ({
     <>
       <motion.div
         className={cn(
-          "h-full px-4 py-4 hidden md:flex md:flex-col w-[180px] shrink-0",
+          "h-full px-4 py-4 hidden md:flex md:flex-col w-[250px]",
           className
         )}
         animate={{
-          width: animate ? (open ? "180px" : "60px") : "180px",
+          width: animate ? (open ? "250px" : "73px") : "250px",
         }}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
@@ -119,87 +120,6 @@ export const DesktopSidebar = ({
   );
 };
 
-// export const MobileSidebar = ({
-//   className,
-//   children,
-//   ...props
-// }: React.ComponentProps<"div">) => {
-//   const { open, setOpen } = useSidebar();
-//   const sidebarRef = useRef<HTMLDivElement>(null);
-//   const pathname = usePathname();
-
-//   // ✅ Click outside handler
-//   useEffect(() => {
-//     const handleClickOutside = (event: MouseEvent) => {
-//       if (
-//         sidebarRef.current &&
-//         !sidebarRef.current.contains(event.target as Node)
-//       ) {
-//         setOpen(false);
-//       }
-//     };
-
-//     if (open) {
-//       document.addEventListener("mousedown", handleClickOutside);
-//     } else {
-//       document.removeEventListener("mousedown", handleClickOutside);
-//     }
-
-//     return () => {
-//       document.removeEventListener("mousedown", handleClickOutside);
-//     };
-//   }, [open, setOpen]);
-
-//   // ✅ Keep sidebar open after route change (don’t reset)
-//   useEffect(() => {
-//     // Do nothing → sidebar will stay open even after navigation
-//     // If you wanted to close it automatically, you’d call setOpen(false) here
-//     setOpen(false)
-//   }, [pathname]);
-
-//   return (
-//     <div
-//       className={cn(
-//         " px-4 py-4 flex flex-row md:hidden items-center justify-between",
-//         className
-//       )}
-//       {...props}
-//     >
-//       <div className="flex justify-between items-center z-20 w-full">
-//         <div className="flex justify-center items-center gap-2">
-//           <Image src="/chat.png" alt="logo" width={30} height={30} />
-//           <h1 onClick={() => setOpen(!open)} className="font-medium text-lg">Open Chat</h1>
-//         </div>
-
-//       </div>
-
-//       <AnimatePresence>
-//         {open && (
-//           <motion.div
-//             ref={sidebarRef}
-//             initial={{ x: "-100%", opacity: 0 }}
-//             animate={{ x: 0, opacity: 1 }}
-//             exit={{ x: "-100%", opacity: 0 }}
-//             transition={{ duration: 0.3, ease: "easeInOut" }}
-//             className={cn(
-//               "fixed h-full w-[200px] rounded-tr-2xl rounded-br-2xl border shadow-2xl inset-0 bg-white dark:bg-neutral-900 pl-4 pt-4 pb-2 z-[100] flex flex-col justify-start",
-//               className
-//             )}
-//           >
-//             <div
-//               className="absolute right-2 top-2 z-50 text-neutral-800 dark:text-neutral-200"
-//               onClick={() => setOpen(false)}
-//             >
-//               <IconX />
-//             </div>
-//             {children}
-//           </motion.div>
-//         )}
-//       </AnimatePresence>
-//     </div>
-//   );
-// };
-
 export const SidebarLink = ({
   link,
   className,
@@ -209,23 +129,28 @@ export const SidebarLink = ({
   className?: string;
 }) => {
   const { open, animate } = useSidebar();
+
   return (
     <Link
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-2  group/sidebar py-2",
+        "flex items-center justify-start gap-2 group/sidebar py-2",
         className
       )}
       {...props}
     >
-      {link.icon}
+      {/* Icon always stable */}
+      <div className="flex-shrink-0">{link.icon}</div>
 
+      {/* Label with smooth width+opacity */}
       <motion.span
         animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
+          x: animate ? (open ? 0 : -10) : 0,
+          width: open ? "auto" : "0px",
         }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+        transition={{ duration: 0.2 }}
+        className="overflow-hidden text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-nowrap inline-block"
       >
         {link.label}
       </motion.span>
@@ -234,7 +159,7 @@ export const SidebarLink = ({
 };
 
 
-// userprofiles
+// ✅ User Profile Link
 export const ProfilesLink = ({
   id,
   name,
@@ -242,9 +167,65 @@ export const ProfilesLink = ({
   className,
   ...props
 }: {
-  id: string;   
+  id: string;
   name: string;
   profilePic: string;
+  className?: string;
+}) => {
+  const { open, animate } = useSidebar();
+
+  return (
+    <Link
+      href={`/chat/${id}`}
+      className={cn(
+        "flex items-center justify-start gap-2 group/sidebar",
+        className
+      )}
+      {...props}
+    >
+      {/* Profile Pic (never shrink) */}
+      <div className="h-10 w-10 rounded-full flex-shrink-0 overflow-hidden">
+        {/* <img
+          src={profilePic}
+          alt={`${name}'s profile picture`}
+          className="h-full w-full object-cover"
+        /> */}
+        <Image
+          src={profilePic}
+          alt={`${name}'s profile picture`}
+          width={40}
+          height={40}
+          className="h-full w-full object-cover"
+        />
+      </div>
+
+      {/* Name */}
+      <motion.span
+        animate={{
+          opacity: animate ? (open ? 1 : 0) : 1,
+          x: animate ? (open ? 0 : -10) : 0,
+          width: open ? "auto" : "0px",
+        }}
+        transition={{ duration: 0.2 }}
+        className="overflow-hidden text-neutral-700 dark:text-neutral-200 text-sm whitespace-nowrap inline-block group-hover/sidebar:translate-x-1 transition duration-150"
+      >
+        {name}
+      </motion.span>
+    </Link>
+  );
+};
+
+// ✅ Group Link
+export const GroupLink = ({
+  id,
+  name,
+  groupIcon,
+  className,
+  ...props
+}: {
+  id: string;
+  name: string;
+  groupIcon: string;
   className?: string;
 }) => {
   const { open, animate } = useSidebar();
@@ -258,23 +239,26 @@ export const ProfilesLink = ({
       )}
       {...props}
     >
-      {/* Profile Pic */}
-      <Image
-        src={profilePic}
-        width={30}
-        height={30}
-        alt={`${name}'s profile picture`}
-        className="rounded-full"
-      />
+      {/* Group Icon (never shrink) */}
+      <div className="h-10 w-10 rounded-full flex-shrink-0 overflow-hidden">
+        <Image
+          src={groupIcon}
+          alt={`${name}'s group icon`}
+          width={40}
+          height={40}
+          className="h-full w-full object-cover"
+        />
+      </div>
 
-      {/* Name (animated visibility) */}
+      {/* Group Name */}
       <motion.span
         animate={{
           opacity: animate ? (open ? 1 : 0) : 1,
           x: animate ? (open ? 0 : -10) : 0,
+          width: open ? "auto" : "0px",
         }}
         transition={{ duration: 0.2 }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm whitespace-pre inline-block"
+        className="overflow-hidden text-neutral-700 dark:text-neutral-200 text-sm whitespace-nowrap inline-block group-hover/sidebar:translate-x-1 transition duration-150"
       >
         {name}
       </motion.span>

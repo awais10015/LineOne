@@ -4,7 +4,7 @@ import { useRouter } from "nextjs-toploader/app";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+
 import { toast } from "sonner";
 import { CheckCircle } from "lucide-react";
 
