@@ -71,7 +71,7 @@ export function ChatSidebar({ children }) {
                     link={{
                       label: "Chats",
                       href: "#",
-                      icon: <FaUser size={27} className="text-[#ff6500]" />,
+                      icon: <FaUser size={27} className="text-black dark:text-white" />,
                     }}
                   />
                 </div>
@@ -86,6 +86,7 @@ export function ChatSidebar({ children }) {
                       key={chat._id}
                       id={chat._id}
                       name={otherUser?.name}
+                      lastMessage={chat?.lastMessage?.text}
                       profilePic={otherUser?.profilePic}
                     />
                   );
@@ -97,7 +98,7 @@ export function ChatSidebar({ children }) {
                     link={{
                       label: "Groups",
                       href: "#",
-                      icon: <FaUsers size={35} className="text-[#ff6500]" />,
+                      icon: <FaUsers size={35} className="text-black dark:text-white" />,
                     }}
                   />
                 </div>
@@ -107,6 +108,7 @@ export function ChatSidebar({ children }) {
                     key={chat._id}
                     id={chat._id}
                     name={chat.name}
+                    lastMessage={chat?.lastMessage?.text}
                     profilePic={chat.groupIcon || "/default-group.png"}
                   />
                 ))}

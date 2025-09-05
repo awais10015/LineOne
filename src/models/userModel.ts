@@ -59,7 +59,12 @@ const userSchema = new mongoose.Schema({
     default: [],
   },
   bio: { type: String, default: "No Bio Added" },
-
+  newMessages: [
+            {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: "Message",
+            },
+          ],
   privateAccount: { type: Boolean, default: false },
   savedPosts: {
     type: [

@@ -27,11 +27,12 @@ export default function ProfileForm() {
     } else {
       setLoading(false); // Only show form if username is not set
     }
-  }, [currentLoggedInUser, router]);
+  }, [currentLoggedInUser]);
 
   useEffect(() => {
     console.log(currentLoggedInUser);
   }, [currentLoggedInUser]);
+  
   const navigateToHome = () => {
     router.push("/home");
   };

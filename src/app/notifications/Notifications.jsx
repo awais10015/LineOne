@@ -5,7 +5,8 @@ import Loader from "@/components/Loader";
 import React from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const Notifications = () => {
   const { currentLoggedInUser } = useContext(CurrentUserContext);
@@ -76,13 +77,13 @@ const Notifications = () => {
                   src={n.eventBy.profilePic || "/default-avatar.png"}
                   alt={n.eventBy.username}
                   className="w-10 h-10 rounded-full object-cover object-top border cursor-pointer"
-                  onClick={() => handleProfileRedirect(n.eventBy._id)} 
+                  onClick={() => handleProfileRedirect(n.eventBy._id)}
                 />
 
                 {/* Text */}
                 <div
                   className="flex-1 text-sm cursor-pointer"
-                  onClick={() => handleProfileRedirect(n.eventBy._id)} 
+                  onClick={() => handleProfileRedirect(n.eventBy._id)}
                 >
                   <span>You got a </span>
                   <span className="font-medium">{n.event}</span>
@@ -101,7 +102,17 @@ const Notifications = () => {
             ))}
           </ul>
         ) : (
-          <p className="mt-40 text-gray-500 text-sm">No Notifications Yet</p>
+          <div className="w-full h-[90dvh] flex flex-col items-center justify-center gap-10">
+            <Image
+              src={"/notification.svg"}
+              height={180}
+              width={180}
+              alt="No notification yet"
+            />
+            <h1 className="text-md font-bold text-gray-600">
+              No notification yet
+            </h1>
+          </div>
         )}
       </div>
     </div>

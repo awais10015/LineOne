@@ -9,6 +9,7 @@ const CurrentUserContextProvider = ({ children }) => {
 
   useEffect(() => {
     const getUser = async () => {
+      if(currentLoggedInUser) return;
       try {
         const res = await fetch("/api/currentUser");
         const data = await res.json();

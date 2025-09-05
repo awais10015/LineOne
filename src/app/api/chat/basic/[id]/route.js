@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server";
 import { Chat } from "@/models/chatModel";
+import { Message } from "@/models/messageModel";
 import { connect } from "@/lib/db";
 
+
 export async function GET(req, { params }) {
-  const { id } = params; 
+  const { id } = params;
 
   try {
     await connect();
 
     // Query chats where this user is a participant
-    const chats = await Chat.find({ participants: id }).populate(
-      "participants",
-      "name profilePic"
-    );
+    const chats = await Chat.find({ participants: id })
+      .populate("participants")
+      .populate("lastMessage")
 
     if (!chats || chats.length === 0) {
       return NextResponse.json(

@@ -1,15 +1,21 @@
 import { NextResponse } from "next/server";
 import { Chat } from "@/models/chatModel";
-import { connectDB } from "@/lib/db";
+import { Message } from "@/models/messageModel";
+import { connect } from "@/lib/db";
 
 export async function GET(req, { params }) {
+  const id = await params?.chatId;
   try {
-    await connectDB();
-    const chat = await Chat.findById(params.chatId)
-      .populate("participants", "name email profilePic")
+    await connect();
+
+    const chat = await Chat.findById(id)
+      .populate("participants")
       .populate({
         path: "messages",
-        populate: { path: "sentBy", select: "name email profilePic" },
+        populate: {
+          path: "sentBy",
+          model: "User", // or whatever your user model name is
+        },
       });
 
     if (!chat)

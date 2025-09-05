@@ -1,11 +1,7 @@
 "use client";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import React, {
-  useState,
-  createContext,
-  useContext,
-} from "react";
+import React, { useState, createContext, useContext } from "react";
 import { motion } from "motion/react";
 // import { IconMenu2, IconX } from "@tabler/icons-react";
 // import { ModeToggle } from "../ModeToggle";
@@ -55,10 +51,12 @@ export const SidebarProvider = ({
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   animate?: boolean;
 }) => {
-  const [openState, setOpenState] = useState(false);
+  // const [openState, setOpenState] = useState(false);
 
-  const open = openProp !== undefined ? openProp : openState;
-  const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
+  // const open = openProp !== undefined ? openProp : openState;
+  // const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
+
+  const [open, setOpen] = useState(true);
 
   return (
     <SidebarContext.Provider value={{ open, setOpen, animate: animate }}>
@@ -104,11 +102,11 @@ export const DesktopSidebar = ({
     <>
       <motion.div
         className={cn(
-          "h-full px-4 py-4 hidden md:flex md:flex-col w-[250px]",
+          "h-full px-4 py-4 hidden md:flex md:flex-col w-[350px]",
           className
         )}
         animate={{
-          width: animate ? (open ? "250px" : "73px") : "250px",
+          width: animate ? (open ? "350px" : "77px") : "250px",
         }}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
@@ -150,7 +148,7 @@ export const SidebarLink = ({
           width: open ? "auto" : "0px",
         }}
         transition={{ duration: 0.2 }}
-        className="overflow-hidden text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-nowrap inline-block"
+        className="overflow-hidden text-black dark:text-white text-sm font-bold group-hover/sidebar:translate-x-1 transition duration-150 whitespace-nowrap inline-block"
       >
         {link.label}
       </motion.span>
@@ -158,17 +156,18 @@ export const SidebarLink = ({
   );
 };
 
-
 // ✅ User Profile Link
 export const ProfilesLink = ({
   id,
   name,
+  lastMessage,
   profilePic,
   className,
   ...props
 }: {
   id: string;
   name: string;
+  lastMessage: string;
   profilePic: string;
   className?: string;
 }) => {
@@ -178,18 +177,12 @@ export const ProfilesLink = ({
     <Link
       href={`/chat/${id}`}
       className={cn(
-        "flex items-center justify-start gap-2 group/sidebar",
+        "hover:bg-[#ff6500]/50 rounded-2xl w-full py-1 pl-1 pr-5 flex items-center justify-start gap-2 group/sidebar",
         className
       )}
       {...props}
     >
-      {/* Profile Pic (never shrink) */}
       <div className="h-10 w-10 rounded-full flex-shrink-0 overflow-hidden">
-        {/* <img
-          src={profilePic}
-          alt={`${name}'s profile picture`}
-          className="h-full w-full object-cover"
-        /> */}
         <Image
           src={profilePic}
           alt={`${name}'s profile picture`}
@@ -209,7 +202,14 @@ export const ProfilesLink = ({
         transition={{ duration: 0.2 }}
         className="overflow-hidden text-neutral-700 dark:text-neutral-200 text-sm whitespace-nowrap inline-block group-hover/sidebar:translate-x-1 transition duration-150"
       >
-        {name}
+        <div className="pl-2 flex flex-col justify-center">
+          <h1 className="text-md font-light text-gray-900 dark:text-gray-100 truncate max-w-[180px]">
+            {name}
+          </h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[220px]">
+            {lastMessage ? lastMessage : "No Message Yet"}
+          </p>
+        </div>
       </motion.span>
     </Link>
   );
@@ -219,12 +219,14 @@ export const ProfilesLink = ({
 export const GroupLink = ({
   id,
   name,
+  lastMessage,
   groupIcon,
   className,
   ...props
 }: {
   id: string;
   name: string;
+  lastMessage: string;
   groupIcon: string;
   className?: string;
 }) => {
@@ -260,7 +262,14 @@ export const GroupLink = ({
         transition={{ duration: 0.2 }}
         className="overflow-hidden text-neutral-700 dark:text-neutral-200 text-sm whitespace-nowrap inline-block group-hover/sidebar:translate-x-1 transition duration-150"
       >
-        {name}
+        <div className="pl-2 flex flex-col justify-center">
+          <h1 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate max-w-[180px]">
+            {name}
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[220px]">
+            {lastMessage}
+          </p>
+        </div>
       </motion.span>
     </Link>
   );

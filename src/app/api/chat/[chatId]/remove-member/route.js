@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 export async function POST(req, { params }) {
   try {
     const { chatId } = params;
-    const { memberIds } = await req.json(); // single or multiple
+    const { memberIds } = await req.json(); // can be single or multiple
 
     if (!memberIds || memberIds.length === 0) {
       return NextResponse.json({ error: "memberIds required" }, { status: 400 });
@@ -14,13 +14,14 @@ export async function POST(req, { params }) {
 
     await connect();
 
-    const membersToAdd = Array.isArray(memberIds)
+    // Ensure it's always an array of ObjectIds
+    const membersToRemove = Array.isArray(memberIds)
       ? memberIds.map((id) => new mongoose.Types.ObjectId(id))
       : [new mongoose.Types.ObjectId(memberIds)];
 
     const updatedChat = await Chat.findByIdAndUpdate(
       chatId,
-      { $addToSet: { participants: { $each: membersToAdd } } }, // prevent duplicates
+      { $pull: { participants: { $in: membersToRemove } } },
       { new: true }
     )
       .populate("participants", "-password")
@@ -32,7 +33,7 @@ export async function POST(req, { params }) {
 
     return NextResponse.json(updatedChat, { status: 200 });
   } catch (err) {
-    console.error("❌ add-member error:", err);
+    console.error("❌ remove-member error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
