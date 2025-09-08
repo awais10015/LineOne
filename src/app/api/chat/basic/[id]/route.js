@@ -5,7 +5,7 @@ import { connect } from "@/lib/db";
 
 
 export async function GET(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
     await connect();

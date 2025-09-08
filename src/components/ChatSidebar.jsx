@@ -6,17 +6,14 @@ import {
   ProfilesLink,
   SidebarLink,
 } from "@/components/ui/sidebar2";
-
+import Pusher from "pusher-js";
 import { FaUser } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa";
-
 
 import { cn } from "@/lib/utils";
 // import Image from "next/image";
 
 import CurrentUserContext from "@/context/CurrentUserContext";
-
-
 
 export function ChatSidebar({ children }) {
   const { currentLoggedInUser } = useContext(CurrentUserContext);
@@ -25,21 +22,66 @@ export function ChatSidebar({ children }) {
   const [loader, setloader] = useState(false);
 
   const fetchChatsBasic = async () => {
-    setloader(true);
-    try {
-      const res = await fetch(`/api/chat/basic/${currentLoggedInUser?._id}`);
-      const data = await res.json();
-      console.log(data);
-      const filterBasicChats = data.filter((chat) => chat.isGroup === false);
-      const filterGroupChats = data.filter((chat) => chat.isGroup === true);
-      setchats([...filterBasicChats]);
-      setgroupChats([...filterGroupChats]);
-      setloader(false);
-    } catch (error) {
-      console.log(error);
-      setloader(false);
-    }
+    if (!currentLoggedInUser) return;
+    const res = await fetch(`/api/chat/basic/${currentLoggedInUser._id}`);
+    const data = await res.json();
+
+    const sortedChats = data.sort(
+      (a, b) =>
+        new Date(b.lastMessage?.createdAt || 0) -
+        new Date(a.lastMessage?.createdAt || 0)
+    );
+
+    // Compute if the chat has new messages
+    const mapNewMessages = (chatArray) =>
+      chatArray.map((chat) => ({
+        ...chat,
+        hasNewMessage: chat.messages?.some((msg) =>
+          currentLoggedInUser.newMessages?.includes(msg._id)
+        ),
+      }));
+
+    setchats(mapNewMessages(sortedChats.filter((c) => !c.isGroup)));
+    setgroupChats(mapNewMessages(sortedChats.filter((c) => c.isGroup)));
   };
+
+  useEffect(() => {
+    if (!currentLoggedInUser) return;
+
+    fetchChatsBasic(); // fetch initial chats
+
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+      cluster: "ap2",
+    });
+
+    // Subscribe to a global channel for the user (better than subscribing to every chat)
+    const channel = pusher.subscribe(`user-${currentLoggedInUser._id}`);
+
+    channel.bind("new-message", (data) => {
+      const { chatId, message } = data;
+
+      setchats((prev) =>
+        prev.map((c) =>
+          c._id === chatId
+            ? { ...c, hasNewMessage: true, lastMessage: message }
+            : c
+        )
+      );
+
+      setgroupChats((prev) =>
+        prev.map((c) =>
+          c._id === chatId
+            ? { ...c, hasNewMessage: true, lastMessage: message }
+            : c
+        )
+      );
+    });
+
+    return () => {
+      pusher.disconnect();
+    };
+  }, [currentLoggedInUser]);
+
   useEffect(() => {
     if (!currentLoggedInUser) return;
     fetchChatsBasic();
@@ -63,15 +105,19 @@ export function ChatSidebar({ children }) {
         >
           <SidebarBody className="justify-between gap-10">
             <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto scrollbar-hide">
-             
               <div className="flex flex-col gap-2 items-start">
                 <div>
                   <SidebarLink
-                  className="pl-2"
+                    className="pl-2"
                     link={{
                       label: "Chats",
                       href: "#",
-                      icon: <FaUser size={27} className="text-black dark:text-white" />,
+                      icon: (
+                        <FaUser
+                          size={27}
+                          className="text-black dark:text-white"
+                        />
+                      ),
                     }}
                   />
                 </div>
@@ -87,18 +133,29 @@ export function ChatSidebar({ children }) {
                       id={chat._id}
                       name={otherUser?.name}
                       lastMessage={chat?.lastMessage?.text}
-                      profilePic={otherUser?.profilePic}
-                    />
+                      profilePic={otherUser?.profilePic || "/default-group.png"}
+                    >
+                      {chat.hasNewMessage && (
+                        <span className="ml-2 inline-block bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                          NEW
+                        </span>
+                      )}
+                    </ProfilesLink>
                   );
                 })}
 
                 <div>
                   <SidebarLink
-                  className="pl-1"
+                    className="pl-1"
                     link={{
                       label: "Groups",
                       href: "#",
-                      icon: <FaUsers size={35} className="text-black dark:text-white" />,
+                      icon: (
+                        <FaUsers
+                          size={35}
+                          className="text-black dark:text-white"
+                        />
+                      ),
                     }}
                   />
                 </div>
@@ -110,7 +167,13 @@ export function ChatSidebar({ children }) {
                     name={chat.name}
                     lastMessage={chat?.lastMessage?.text}
                     profilePic={chat.groupIcon || "/default-group.png"}
-                  />
+                  >
+                    {chat.hasNewMessage && (
+                      <span className="ml-2 inline-block bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                        NEW
+                      </span>
+                    )}
+                  </ProfilesLink>
                 ))}
               </div>
             </div>
