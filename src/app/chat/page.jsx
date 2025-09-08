@@ -10,6 +10,7 @@ import { MdOutlineAddComment } from "react-icons/md";
 import { RiUserSearchFill } from "react-icons/ri";
 import { FaUsers } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { FaUsersViewfinder } from "react-icons/fa6";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -70,6 +71,13 @@ const page = () => {
               >
                 <RiUserSearchFill size={38} />{" "}
                 <span className="text-black dark:text-white">Search User</span>
+              </Button>
+               <Button
+                onClick={() => router.push("/groups")}
+                className="cursor-pointer w-full gap-2 flex items-start justify-start bg-transparent hover:bg-transparent text-[#ff6500] rounded-full p-3"
+              >
+                <FaUsersViewfinder size={38} />{" "}
+                <span className="text-black dark:text-white">Join Groups</span>
               </Button>
               <Button
                 onClick={() => router.push("/creategroup")}

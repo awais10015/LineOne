@@ -1,8 +1,8 @@
 import React from 'react'
-import SearchUser from './SearchUser'
+import Groups from './Groups'
 const page = () => {
   return (
-    <SearchUser/>
+    <Groups/>
   )
 }
 

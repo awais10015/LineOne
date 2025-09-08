@@ -1,17 +1,8 @@
 "use client";
-
-import React, { useEffect, useState, useContext, useRef } from "react";
-import { useParams } from "next/navigation";
 import Loader from "@/components/Loader";
+import { Select, Space } from "antd";
+import FollowUnfollowButton from "@/components/profile/FollowUnfollowButton";
 import { Button } from "@/components/ui/button";
-import { FaArrowLeft } from "react-icons/fa";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import Link from "next/link";
-import Image from "next/image";
-import CurrentUserContext from "@/context/CurrentUserContext";
-import { Input } from "@/components/ui/input";
-import { Send, LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -20,21 +11,32 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import CurrentUserContext from "@/context/CurrentUserContext";
+import { LogOut, Send, UserRoundMinus, UserRoundPlus } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useContext, useEffect, useRef, useState } from "react";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { FaArrowLeft } from "react-icons/fa";
+import Pusher from "pusher-js";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const Chat = () => {
   const { id } = useParams();
@@ -45,12 +47,86 @@ const Chat = () => {
   const [text, setText] = useState("");
   const [media, setMedia] = useState(null);
   const [replyOf, setReplyOf] = useState(null);
+  const [selectUsers, setselectUsers] = useState("");
+  const [options, setoptions] = useState("");
+  const [addMembers, setaddMembers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const { currentLoggedInUser } = useContext(CurrentUserContext);
   const messagesEndRef = useRef(null);
+
+
+
+  useEffect(() => {
+  if (!chat?._id) return;
+
+  const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+    cluster: "ap2",
+  });
+
+  const channel = pusher.subscribe(`chat-${chat._id}`);
+
+  channel.bind("new-message", (data) => {
+    setChat((prev) => ({
+      ...prev,
+      messages: [...prev.messages, data.message],
+    }));
+    scrollToBottom();
+  });
+
+  return () => {
+    pusher.unsubscribe(`chat-${chat._id}`);
+    pusher.disconnect();
+  };
+}, [chat?._id]);
+
+
   // Scroll to bottom function
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const getUsers = async () => {
+    if (!chat) return;
+    try {
+      const res = await fetch("/api/users");
+      const data = await res.json();
+
+      setAllUsers(data.users); // save full list ✅
+
+      const participantIds = chat?.participants?.map((p) => p._id) || [];
+
+      const filteredUsers = data.users.filter(
+        (user) =>
+          user._id !== currentLoggedInUser._id &&
+          !participantIds.includes(user._id)
+      );
+
+      setselectUsers(filteredUsers);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getUsers();
+  }, [chat]);
+  useEffect(() => {
+    if (!selectUsers) return;
+    setoptions(
+      selectUsers?.map((user) => ({
+        label: user.name,
+        value: user._id,
+        profilePic: user.profilePic,
+        username: user.username,
+      }))
+    );
+  }, [selectUsers]);
+
+  const handleChange = (value) => {
+    setaddMembers([...value]);
+  };
+  useEffect(() => {
+    console.log(addMembers);
+  }, [addMembers]);
 
   // Scroll when chat loads or new messages arrive
   useEffect(() => {
@@ -67,17 +143,30 @@ const Chat = () => {
     }
   }, [sendLoader]);
   const getChat = async () => {
-    setLoader(true);
-    try {
-      const res = await fetch(`/api/chat/${id}`);
-      const data = await res.json();
-      setChat(data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoader(false);
+  setLoader(true);
+  try {
+    const res = await fetch(`/api/chat/${id}`);
+    const data = await res.json();
+
+    // Check if current user is in participants
+    const isParticipant = data?.participants?.some(
+      (p) => p._id === currentLoggedInUser._id
+    );
+
+    if (!isParticipant) {
+      alert("❌ You are not part of this chat now.");
+      router.push("/chat");
+      return; // stop execution
     }
-  };
+
+    setChat(data);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    setLoader(false);
+  }
+};
+
 
   useEffect(() => {
     getChat();
@@ -95,7 +184,7 @@ const Chat = () => {
       if (res.ok) {
         setLoader(false);
         console.log(currentLoggedInUser._id, "left group");
-        router.push("/chat");
+        router.push("/chat")
       }
     } catch (error) {
       console.log(error);
@@ -103,59 +192,79 @@ const Chat = () => {
     }
   };
 
-  // const adminRemoveMembers = async () => {
-  //   setLoader(true);
-  //   try {
-  //     const res = await fetch(`/api/chat/${id}/remove-member`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ memberIds: ["id1", "id2", "id3"] }),
-  //     });
+  const adminRemoveMembers = async (userId) => {
+    
+    try {
+      const res = await fetch(`/api/chat/${id}/remove-member`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memberIds: [userId] }),
+      });
 
-  //     if (res.ok) {
-  //       setLoader(false);
-  //       console.log(currentLoggedInUser._id, "left group");
-  //       router.push("/chat");
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     setLoader(false);
-  //   }
-  // };
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to remove member");
+      }
 
-  // const adminAddMembers = async () => {
-  //   try {
-  //     const res = await fetch(`/api/chat/${id}/add-member`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ memberIds: ["id4", "id5"] }),
-  //     });
+      const data = await res.json();
+      console.log("✅ Removed a user:", data);
 
-  //     if (res.ok) {
-  //       console.log(currentLoggedInUser._id, "left group");
-  //       router.push("/chat");
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+      // Update participants
+      setChat((prev) => ({
+        ...prev,
+        participants: prev.participants.filter((user) => user._id !== userId),
+      }));
 
-  // const userJoinsGroup = async () => {
-  //   try {
-  //     const res = await fetch(`/api/chat/${id}/add-member`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ memberIds: "id6" }),
-  //     });
+      // Re-add removed user to dropdown
+      const removedUser = allUsers.find((u) => u._id === userId);
+      if (removedUser) {
+        setselectUsers((prev) => [...prev, removedUser]);
+      }
 
-  //     if (res.ok) {
-  //       console.log(currentLoggedInUser._id, "left group");
-  //       router.push("/chat");
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+      
+    } catch (error) {
+      console.error("❌ Error removing member:", error);
+     
+    }
+  };
+
+  const adminAddMembers = async () => {
+    if (!addMembers || addMembers.length === 0) return;
+
+    try {
+      const res = await fetch(`/api/chat/${id}/add-member`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memberIds: addMembers }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to add members");
+      }
+
+      const data = await res.json();
+      console.log("✅ Members added successfully:", data);
+
+      // Find newly added users from your selectUsers list
+      const newMembers = selectUsers.filter((user) =>
+        addMembers.includes(user._id)
+      );
+
+      // Update local chat state
+      setChat((prev) => ({
+        ...prev,
+        participants: [...prev.participants, ...newMembers],
+      }));
+
+      // Clear selection after success
+      setaddMembers([]);
+    } catch (error) {
+      console.error("❌ Error adding members:", error);
+    }
+  };
+
+  
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -236,19 +345,217 @@ const Chat = () => {
                         <h1 className="text-md text-start font-semibold text-gray-900 dark:text-gray-100">
                           {chat?.name}
                         </h1>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-start text-gray-500 dark:text-gray-400">
                           {chat?.participants?.length} members
                         </p>
                       </div>
                     </div>
                   </DialogTrigger>
-                  <DialogContent className="z-1000">
+                  <DialogContent className="z-1000 px-0">
                     <DialogHeader>
-                      <DialogTitle>Are you absolutely sure?</DialogTitle>
-                      <DialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete your account and remove your data from our
-                        servers.
+                      <DialogTitle>
+                        <div className="w-full flex flex-col items-center justify-center gap-5">
+                          <div className="relative h-[90px] w-[90px] rounded-full overflow-hidden">
+                            <Image
+                              src={chat?.groupIcon}
+                              alt="Group Icon"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="flex flex-col justify-center items-center ">
+                            <h1 className="text-md text-start font-semibold text-gray-900 dark:text-gray-100">
+                              {chat?.name}
+                            </h1>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {chat?.participants?.length} members
+                            </p>
+                          </div>
+                        </div>
+                      </DialogTitle>
+                      <DialogDescription asChild>
+                        <Card className="h-[450px] overflow-y-auto scrollbar-hide w-full p-0 gap-1 border-none shadow-none">
+                          <CardHeader className="items-start px-3">
+                            <CardTitle>Admin</CardTitle>
+                            <CardDescription className="">
+                              <div className="flex items-center justify-between p-2 rounded-lg">
+                                <Link href={`/userprofile/${chat?.admin._id}`}>
+                                  <div className="flex items-center gap-3">
+                                    <img
+                                      src={
+                                        chat?.admin.profilePic ||
+                                        "/default-avatar.png"
+                                      }
+                                      alt={chat?.admin.name}
+                                      className="w-10 h-10 rounded-full object-cover object-top"
+                                    />
+                                    <div>
+                                      <p className="font-medium text-black dark:text-white flex items-center gap-2">
+                                        {chat?.admin.name}
+                                        <span className="text-xs bg-[#ff6500]/15 text-[#ff6500] px-2 py-0.5 rounded-full">
+                                          Admin
+                                        </span>
+                                      </p>
+                                      <p className="text-sm text-start text-gray-500">
+                                        {chat?.admin.username}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </Link>
+
+                                {currentLoggedInUser?._id ===
+                                  chat?.admin._id && (
+                                  <div className="">
+                                    <Dialog>
+                                      <DialogTrigger>
+                                        <div className="flex items-center gap-2 px-2 py-1 rounded-lg bg-[#ff6500]/20 text-[#ff6500] hover:bg-[#ff6500] hover:text-white cursor-pointer transition-colors duration-200">
+                                          <UserRoundPlus />
+                                          Add Members
+                                        </div>
+                                      </DialogTrigger>
+                                      <DialogContent className="z-2000">
+                                        <DialogHeader>
+                                          <DialogTitle>Add Users</DialogTitle>
+                                          <DialogDescription asChild>
+                                            <Select
+                                              value={addMembers}
+                                              mode="multiple"
+                                              style={{ width: "100%" }}
+                                              className="z-3000"
+                                              placeholder="Select users to add in group"
+                                              onChange={handleChange}
+                                              options={options}
+                                              showSearch
+                                              optionFilterProp="label"
+                                              getPopupContainer={(trigger) =>
+                                                trigger.parentNode
+                                              }
+                                              filterOption={(input, option) =>
+                                                option?.label
+                                                  .toLowerCase()
+                                                  .includes(
+                                                    input.toLowerCase()
+                                                  ) ||
+                                                option?.username
+                                                  ?.toLowerCase()
+                                                  .includes(input.toLowerCase())
+                                              }
+                                              optionRender={(option) => (
+                                                <Space>
+                                                  <img
+                                                    src={
+                                                      option.data.profilePic ||
+                                                      "/default.png"
+                                                    }
+                                                    alt={option.data.label}
+                                                    className="w-6 h-6 rounded-full object-cover object-top"
+                                                  />
+                                                  <span>
+                                                    {option.data.label}
+                                                  </span>
+                                                  <span className="text-gray-400 text-xs">
+                                                    {option.data.username}
+                                                  </span>
+                                                </Space>
+                                              )}
+                                            />
+                                          </DialogDescription>
+                                        </DialogHeader>
+
+                                        {/* Action Button */}
+                                        <div className="flex justify-end mt-4">
+                                          <Button
+                                            onClick={adminAddMembers}
+                                            className="cursor-pointer bg-[#ff6500] hover:bg-[#e45b00] text-white px-4 py-2 rounded-lg"
+                                          >
+                                            Add Members
+                                          </Button>
+                                        </div>
+                                      </DialogContent>
+                                    </Dialog>
+                                  </div>
+                                )}
+                              </div>
+                            </CardDescription>
+                          </CardHeader>
+
+                          <CardContent className="w-full h-[340px] px-3 overflow-y-auto scrollbar-hide flex flex-col ">
+                            <div className="mt-1">Members</div>
+                            {chat?.participants?.map((user) => (
+                              <div
+                                key={user?._id}
+                                className="flex items-center justify-between p-2 rounded-lg hover:text-black hover:bg-gray-100"
+                              >
+                                <Link href={`/userprofile/${user?._id}`}>
+                                  <div className="flex items-center gap-3">
+                                    <img
+                                      src={
+                                        user?.profilePic ||
+                                        "/default-avatar.png"
+                                      }
+                                      alt={user?.name}
+                                      className="w-10 h-10 rounded-full object-cover object-top"
+                                    />
+                                    <div>
+                                      <p className="font-medium text-black dark:text-white flex items-center gap-2">
+                                        {user?.name}
+                                        {/* Show Admin Badge */}
+                                        {user?._id === chat?.admin._id && (
+                                          <span className="text-xs bg-[#ff6500]/15 text-[#ff6500] px-2 py-0.5 rounded-full">
+                                            Admin
+                                          </span>
+                                        )}
+                                      </p>
+                                      <p className="text-sm text-start text-gray-500">
+                                        {user?.username}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </Link>
+
+                                {/* Show "You" if it's the current user, else follow/unfollow */}
+                                {user?._id === currentLoggedInUser?._id ? (
+                                  // Case 1: It's the current logged-in user
+                                  <span className="text-sm text-gray-400">
+                                    You
+                                  </span>
+                                ) : currentLoggedInUser?._id ===
+                                  chat?.admin._id ? (
+                                  // Case 2: Current user is admin -> show remove button
+                                  <Button
+                                    onClick={() => {
+                                      adminRemoveMembers(user?._id);
+                                    }}
+                                    className="cursor-pointer bg-transparent hover:bg-transparent shadow-none text-red-500 hover:text-red-600"
+                                  >
+                                    <UserRoundMinus />
+                                  </Button>
+                                ) : (
+                                  // Case 3: Everyone else -> follow/unfollow button
+                                  <FollowUnfollowButton
+                                    currentLoggedInUser={currentLoggedInUser}
+                                    id={user?._id}
+                                    refresh={getChat}
+                                  />
+                                )}
+                              </div>
+                            ))}
+                          </CardContent>
+
+                          <CardFooter className="flex justify-end">
+                            {currentLoggedInUser._id === chat?.admin._id ? (
+                              <div></div>
+                            ) : (
+                              <Button
+                                onClick={leaveGroup}
+                                className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl shadow-md transition-all duration-300 ease-in-out"
+                              >
+                                <LogOut size={20} className="text-white" />
+                                Leave Group
+                              </Button>
+                            )}
+                          </CardFooter>
+                        </Card>
                       </DialogDescription>
                     </DialogHeader>
                   </DialogContent>

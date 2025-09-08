@@ -8,6 +8,8 @@ export async function POST(req, { params }) {
     const { chatId } = params;
     const { memberIds } = await req.json(); // can be single or multiple
 
+    console.log("memberIds : ", memberIds)
+
     if (!memberIds || memberIds.length === 0) {
       return NextResponse.json({ error: "memberIds required" }, { status: 400 });
     }

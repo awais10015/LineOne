@@ -10,6 +10,7 @@ export async function GET(req, { params }) {
 
     const chat = await Chat.findById(id)
       .populate("participants")
+      .populate("admin")
       .populate({
         path: "messages",
         populate: {
