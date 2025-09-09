@@ -245,7 +245,7 @@ const Profile = () => {
                   <FollowUnfollowButton
                     currentLoggedInUser={currentLoggedInUser}
                     id={AnotherUser?._id}
-                    refresh={getUsers}
+                    
                   />
                   <MessageButton id={AnotherUser?._id} />
                 </div>

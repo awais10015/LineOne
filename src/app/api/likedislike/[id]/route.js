@@ -5,17 +5,11 @@ import { NextResponse } from "next/server";
 export async function POST(req, { params }) {
   try {
     await connect();
-
     const { id } = params;
     const { currentLoggedInUser, toDo } = await req.json();
 
     const post = await Post.findById(id).populate("postBy");
-    if (!post) {
-      return NextResponse.json(
-        { success: false, error: "Post not found" },
-        { status: 404 }
-      );
-    }
+    if (!post) return NextResponse.json({ error: "Post not found" }, { status: 404 });
 
     const eventData = {
       eventBy: currentLoggedInUser,
@@ -30,15 +24,11 @@ export async function POST(req, { params }) {
         post.likedBy.push(currentLoggedInUser);
         post.dislikedBy.pull(currentLoggedInUser);
 
-        try {
-          await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notification`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(eventData),
-          });
-        } catch (err) {
-          console.error("Notification failed:", err.message);
-        }
+        await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notification`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(eventData),
+        });
       }
     }
 
@@ -52,13 +42,9 @@ export async function POST(req, { params }) {
     }
 
     await post.save();
-
     return NextResponse.json({ success: true, post });
-  } catch (error) {
-    console.error("LikeDislike API Error:", error);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
+  } catch (err) {
+    console.error("LikeDislike Error:", err.message);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { connect } from "@/lib/db";
 import { User } from "@/models/userModel";
 import { Post } from "@/models/postModel"; 
+import { Message } from "@/models/messageModel"; 
 
 export async function GET() {
   const session = await auth();
@@ -32,7 +33,7 @@ export async function GET() {
       
     return NextResponse.json({ user: user || null });
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
     return;
   }
 }
