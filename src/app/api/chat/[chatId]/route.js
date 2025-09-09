@@ -15,7 +15,7 @@ export async function GET(req, { params }) {
         path: "messages",
         populate: {
           path: "sentBy",
-          model: "User", // or whatever your user model name is
+          model: "User",
         },
       });
 

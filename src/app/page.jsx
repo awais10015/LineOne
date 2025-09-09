@@ -13,19 +13,19 @@ export default function ProfileForm() {
   const router = useRouter();
   const { currentLoggedInUser } = useContext(CurrentUserContext);
 
-  // Handle user redirect logic
+  
   useEffect(() => {
     if (currentLoggedInUser === null) {
       if (!sessionStorage.getItem("reloaded")) {
         sessionStorage.setItem("reloaded", "true");
-        window.location.reload(); // Hard reload
+        window.location.reload();
       }
       return;
     } else if (currentLoggedInUser?.username) {
       router.push("/home");
       return;
     } else {
-      setLoading(false); // Only show form if username is not set
+      setLoading(false); 
     }
   }, [currentLoggedInUser]);
 
@@ -65,12 +65,12 @@ export default function ProfileForm() {
       }
 
       toast.success("Credentials added successfully");
-      navigateToHome(); // Go to landing or auth route
+      navigateToHome(); 
       return;
     } catch (err) {
       console.error(err);
       toast.error("Error updating profile.");
-      setLoading(false); // Allow retry
+      setLoading(false); 
     }
     loader.done();
   };
@@ -85,7 +85,7 @@ export default function ProfileForm() {
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 w-full max-w-md mx-auto p-6 rounded-2xl shadow-lg"
       >
-        {/* Username */}
+       
         <div className="flex flex-col gap-1">
           <label
             htmlFor="username"
@@ -105,7 +105,7 @@ export default function ProfileForm() {
           </div>
         </div>
 
-        {/* Date of Birth */}
+      
         <div className="flex flex-col gap-1">
           <label
             htmlFor="dateOfBirth"
@@ -130,7 +130,7 @@ export default function ProfileForm() {
           </div>
         </div>
 
-        {/* Gender */}
+       
         <div className="flex flex-col gap-1">
           <label htmlFor="gender" className="text-sm font-medium text-gray-700">
             Gender
@@ -159,7 +159,6 @@ export default function ProfileForm() {
           </div>
         </div>
 
-        {/* Save button */}
         <button
           type="submit"
           className="w-full bg-[#ff6500] text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-200"

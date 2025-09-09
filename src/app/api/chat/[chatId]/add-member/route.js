@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 export async function POST(req, { params }) {
   try {
     const { chatId } = params;
-    const { memberIds } = await req.json(); // single or multiple
+    const { memberIds } = await req.json(); 
 
     if (!memberIds || memberIds.length === 0) {
       return NextResponse.json({ error: "memberIds required" }, { status: 400 });
@@ -20,7 +20,7 @@ export async function POST(req, { params }) {
 
     const updatedChat = await Chat.findByIdAndUpdate(
       chatId,
-      { $addToSet: { participants: { $each: membersToAdd } } }, // prevent duplicates
+      { $addToSet: { participants: { $each: membersToAdd } } }, 
       { new: true }
     )
       .populate("participants", "-password")

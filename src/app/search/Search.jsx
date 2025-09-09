@@ -51,20 +51,19 @@ const Search = () => {
     }
   };
   const fetchUsers = async () => {
-    setloader(true)
+    setloader(true);
     try {
       const res = await fetch("/api/users");
-    const data = await res.json();
-    const filteredData = data.users.filter(
-      (user) => user._id !== currentLoggedInUser._id
-    );
-    setUsers(filteredData);
-    setloader(false)
+      const data = await res.json();
+      const filteredData = data.users.filter(
+        (user) => user._id !== currentLoggedInUser._id
+      );
+      setUsers(filteredData);
+      setloader(false);
     } catch (error) {
-      console.log(error)
-      setloader(false)
+      console.log(error);
+      setloader(false);
     }
-    
   };
   const getHashtags = () => {
     if (!searchWord) {
@@ -120,7 +119,6 @@ const Search = () => {
     <>
       <div className="w-full flex items-start justify-center mt-5">
         <div className="w-full max-w-4xl px-3 pb-5 flex items-center justify-center flex-col gap-10 rounded-2xl overflow-hidden srollbar-hide">
-          {/* <Input type="text" placeholder="Search..." onChange={(e) => setSearchWord(e.target.value)} /> */}
           <div className="relative w-full max-w-sm">
             <Input
               className="pl-10 focus:outline-none focus:ring-none"
@@ -166,9 +164,9 @@ const Search = () => {
                     <CardDescription>{}</CardDescription>
                   </CardHeader>
                   <CardContent className="grid gap-1 p-1">
-                    {loader ? (<Loader/>):(
-!searchWord ? (
-                      // Default Grid of posts
+                    {loader ? (
+                      <Loader />
+                    ) : !searchWord ? (
                       <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
                         {posts?.map((post) => (
                           <div
@@ -196,14 +194,12 @@ const Search = () => {
                               </div>
                             </Link>
 
-                            {/* Post Description */}
                             <Link href={`/post/${post?._id}`}>
                               <p className="text-base mt-5">
                                 {post?.description}
                               </p>
                             </Link>
 
-                            {/* Media */}
                             {post.media && (
                               <Link href={`/post/${post?._id}`}>
                                 {/\.(mp4|webm|ogg)$/i.test(post?.media) ? (
@@ -225,7 +221,6 @@ const Search = () => {
                         ))}
                       </div>
                     ) : (
-                      // When searchedWord exists → show searchedPosts
                       searchedPosts?.map((post) => (
                         <div
                           key={post._id}
@@ -254,10 +249,8 @@ const Search = () => {
                             </div>
                           </Link>
 
-                          {/* Post Description */}
                           <p className="text-base mt-5">{post?.description}</p>
 
-                          {/* tagged users */}
                           {post?.taggedUsers.length > 0 && (
                             <div className="flex gap-1 text-gray-400 flex-wrap">
                               tagged
@@ -273,7 +266,6 @@ const Search = () => {
                             </div>
                           )}
 
-                          {/* Hashtags */}
                           {post?.hashtags?.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-2">
                               {post?.hashtags.map((hashtag, i) => (
@@ -287,7 +279,6 @@ const Search = () => {
                             </div>
                           )}
 
-                          {/* Media */}
                           {post.media && (
                             <>
                               <Link href={`/media/${post?._id}`}>
@@ -307,7 +298,7 @@ const Search = () => {
                               </Link>
                             </>
                           )}
-                          {/* Actions */}
+
                           <div className="flex gap-5 mt-5">
                             <LikeDislike postId={post?._id} />
                             <Link href={`/post/${post?._id}`}>
@@ -324,7 +315,6 @@ const Search = () => {
                           </div>
                         </div>
                       ))
-                    )
                     )}
                     {}
                   </CardContent>
@@ -342,7 +332,6 @@ const Search = () => {
                         key={user?._id}
                         className="flex items-center justify-between p-2 rounded-lg hover:text-black hover:bg-gray-100"
                       >
-                        {/* Left: Profile picture */}
                         <Link href={`/userprofile/${user?._id}`}>
                           <div className="flex items-center gap-3">
                             <img
@@ -350,7 +339,7 @@ const Search = () => {
                               alt={user?.name}
                               className="w-10 h-10 rounded-full object-cover object-top"
                             />
-                            {/* Middle: Name + Username */}
+
                             <div>
                               <p className="font-medium">{user?.name}</p>
                               <p className="text-sm text-gray-500">
@@ -368,7 +357,6 @@ const Search = () => {
                       </div>
                     ))}
                   </CardContent>
-                  {/* <CardFooter>This is the posts footer</CardFooter> */}
                 </Card>
               </TabsContent>
               {searchWord && (
@@ -423,10 +411,8 @@ const Search = () => {
                               </div>
                             </Link>
 
-                            {/* Post Description */}
                             <p className="text-base mt-5">{post.description}</p>
 
-                            {/* tagged users */}
                             {post?.taggedUsers.length > 0 && (
                               <div className="flex gap-1 text-gray-400 flex-wrap">
                                 tagged
@@ -442,7 +428,6 @@ const Search = () => {
                               </div>
                             )}
 
-                            {/* Hashtags */}
                             {post.hashtags?.length > 0 && (
                               <div className="flex flex-wrap gap-2 mt-2">
                                 {post.hashtags.map((hashtag, i) => (
@@ -456,7 +441,6 @@ const Search = () => {
                               </div>
                             )}
 
-                            {/* Media */}
                             {post.media && (
                               <>
                                 <Link href={`/media/${post._id}`}>
@@ -477,7 +461,6 @@ const Search = () => {
                               </>
                             )}
 
-                            {/* Actions */}
                             <div className="flex gap-5 mt-5">
                               <LikeDislike postId={post._id} />
                               <Link href={`/post/${post._id}`}>
@@ -495,7 +478,6 @@ const Search = () => {
                           </div>
                         ))}
                     </CardContent>
-                    {/* <CardFooter>This is the posts footer</CardFooter> */}
                   </Card>
                 </TabsContent>
               )}

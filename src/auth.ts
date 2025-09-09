@@ -25,7 +25,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const email = credentials.email as string | undefined;
         const password = credentials.password as string | undefined;
 
-        // Validation kra ga k email hi ha na
+       
         if (!email || !validator.isEmail(email)) {
           throw new Error("Invalid email address");
         }
@@ -33,7 +33,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!email || !password)
           throw new CredentialsSignin("Please provide both Email and Password");
 
-        //connect with DB
+     
         await connect();
 
         const user = await User.findOne({ email }).select("+password");
@@ -57,7 +57,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       try {
         if (account?.provider === "google") {
           const { email, name, id } = user;
-          // validation for email
+       
            if (!email || !validator.isEmail(email)) {
           throw new Error("Invalid email address");
         }
@@ -68,7 +68,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             await User.create({ email, name, googleId: id });
           }
         }
-        return true; // ✅ always return true if successful
+        return true;
       } catch (err) {
         console.error("Sign-in error:", err);
         return false;

@@ -1,4 +1,4 @@
-// app/api/notifications/route.js
+
 import { connect } from "@/lib/db";
 import { Notification } from "@/models/notificationModel";
 import { NextResponse } from "next/server";
@@ -7,28 +7,21 @@ export async function POST(req) {
   try {
     const body = await req.json();
     await connect();
-
-    // 1. Save notification in DB
     let newNotification = await Notification.create(body);
-
-    // repopulate it (assuming eventBy and eventFor reference User model)
     newNotification = await Notification.findById(newNotification._id)
       .populate("eventBy") 
       .populate("eventFor");
-
-    // 2. Trigger real-time socket notification
     await fetch("https://lineoneserver-production.up.railway.app/notify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        userId: body.eventFor, // notify the receiver
+        userId: body.eventFor,
         notification: {
           type: body.event,
           message: `You have a new ${newNotification.event} from ${newNotification.eventBy.username}`, // customize text
         },
       }),
     });
-
     return NextResponse.json(newNotification, { status: 201 });
   } catch (error) {
     console.error("Error creating notification:", error.message);

@@ -22,7 +22,6 @@ const LikeDislike = ({ postId, refresh }) => {
   const [initialLikeValue, setInitialLikeValue] = useState();
   const [initialDislikeValue, setInitialDislikeValue] = useState();
 
-  // optimistic hook start
   const [isLiking, setIsLiking] = useOptimistic(
     isLiked,
     (_, newState) => newState
@@ -32,7 +31,6 @@ const LikeDislike = ({ postId, refresh }) => {
     isDisliked,
     (_, newState) => newState
   );
-  // optimistic hook end
 
   const getPost = async () => {
     const res = await fetch(`/api/post/${postId}`);
@@ -43,9 +41,6 @@ const LikeDislike = ({ postId, refresh }) => {
     getPost();
   }, [postId]);
 
-  // useEffect(() => {
-  //   setPost(post.Data);
-  // }, []);
   useEffect(() => {
     if (!post) return;
     setisLiked(post?.likedBy.includes(currentLoggedInUser?._id));
@@ -60,15 +55,8 @@ const LikeDislike = ({ postId, refresh }) => {
     console.log(post);
   }, [post]);
 
-  // useEffect(() => {
-  //   console.log("isLiked", isLiked);
-  //   console.log("isDisliked", isDisliked);
-  // }, [isLiked, isDisliked]);
-
   const likePost = async () => {
     const newIsLiking = !isLiking;
-
-    // optimistic update
     startTransition(() => {
       setIsLiking(newIsLiking);
       setisLiked(newIsLiking);
@@ -98,7 +86,6 @@ const LikeDislike = ({ postId, refresh }) => {
   const dislikePost = async () => {
     const newIsDisliking = !isDisliking;
 
-    // optimistic update
     startTransition(() => {
       setIsDisliking(newIsDisliking);
       setisDisliked(newIsDisliking);

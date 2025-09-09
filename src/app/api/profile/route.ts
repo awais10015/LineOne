@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth"; // your custom auth logic
-import { connect } from "@/lib/db"; // your DB connection logic
-import {User} from "@/models/userModel"; // your Mongoose User model
+import { auth } from "@/auth"; 
+import { connect } from "@/lib/db"; 
+import {User} from "@/models/userModel"; 
 
 export async function POST(req: Request) {
   try {

@@ -3,7 +3,6 @@ import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Power } from "lucide-react";
 import { motion } from "motion/react";
-// import { useSidebar } from "./ui/sidebar";
 import { useSidebar } from "../ui/sidebar";
 const SignOutButton = () => {
   const { open, animate } = useSidebar();

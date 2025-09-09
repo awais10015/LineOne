@@ -1,4 +1,4 @@
-// app/api/posts/user/[id]/route.js
+
 import { connect } from "@/lib/db";
 import { Post } from "@/models/postModel";
 import { NextResponse } from "next/server";
@@ -9,7 +9,6 @@ export async function GET(req, { params }) {
     await connect();
     const { id } = await params; 
     
-    // Find posts where postBy === id
     const posts = await Post.find({ postBy: new mongoose.Types.ObjectId(id) })
        .populate("taggedUsers")
        .sort({ createdAt: -1 });

@@ -1,23 +1,19 @@
 "use client";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import React, { useState, createContext, useContext, useRef, useEffect } from "react";
+import React, {
+  useState,
+  createContext,
+  useContext,
+  useRef,
+  useEffect,
+} from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import { ModeToggle } from "../ModeToggle";
 import Link from "next/link";
-
-// import React, { useRef, useEffect } from "react";
-// import { useSidebar } from "./sidebar";
-// import { AnimatePresence, motion } from "motion/react";
-// import { cn } from "@/lib/utils";
-// import { IconMenu2, IconX } from "@tabler/icons-react";
-// import { ModeToggle } from "../ModeToggle";
-// import Image from "next/image";
 import { usePathname } from "next/navigation";
-
-
-
+import { IconBrandLine, IconBellRinging, } from "@tabler/icons-react";
 
 interface Links {
   label: string;
@@ -127,8 +123,6 @@ export const MobileSidebar = ({
   const { open, setOpen } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-
-  // ✅ Click outside handler
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -150,11 +144,8 @@ export const MobileSidebar = ({
     };
   }, [open, setOpen]);
 
-  // ✅ Keep sidebar open after route change (don’t reset)
   useEffect(() => {
-    // Do nothing → sidebar will stay open even after navigation
-    // If you wanted to close it automatically, you’d call setOpen(false) here
-    setOpen(false)
+    setOpen(false);
   }, [pathname]);
 
   return (
@@ -234,6 +225,109 @@ export const SidebarLink = ({
         className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
       >
         {link.label}
+      </motion.span>
+    </Link>
+  );
+};
+
+export const ChatLink = ({
+  
+  label,
+  href,
+  count,
+  className,
+  ...props
+}: {
+  
+  label: string;
+  href: string;
+  count?: number;
+  className?: string;
+}) => {
+  const { open, animate } = useSidebar();
+
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "flex items-center justify-start gap-2 group/sidebar py-2",
+        className
+      )}
+      {...props}
+    >
+      {/* Icon wrapper */}
+      <div className="relative">
+        <IconBrandLine className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
+
+        {/* Badge */}
+         {count && Number(count) > 0 ? (
+          <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white shadow-md">
+            {count}
+          </span>
+        ):("")}
+      </div>
+
+      {/* Label */}
+      <motion.span
+        animate={{
+          display: animate ? (open ? "inline-block" : "none") : "inline-block",
+          opacity: animate ? (open ? 1 : 0) : 1,
+        }}
+        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+      >
+        {label}
+      </motion.span>
+    </Link>
+  );
+};
+
+
+export const NotificationLink = ({
+  
+  label,
+  href,
+  count,
+  className,
+  ...props
+}: {
+  
+  label: string;
+  href: string;
+  count?: number | string;
+  className?: string;
+}) => {
+  const { open, animate } = useSidebar();
+
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "flex items-center justify-start gap-2 group/sidebar py-2",
+        className
+      )}
+      {...props}
+    >
+      {/* Icon wrapper */}
+      <div className="relative">
+        <IconBellRinging className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
+
+        {/* Badge with count */}
+        {count && Number(count) > 0 ? (
+          <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white shadow-md">
+            {count}
+          </span>
+        ):("")}
+      </div>
+
+      {/* Label */}
+      <motion.span
+        animate={{
+          display: animate ? (open ? "inline-block" : "none") : "inline-block",
+          opacity: animate ? (open ? 1 : 0) : 1,
+        }}
+        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+      >
+        {label}
       </motion.span>
     </Link>
   );

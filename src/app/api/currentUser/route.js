@@ -27,7 +27,9 @@ export async function GET() {
       .populate({
         path: "following",
         select: "name username profilePic followers following posts",
-      });
+      })
+      .populate("newMessages")
+      
     return NextResponse.json({ user: user || null });
   } catch (error) {
     console.log(error.message);

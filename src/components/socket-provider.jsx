@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
-import { toast } from "sonner"; // or any toast lib
+import { toast } from "sonner";
 
 export default function SocketProvider({ userId, children }) {
   useEffect(() => {

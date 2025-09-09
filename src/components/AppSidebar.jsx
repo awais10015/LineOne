@@ -1,13 +1,13 @@
 "use client";
-import React, { useContext, useState } from "react";
-import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import React, { useContext, useState, useEffect } from "react";
 import {
-  IconHome,
-  IconSearch,
-  IconBrandLine,
-  IconBellRinging,
-  IconUsers,
-} from "@tabler/icons-react";
+  Sidebar,
+  SidebarBody,
+  SidebarLink,
+  ChatLink,
+  NotificationLink,
+} from "@/components/ui/sidebar";
+import { IconHome, IconSearch, IconUsers } from "@tabler/icons-react";
 
 import SignOutButton from "./client/SignOutButton";
 
@@ -18,9 +18,16 @@ import { ModeToggle } from "./ModeToggle";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import Link from "next/link";
 import { useSidebar } from "@/components/ui/sidebar";
+import NotificationContext from "@/context/NotificationContext";
+import NewMessageContext from "@/context/NewMessageContext";
 
 export function AppSidebar({ children }) {
+  
   const { currentLoggedInUser } = useContext(CurrentUserContext);
+  
+  const {notificationCount, setnotificationCount} = useContext(NotificationContext)
+  const {newMessages, setNewMessages , newMessagesCount, setnewMessagesCount} = useContext(NewMessageContext)
+
   let name = currentLoggedInUser?.name;
   let profilePic =
     currentLoggedInUser?.profilePic ||
@@ -30,46 +37,49 @@ export function AppSidebar({ children }) {
       label: "Home",
       href: "/home",
       icon: (
-        <IconHome className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+        <IconHome className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
     {
       label: "Search",
       href: "/search",
       icon: (
-        <IconSearch className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
-      ),
-    },
-    {
-      label: "Chat",
-      href: "/chat",
-      icon: (
-        <IconBrandLine className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
-      ),
-    },
-    {
-      label: "Notifications",
-      href: "/notifications",
-      icon: (
-        <IconBellRinging className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+        <IconSearch className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
     {
       label: "Users",
       href: "/users",
       icon: (
-        <IconUsers className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+        <IconUsers className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
   ];
   const [open, setOpen] = useState(false);
   const { animate } = useSidebar();
+
+  const getNotifications = async () => {
+    try {
+      const res = await fetch(`/api/notification/${currentLoggedInUser?._id}`);
+      const data = await res.json();
+      setnotificationCount(data?.notifications.length || 0);
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  };
+  useEffect(() => {
+    if (currentLoggedInUser?._id) {
+      getNotifications();
+    }
+  }, [currentLoggedInUser]);
+
   return (
     <div className="h-screen w-screen bg-background border-r">
       <div
         className={cn(
           " flex flex-1 flex-col overflow-scroll scrollbar-hide rounded-tl-md rounded-tr-2xl md:flex-row dark:border-neutral-700 dark:bg-neutral-800",
-          // for your use case, use `h-screen` instead of `h-[60vh]`
+
           "h-screen"
         )}
       >
@@ -85,6 +95,12 @@ export function AppSidebar({ children }) {
                 {links.map((link, idx) => (
                   <SidebarLink key={idx} link={link} />
                 ))}
+                <ChatLink label={"Chat"} href={"/chat"} count={newMessages?.length} />
+                <NotificationLink
+                  label={"Notifications"}
+                  href={"/notifications"}
+                  count={notificationCount}
+                />
               </div>
             </div>
 
@@ -124,7 +140,6 @@ export const Logo = () => {
       href="/home"
       className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
     >
-      {/* <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" /> */}
       <Image src="/logo.svg" width={30} height={30} alt="logo" />
       <motion.span
         initial={{ opacity: 0 }}
@@ -142,13 +157,11 @@ export const LogoIcon = () => {
       href="/home"
       className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
     >
-      {/* <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" /> */}
       <Image src="/logo.svg" width={30} height={30} alt="logo" />
     </Link>
   );
 };
 
-// Dummy dashboard component with content
 const Dashboard = ({ children }) => {
   return (
     <div className="flex-1 min-w-0 top-0">

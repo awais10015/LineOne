@@ -8,7 +8,7 @@ const CommentItem = ({ comment, replies, onReply }) => {
 
   return (
     <div className="flex items-start gap-3 my-2">
-      {/* Avatar */}
+ 
       <Link href={`/userprofile/${comment?.commentBy?._id}`}>
         <img
           src={
@@ -21,7 +21,7 @@ const CommentItem = ({ comment, replies, onReply }) => {
       </Link>
 
       <div className="flex flex-col">
-        {/* User Info */}
+     
         <div className="flex items-center gap-2 flex-wrap">
           <Link
             className="flex gap-1"
@@ -40,12 +40,10 @@ const CommentItem = ({ comment, replies, onReply }) => {
           </span>
         </div>
 
-        {/* Comment Text */}
         <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-2xl mt-1">
           {comment?.text}
         </p>
 
-        {/* Actions */}
         <div className="flex gap-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
           <button
             className="hover:text-[#ff6500] transition"
@@ -73,7 +71,6 @@ const CommentItem = ({ comment, replies, onReply }) => {
           )}
         </div>
 
-        {/* Replies (conditionally rendered) */}
         {showReplies && (
           <div className="mt-2">
             {replies.map((reply) => (

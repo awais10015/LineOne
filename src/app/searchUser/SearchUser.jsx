@@ -1,11 +1,11 @@
 "use client";
 import MessageButton from "@/components/profile/MessageButton";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import CurrentUserContext from "@/context/CurrentUserContext";
@@ -14,17 +14,10 @@ import { useContext, useEffect, useState } from "react";
 
 const SearchUser = () => {
   const { currentLoggedInUser } = useContext(CurrentUserContext);
-
   const [users, setUsers] = useState([]);
-
   const [searchWord, setSearchWord] = useState(null);
-
   const [searchedUsers, setSearchedUsers] = useState([]);
-
-
   const [loader, setloader] = useState(false);
-
-  
 
   const fetchUsers = async () => {
     setloader(true);
@@ -45,16 +38,15 @@ const SearchUser = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
   const wordToSearch = () => {
     if (!searchWord) {
       setSearchedUsers([...users]);
       return;
     }
-
     const matchedUsers = users.filter((user) =>
       user?.name?.toLowerCase().includes(searchWord.toLowerCase())
     );
-
     setSearchedUsers(matchedUsers);
   };
 
@@ -66,7 +58,6 @@ const SearchUser = () => {
     <>
       <div className="w-full flex items-start justify-center mt-5">
         <div className="w-full max-w-4xl px-3 pb-5 flex items-center justify-center flex-col gap-10 rounded-2xl overflow-hidden srollbar-hide">
-          {/* <Input type="text" placeholder="Search..." onChange={(e) => setSearchWord(e.target.value)} /> */}
           <div className="relative w-full max-w-sm">
             <Input
               className="pl-10 focus:outline-none focus:ring-none"
@@ -104,7 +95,6 @@ const SearchUser = () => {
                     key={user?._id}
                     className="flex items-center justify-between p-2 rounded-lg hover:text-black hover:bg-gray-100"
                   >
-                    {/* Left: Profile picture */}
                     <Link href={`/userprofile/${user?._id}`}>
                       <div className="flex items-center gap-3">
                         <img
@@ -112,7 +102,7 @@ const SearchUser = () => {
                           alt={user?.name}
                           className="w-10 h-10 rounded-full object-cover object-top"
                         />
-                        {/* Middle: Name + Username */}
+
                         <div>
                           <p className="font-medium">{user?.name}</p>
                           <p className="text-sm text-gray-500">
@@ -126,7 +116,6 @@ const SearchUser = () => {
                   </div>
                 ))}
               </CardContent>
-              {/* <CardFooter>This is the posts footer</CardFooter> */}
             </Card>
           </div>
         </div>

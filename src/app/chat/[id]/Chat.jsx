@@ -54,33 +54,29 @@ const Chat = () => {
   const { currentLoggedInUser } = useContext(CurrentUserContext);
   const messagesEndRef = useRef(null);
 
-
-
   useEffect(() => {
-  if (!chat?._id) return;
+    if (!chat?._id) return;
 
-  const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
-    cluster: "ap2",
-  });
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+      cluster: "ap2",
+    });
 
-  const channel = pusher.subscribe(`chat-${chat._id}`);
+    const channel = pusher.subscribe(`chat-${chat._id}`);
 
-  channel.bind("new-message", (data) => {
-    setChat((prev) => ({
-      ...prev,
-      messages: [...prev.messages, data.message],
-    }));
-    scrollToBottom();
-  });
+    channel.bind("new-message", (data) => {
+      setChat((prev) => ({
+        ...prev,
+        messages: [...prev.messages, data.message],
+      }));
+      scrollToBottom();
+    });
 
-  return () => {
-    pusher.unsubscribe(`chat-${chat._id}`);
-    pusher.disconnect();
-  };
-}, [chat?._id]);
+    return () => {
+      pusher.unsubscribe(`chat-${chat._id}`);
+      pusher.disconnect();
+    };
+  }, [chat?._id]);
 
-
-  // Scroll to bottom function
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -91,7 +87,7 @@ const Chat = () => {
       const res = await fetch("/api/users");
       const data = await res.json();
 
-      setAllUsers(data.users); // save full list ✅
+      setAllUsers(data.users);
 
       const participantIds = chat?.participants?.map((p) => p._id) || [];
 
@@ -128,7 +124,6 @@ const Chat = () => {
     console.log(addMembers);
   }, [addMembers]);
 
-  // Scroll when chat loads or new messages arrive
   useEffect(() => {
     if (!chat) return;
     if (chat?.messages?.length) {
@@ -136,37 +131,34 @@ const Chat = () => {
     }
   }, [chat?.messages]);
 
-  // Also scroll after sending a message
   useEffect(() => {
     if (!sendLoader) {
       scrollToBottom();
     }
   }, [sendLoader]);
   const getChat = async () => {
-  setLoader(true);
-  try {
-    const res = await fetch(`/api/chat/${id}`);
-    const data = await res.json();
+    setLoader(true);
+    try {
+      const res = await fetch(`/api/chat/${id}`);
+      const data = await res.json();
 
-    // Check if current user is in participants
-    const isParticipant = data?.participants?.some(
-      (p) => p._id === currentLoggedInUser._id
-    );
+      const isParticipant = data?.participants?.some(
+        (p) => p._id === currentLoggedInUser._id
+      );
 
-    if (!isParticipant) {
-      alert("❌ You are not part of this chat now.");
-      router.push("/chat");
-      return; // stop execution
+      if (!isParticipant) {
+        alert("❌ You are not part of this chat now.");
+        router.push("/chat");
+        return;
+      }
+
+      setChat(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoader(false);
     }
-
-    setChat(data);
-  } catch (error) {
-    console.log(error);
-  } finally {
-    setLoader(false);
-  }
-};
-
+  };
 
   useEffect(() => {
     getChat();
@@ -184,7 +176,7 @@ const Chat = () => {
       if (res.ok) {
         setLoader(false);
         console.log(currentLoggedInUser._id, "left group");
-        router.push("/chat")
+        router.push("/chat");
       }
     } catch (error) {
       console.log(error);
@@ -193,7 +185,6 @@ const Chat = () => {
   };
 
   const adminRemoveMembers = async (userId) => {
-    
     try {
       const res = await fetch(`/api/chat/${id}/remove-member`, {
         method: "POST",
@@ -209,22 +200,17 @@ const Chat = () => {
       const data = await res.json();
       console.log("✅ Removed a user:", data);
 
-      // Update participants
       setChat((prev) => ({
         ...prev,
         participants: prev.participants.filter((user) => user._id !== userId),
       }));
 
-      // Re-add removed user to dropdown
       const removedUser = allUsers.find((u) => u._id === userId);
       if (removedUser) {
         setselectUsers((prev) => [...prev, removedUser]);
       }
-
-      
     } catch (error) {
       console.error("❌ Error removing member:", error);
-     
     }
   };
 
@@ -246,25 +232,20 @@ const Chat = () => {
       const data = await res.json();
       console.log("✅ Members added successfully:", data);
 
-      // Find newly added users from your selectUsers list
       const newMembers = selectUsers.filter((user) =>
         addMembers.includes(user._id)
       );
 
-      // Update local chat state
       setChat((prev) => ({
         ...prev,
         participants: [...prev.participants, ...newMembers],
       }));
 
-      // Clear selection after success
       setaddMembers([]);
     } catch (error) {
       console.error("❌ Error adding members:", error);
     }
   };
-
-  
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -277,12 +258,12 @@ const Chat = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          chatId: id, // chat _id
-          senderId: currentLoggedInUser._id, // current user _id
-          sentTo: chat.participants, // array of user ids
+          chatId: id,
+          senderId: currentLoggedInUser._id,
+          sentTo: chat.participants,
           text: text,
-          media: media, // or a URL / file reference
-          replyOf: replyOf, // or messageId you're replying to
+          media: media,
+          replyOf: replyOf,
         }),
       });
 
@@ -309,7 +290,6 @@ const Chat = () => {
 
   if (!chat) return null;
 
-  //  other user if it's a one-to-one chat
   const otherUser =
     !chat?.isGroup &&
     chat?.participants?.find((p) => p._id !== currentLoggedInUser._id);
@@ -322,7 +302,6 @@ const Chat = () => {
             className="bg-white dark:bg-black rounded-2xl w-full max-w-4xl z-1000 absolute md:relative 
                   top-0 left-0 flex flex-col h-[100dvh] md:h-screen overflow-hidden scrollbar-hide"
           >
-            {/* Header - 10% */}
             <div className="basis-[10%] md:basis-[5%] flex justify-start items-center gap-2 rounded-t-2xl p-2">
               <Link href={"/chat"}>
                 <Button className="cursor-pointer bg-transparent hover:bg-transparent shadow-none border-none hover:scale-115 transition duration-150">
@@ -462,7 +441,6 @@ const Chat = () => {
                                           </DialogDescription>
                                         </DialogHeader>
 
-                                        {/* Action Button */}
                                         <div className="flex justify-end mt-4">
                                           <Button
                                             onClick={adminAddMembers}
@@ -499,7 +477,7 @@ const Chat = () => {
                                     <div>
                                       <p className="font-medium text-black dark:text-white flex items-center gap-2">
                                         {user?.name}
-                                        {/* Show Admin Badge */}
+
                                         {user?._id === chat?.admin._id && (
                                           <span className="text-xs bg-[#ff6500]/15 text-[#ff6500] px-2 py-0.5 rounded-full">
                                             Admin
@@ -513,15 +491,12 @@ const Chat = () => {
                                   </div>
                                 </Link>
 
-                                {/* Show "You" if it's the current user, else follow/unfollow */}
                                 {user?._id === currentLoggedInUser?._id ? (
-                                  // Case 1: It's the current logged-in user
                                   <span className="text-sm text-gray-400">
                                     You
                                   </span>
                                 ) : currentLoggedInUser?._id ===
                                   chat?.admin._id ? (
-                                  // Case 2: Current user is admin -> show remove button
                                   <Button
                                     onClick={() => {
                                       adminRemoveMembers(user?._id);
@@ -531,7 +506,6 @@ const Chat = () => {
                                     <UserRoundMinus />
                                   </Button>
                                 ) : (
-                                  // Case 3: Everyone else -> follow/unfollow button
                                   <FollowUnfollowButton
                                     currentLoggedInUser={currentLoggedInUser}
                                     id={user?._id}
@@ -586,7 +560,7 @@ const Chat = () => {
                 </DropdownMenu>
               </div>
             </div>
-            {/* Chat Area - 80% */}
+
             <div className="basis-[80%] md:basis-[90%] overflow-y-auto scrollbar-hide py-2 px-2">
               <div className="flex flex-col gap-1">
                 {chat?.messages?.map((msg, index) => {
@@ -603,7 +577,6 @@ const Chat = () => {
                         isOwnMessage ? "justify-end" : "justify-start"
                       }`}
                     >
-                      {/* Left side: profile pic or spacer */}
                       {!isOwnMessage && (
                         <div className="w-8 mr-2 flex-shrink-0">
                           {!isSameSender ? (
@@ -615,16 +588,12 @@ const Chat = () => {
                               />
                             </Link>
                           ) : (
-                            // spacer (same width as profile pic)
                             <div className="w-8 h-8" />
                           )}
                         </div>
                       )}
 
-                      {/* Right side: message bubble */}
                       <div className="flex flex-col max-w-[70%]">
-                        {/* Show name only if not same sender */}
-                        {/* Show sender name only if first message in a group */}
                         {!isOwnMessage
                           ? !isSameSender && (
                               <span className="text-xs font-medium text-gray-500 mb-1">
@@ -638,13 +607,19 @@ const Chat = () => {
                             )}
 
                         <div
-                          className={`px-4 py-2 rounded-2xl text-sm ${
+                          className={`px-4 py-2 rounded-2xl text-sm flex flex-col ${
                             isOwnMessage
                               ? "bg-[#ff6500] text-white rounded-tr-none self-end"
                               : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-tl-none"
                           }`}
                         >
-                          {msg.text}
+                          <span>{msg.text}</span>
+                          <span className="text-[10px] mt-1 self-end">
+                            {new Date(msg.createdAt).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -654,7 +629,6 @@ const Chat = () => {
               </div>
             </div>
 
-            {/* Input - 10% */}
             <div className="basis-[10%] md:basis-[5%]">
               <div className="w-full px-2 py-2 bg-white dark:bg-black h-full flex items-end">
                 <form
@@ -693,7 +667,6 @@ const Chat = () => {
               className="bg-white dark:bg-black rounded-2xl w-full max-w-4xl z-1000 absolute md:relative 
                   top-0 left-0 flex flex-col h-[100dvh] md:h-screen overflow-hidden scrollbar-hide"
             >
-              {/* Header - 10% */}
               <div className="basis-[10%] md:basis-[5%] flex justify-start items-start gap-2 rounded-t-2xl p-2">
                 <Link href={"/chat"}>
                   <Button className="cursor-pointer bg-transparent hover:bg-transparent shadow-none border-none hover:scale-115 transition duration-150">
@@ -720,7 +693,6 @@ const Chat = () => {
                 </Link>
               </div>
 
-              {/* Chat Area - 80% */}
               <div className="basis-[80%] md:basis-[90%] overflow-y-auto scrollbar-hide py-2 px-2">
                 {chat?.messages?.map((msg) => {
                   const isOwnMessage =
@@ -734,13 +706,19 @@ const Chat = () => {
                       }`}
                     >
                       <div
-                        className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm ${
+                        className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm flex flex-col ${
                           isOwnMessage
                             ? "bg-[#ff6500] text-white rounded-tr-none"
                             : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-tl-none"
                         }`}
                       >
-                        {msg.text}
+                        <span>{msg.text}</span>
+                        <span className="text-[10px] mt-1 self-end">
+                          {new Date(msg.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
                       </div>
                     </div>
                   );
@@ -748,7 +726,6 @@ const Chat = () => {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input - 10% */}
               <div className="basis-[10%] md:basis-[5%]">
                 <div className="w-full px-2 py-2 bg-white dark:bg-black h-full flex items-end">
                   <form

@@ -8,15 +8,11 @@ export async function POST(req) {
     const body = await req.json();
     await connect();
 
-    // Create the post
     const newPost = await Post.create(body);
 
-    //  Push post ID to the user's posts array
     await User.findByIdAndUpdate(body.postBy, {
       $push: { posts: newPost._id }
     })
-
-     
 
     return NextResponse.json(newPost, { status: 201 });
   } catch (error) {

@@ -88,10 +88,9 @@ const Home = () => {
                       </div>
                     </div>
                   </Link>
-                  {/* Post Description */}
+              
                   <p className="text-base mt-5">{post?.description}</p>
-
-                  {/* tagged users */}
+ 
 
                   {post?.taggedUsers.length > 0 && (
                     <div className="flex gap-1 text-gray-400 flex-wrap">
@@ -108,7 +107,7 @@ const Home = () => {
                       ))}
                     </div>
                   )}
-                  {/* Hashtags */}
+               
                   {post?.hashtags?.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
                       {post?.hashtags.map((hashtag, i) => (
@@ -122,7 +121,7 @@ const Home = () => {
                     </div>
                   )}
 
-                  {/* Media */}
+               
                   {post?.media && (
                     <>
                       <Link href={`/media/${post?._id}`}>
@@ -143,7 +142,7 @@ const Home = () => {
                     </>
                   )}
 
-                  {/* Actions */}
+             
                   <div className="flex gap-5 mt-5">
                     <LikeDislike postId={post?._id} />
                     <Link href={`/post/${post?._id}`}>

@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 export async function POST(req, { params }) {
   try {
     const { chatId } = params;
-    const { memberIds } = await req.json(); // can be single or multiple
+    const { memberIds } = await req.json(); 
 
     console.log("memberIds : ", memberIds)
 
@@ -16,7 +16,6 @@ export async function POST(req, { params }) {
 
     await connect();
 
-    // Ensure it's always an array of ObjectIds
     const membersToRemove = Array.isArray(memberIds)
       ? memberIds.map((id) => new mongoose.Types.ObjectId(id))
       : [new mongoose.Types.ObjectId(memberIds)];

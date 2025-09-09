@@ -10,8 +10,7 @@ export async function GET(req) {
     $or: [
       { name: { $regex: q, $options: "i" } },
       { username: { $regex: q, $options: "i" } },
-      // { gender: { $regex: q, $options: "i" } },
-      // { profilePic: { $regex: q, $options: "i" } },
+     
     ],
   }).select("_id name username gender profilePic");
 

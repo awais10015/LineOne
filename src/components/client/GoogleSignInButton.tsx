@@ -9,7 +9,7 @@ const GoogleSignInButton = () => {
       variant="outline"
       onClick={() => {
         signIn("google", {
-          callbackUrl: "/", // or your dashboard like "/home"
+          callbackUrl: "/", 
         });
       }}
     >

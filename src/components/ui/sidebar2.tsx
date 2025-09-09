@@ -3,18 +3,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { motion } from "motion/react";
-// import { IconMenu2, IconX } from "@tabler/icons-react";
-// import { ModeToggle } from "../ModeToggle";
 import Link from "next/link";
-
-// import React, { useRef, useEffect } from "react";
-// import { useSidebar } from "./sidebar";
-// import { AnimatePresence, motion } from "motion/react";
-// import { cn } from "@/lib/utils";
-// import { IconMenu2, IconX } from "@tabler/icons-react";
-// import { ModeToggle } from "../ModeToggle";
-// import Image from "next/image";
-// import { usePathname } from "next/navigation";
 
 interface Links {
   label: string;
@@ -51,11 +40,6 @@ export const SidebarProvider = ({
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   animate?: boolean;
 }) => {
-  // const [openState, setOpenState] = useState(false);
-
-  // const open = openProp !== undefined ? openProp : openState;
-  // const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
-
   const [open, setOpen] = useState(true);
 
   return (
@@ -87,7 +71,6 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
   return (
     <>
       <DesktopSidebar {...props} />
-      {/* <MobileSidebar {...(props as React.ComponentProps<"div">)} /> */}
     </>
   );
 };
@@ -102,14 +85,14 @@ export const DesktopSidebar = ({
     <>
       <motion.div
         className={cn(
-          "h-full px-4 py-4 hidden md:flex md:flex-col w-[350px]",
+          "h-full px-4 py-4 hidden md:flex md:flex-col w-[250px]",
           className
         )}
         animate={{
-          width: animate ? (open ? "350px" : "77px") : "250px",
+          width: animate ? (open ? "250px" : "77px") : "250px",
         }}
         onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
+        onMouseLeave={() => setOpen(true)}
         {...props}
       >
         {children}
@@ -137,10 +120,7 @@ export const SidebarLink = ({
       )}
       {...props}
     >
-      {/* Icon always stable */}
       <div className="flex-shrink-0">{link.icon}</div>
-
-      {/* Label with smooth width+opacity */}
       <motion.span
         animate={{
           opacity: animate ? (open ? 1 : 0) : 1,
@@ -156,12 +136,12 @@ export const SidebarLink = ({
   );
 };
 
-// ✅ User Profile Link
 export const ProfilesLink = ({
   id,
   name,
   lastMessage,
   profilePic,
+  badge, // 👈 add badge prop
   className,
   ...props
 }: {
@@ -169,6 +149,7 @@ export const ProfilesLink = ({
   name: string;
   lastMessage: string;
   profilePic: string;
+  badge?: number; // 👈 optional
   className?: string;
 }) => {
   const { open, animate } = useSidebar();
@@ -182,17 +163,21 @@ export const ProfilesLink = ({
       )}
       {...props}
     >
-      <div className="h-10 w-10 rounded-full flex-shrink-0 overflow-hidden">
+      <div className="relative h-10 w-10 rounded-full flex-shrink-0">
         <Image
           src={profilePic}
           alt={`${name}'s profile picture`}
           width={40}
           height={40}
-          className="h-full w-full object-cover"
+          className="h-full w-full rounded-full object-cover"
         />
+        {badge && badge > 0 ? (
+          <span className="absolute -top-1 -right-1 bg-red-500 z-10 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+            {badge > 99 ? "99+" : badge}
+          </span>
+        ):("")}
       </div>
 
-      {/* Name */}
       <motion.span
         animate={{
           opacity: animate ? (open ? 1 : 0) : 1,
@@ -215,7 +200,6 @@ export const ProfilesLink = ({
   );
 };
 
-// ✅ Group Link
 export const GroupLink = ({
   id,
   name,
@@ -241,7 +225,6 @@ export const GroupLink = ({
       )}
       {...props}
     >
-      {/* Group Icon (never shrink) */}
       <div className="h-10 w-10 rounded-full flex-shrink-0 overflow-hidden">
         <Image
           src={groupIcon}
@@ -252,7 +235,6 @@ export const GroupLink = ({
         />
       </div>
 
-      {/* Group Name */}
       <motion.span
         animate={{
           opacity: animate ? (open ? 1 : 0) : 1,

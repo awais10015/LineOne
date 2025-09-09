@@ -13,6 +13,11 @@ import { redirect } from "next/navigation";
 import GoogleSignInButton from "@/components/client/GoogleSignInButton";
 import Image from "next/image";
 
+export const metadata = {
+  title: "LineOne-Login",
+  description: "Login",
+};
+
 const Page = async () => {
   const session = await auth();
   if (session?.user) redirect("/");

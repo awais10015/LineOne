@@ -6,7 +6,7 @@ export async function POST(req, { params }) {
   try {
     await connect();
 
-    const { id } = params; // ✅ no await
+    const { id } = params;
     const { currentLoggedInUser, toDo } = await req.json();
 
     const post = await Post.findById(id).populate("postBy");
@@ -17,11 +17,10 @@ export async function POST(req, { params }) {
       );
     }
 
-    // prepare event data
     const eventData = {
       eventBy: currentLoggedInUser,
       eventFor: post?.postBy?._id,
-      event: toDo, // ✅ dynamic
+      event: toDo,
     };
 
     if (toDo === "like") {
@@ -31,7 +30,6 @@ export async function POST(req, { params }) {
         post.likedBy.push(currentLoggedInUser);
         post.dislikedBy.pull(currentLoggedInUser);
 
-        // ✅ don’t let notification failure break like/dislike
         try {
           await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notification`, {
             method: "POST",

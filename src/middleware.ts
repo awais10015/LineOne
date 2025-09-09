@@ -1,12 +1,8 @@
-
-// export { auth as middleware } from "@/auth";
-
 export const config = {
-   matcher: [
-    // apply middleware to everything except these paths
+  matcher: [
     "/((?!api|_next/static|_next/image|favicon.ico|.*\\.svg$|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.webp$|login|signup).*)",
   ],
-  runtime: "nodejs", 
+  runtime: "nodejs",
 };
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";

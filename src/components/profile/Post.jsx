@@ -42,10 +42,10 @@ const Post = () => {
                     </p>
                   </div>
                 </div>
-                {/* Post Description */}
+               
                 <p className="text-base mt-5">{post.description}</p>
 
-                {/* tagged users */}
+                
                 {post?.taggedUsers.length > 0 && (
                   <div className="flex gap-1 text-gray-400 flex-wrap">
                     tagged
@@ -59,7 +59,7 @@ const Post = () => {
                   </div>
                 )}
 
-                {/* Hashtags */}
+               
                 {post.hashtags?.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {post.hashtags.map((hashtag, i) => (
@@ -73,7 +73,7 @@ const Post = () => {
                   </div>
                 )}
 
-                {/* Media */}
+              
                 {post.media && (
                   <>
                     {/\.(mp4|webm|ogg)$/i.test(post.media) ? (
@@ -91,7 +91,7 @@ const Post = () => {
                     )}
                   </>
                 )}
-                {/* Actions */}
+                
                 <div className="flex gap-5 mt-5">
                   <LikeDislike postId={post._id} />
                   <Link href={`/post/${post._id}`}>

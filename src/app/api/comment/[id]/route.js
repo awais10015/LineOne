@@ -6,8 +6,6 @@ export async function GET(req, { params }) {
   try {
     await connect();
     const { id } = await params;  
-
-    // find all comments that belong to this post
     const comments = await Comment.find({ postId: id })
       .sort({ createdAt: 1 }) 
       .populate("commentBy");

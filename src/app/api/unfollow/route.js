@@ -1,5 +1,4 @@
 import { connect } from "@/lib/db";
-// import { Post } from "@/models/postModel";
 import { User } from "@/models/userModel";
 import { NextResponse } from "next/server";
 

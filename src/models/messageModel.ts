@@ -14,6 +14,11 @@ const messageSchema = new mongoose.Schema(
         required: true,
       },
     ],
+    chatId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Chat",
+      required: true,
+    },
     text: { type: String },
     media: { type: String },
     replyOf: {

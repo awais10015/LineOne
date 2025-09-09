@@ -39,11 +39,7 @@ const Page = () => {
     getUsers();
   }, []);
 
-  // useEffect(() => {
-  //   console.log(groupName);
-  // }, [groupName]);
-
-  // group pic upload
+  
   const handleMediaChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -77,7 +73,7 @@ const Page = () => {
   }));
 
   const createGroup = async (e) => {
-    // name, participants, groupIcon, admin
+   
     e.preventDefault();
 
     try {
@@ -87,10 +83,10 @@ const Page = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: groupName, // string
-          participants: participants, // array of user IDs
-          groupIcon: groupIconUrl, // optional string (image url)
-          admin: currentLoggedInUser._id, // logged in user
+          name: groupName, 
+          participants: participants,
+          groupIcon: groupIconUrl, 
+          admin: currentLoggedInUser._id, 
         }),
       });
 
@@ -123,7 +119,7 @@ const Page = () => {
               action=""
               className="flex flex-col justify-center items-center gap-6"
             >
-              {/* Group Picture */}
+          
               <div className="flex flex-col items-center">
                 {groupIconUrl && (
                   <div className="h-[150px] w-[150px] mb-3 rounded-full overflow-hidden shadow-md border border-gray-300 dark:border-gray-700">
@@ -136,7 +132,7 @@ const Page = () => {
                 )}
               </div>
 
-              {/* Group Name */}
+            
               <Input
                 onChange={(e) => setgroupName(e.target.value)}
                 type="text"
@@ -145,7 +141,7 @@ const Page = () => {
                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
               />
 
-              {/* Select Users */}
+             
               <Select
                 mode="multiple"
                 style={{ width: "100%" }}
@@ -173,7 +169,7 @@ const Page = () => {
                 )}
               />
 
-              {/* Group Picture Upload + Submit */}
+              
               <div className="flex gap-3 w-full">
                 <label
                   htmlFor="media"

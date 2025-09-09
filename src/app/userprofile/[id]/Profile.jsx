@@ -1,32 +1,28 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import AnotherUserContext from "@/context/AnotherUserContext";
-import { motion } from "framer-motion";
-import { Separator } from "@/components/ui/separator";
+import Loader from "@/components/Loader";
+import LikeDislike from "@/components/post/LikeDislike";
+import FollowUnfollowButton from "@/components/profile/FollowUnfollowButton";
+import MessageButton from "@/components/profile/MessageButton";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import AnotherUserContext from "@/context/AnotherUserContext";
 import CurrentUserContext from "@/context/CurrentUserContext";
-import MessageButton from "@/components/profile/MessageButton";
-import FollowUnfollowButton from "@/components/profile/FollowUnfollowButton";
-import LikeDislike from "@/components/post/LikeDislike";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
 import { IoChatbox } from "react-icons/io5";
-import { useRouter } from "next/navigation";
-import Loader from "@/components/Loader";
 
 const Profile = () => {
-  // const params = useParams();
+ 
   const { id } = useParams();
   const { AnotherUser, setAnotherUser } = useContext(AnotherUserContext);
   const { currentLoggedInUser } = useContext(CurrentUserContext);
@@ -62,9 +58,7 @@ const Profile = () => {
     getUsers();
   }, []);
 
-  // useEffect(() => {
-  //   console.log("AnotherUser",AnotherUser?._id)
-  // }, [AnotherUser]);
+ 
 
   useEffect(() => {
     if (!id) return;
@@ -86,16 +80,16 @@ const Profile = () => {
 
   return (
     <>
-      {/* original */}
+     
 
       <div className="flex flex-col w-full items-center ">
         <div className="min-h-screen max-w-4xl min-w-full flex flex-col items-center">
-          {/* Profile Header */}
+    
           {loader ? (
             <Loader />
           ) : (
             <div className="w-full max-w-4xl  rounded-2xl shadow-lg overflow-hidden srollbar-hide">
-              {/* Cover Photo */}
+           
               <div
                 style={{ backgroundImage: `url(${userCoverPic})` }}
                 className="w-full h-48 relative"
@@ -111,13 +105,13 @@ const Profile = () => {
                 </div>
               </div>
 
-              {/* User Info */}
+              
               <div className="mt-20  pb-6 text-center">
                 <h1 className="text-2xl font-bold ">{AnotherUser?.name}</h1>
                 <p className="">{AnotherUser?.username}</p>
                 <p className="mt-3">{AnotherUser?.bio || "no bio added"}</p>
 
-                {/* Stats */}
+         
                 <div className="mt-6 w-full h-12 flex justify-center items-center gap-5">
                   <div>
                     <p className="font-bold ">{AnotherUser?.posts?.length}</p>
@@ -125,7 +119,6 @@ const Profile = () => {
                   </div>
                   <Separator orientation="vertical" />
 
-                  {/* FOLLOWERS WALA DIALOG */}
 
                   <Dialog>
                     <DialogTrigger asChild>
@@ -158,7 +151,7 @@ const Profile = () => {
                           <TabsTrigger value="following">Following</TabsTrigger>
                         </TabsList>
 
-                        {/* Followers List */}
+                        
                         <TabsContent
                           value="followers"
                           className="w-full max-h-[350px] mt-1 space-y-3 overflow-scroll scrollbar-hide"
@@ -168,7 +161,7 @@ const Profile = () => {
                               key={follower._id}
                               className="flex items-center justify-between p-2 rounded-lg hover:text-black hover:bg-gray-100"
                             >
-                              {/* Left: Profile picture */}
+                         
                               <Link href={`/userprofile/${follower._id}`}>
                                 <div className="flex items-center gap-3">
                                   <img
@@ -179,7 +172,7 @@ const Profile = () => {
                                     alt={follower?.name}
                                     className="w-10 h-10 rounded-full object-cover object-top"
                                   />
-                                  {/* Middle: Name + Username */}
+                          
                                   <div>
                                     <p className="font-medium">
                                       {follower?.name}
@@ -191,7 +184,7 @@ const Profile = () => {
                                 </div>
                               </Link>
 
-                              {/* Right: Action Button */}
+                          
 
                               <FollowUnfollowButton
                                 currentLoggedInUser={currentLoggedInUser}
@@ -202,7 +195,6 @@ const Profile = () => {
                           ))}
                         </TabsContent>
 
-                        {/* Following List */}
                         <TabsContent
                           value="following"
                           className="w-full max-h-[350px] mt-1 space-y-3 overflow-scroll scrollbar-hide"
@@ -248,7 +240,7 @@ const Profile = () => {
                   </Dialog>
                 </div>
 
-                {/* Message aur Follow/Unfollow Button */}
+            
                 <div className="mt-5 flex gap-5 w-full justify-center items-center">
                   <FollowUnfollowButton
                     currentLoggedInUser={currentLoggedInUser}
@@ -261,7 +253,7 @@ const Profile = () => {
             </div>
           )}
 
-          {/* User's Posts Section */}
+   
           {postloader ? (
             <Loader />
           ) : (
@@ -297,16 +289,15 @@ const Profile = () => {
                           </p>
                         </div>
                       </div>
-                      {/* Post Description */}
+                  
                       <p className="text-base mt-5">{post.description}</p>
 
-                      {/* tagged users */}
                       {post?.taggedUsers?.length > 0 && (
                         <div className="flex gap-1 text-gray-400 flex-wrap">
                           tagged
                           {post?.taggedUsers?.map((taggedUser) => (
                             <Link
-                              key={taggedUser?._id} // <-- key on the first element returned
+                              key={taggedUser?._id} 
                               href={`/userprofile/${taggedUser._id}`}
                             >
                               <p>{taggedUser.username}</p>
@@ -315,7 +306,7 @@ const Profile = () => {
                         </div>
                       )}
 
-                      {/* Hashtags */}
+                    
                       {post.hashtags?.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-2">
                           {post.hashtags.map((hashtag, i) => (
@@ -329,7 +320,7 @@ const Profile = () => {
                         </div>
                       )}
 
-                      {/* Media */}
+                     
                       {post.media && (
                         <Link href={`/media/${post._id}`}>
                           {/\.(mp4|webm|ogg)$/i.test(post.media) ? (
@@ -349,7 +340,6 @@ const Profile = () => {
                         </Link>
                       )}
 
-                      {/* Actions */}
                       <div className="flex gap-5 mt-5">
                         <LikeDislike postId={post._id} />
                         <Link href={`/post/${post._id}`}>

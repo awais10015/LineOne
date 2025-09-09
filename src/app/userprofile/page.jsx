@@ -3,7 +3,7 @@ import Profile from "./Profile"
 
 export const metadata = {
   title: "LineOne-Profile",
-  description: "Lets connect",
+  description: "Profile",
 };
 
 const page = () => {

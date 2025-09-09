@@ -9,17 +9,16 @@ export default function StoryBar() {
   const [stories, setStories] = useState([]);
   const { currentLoggedInUser } = useContext(CurrentUserContext);
 
-  // state for Loader
+ 
   const [loader, setLoader] = useState(false);
 
-  // add story state
   const [file, setFile] = useState("");
   const [preview, setPreview] = useState(null);
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef();
 
-  const [viewer, setViewer] = useState(null); // { user, stories }
+  const [viewer, setViewer] = useState(null); 
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const openStoryViewer = (group) => {
@@ -37,20 +36,18 @@ export default function StoryBar() {
         if (currentIndex < viewer.stories.length - 1) {
           setCurrentIndex((prev) => prev + 1);
         } else {
-          setViewer(null); // close after last story
+          setViewer(null);
         }
-      }, 2000); // ⏱️ 5s per story
+      }, 2000); 
 
       return () => clearTimeout(timer);
     }
   }, [viewer, currentIndex]);
 
-  // handle file selection
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
-    //  only allow images and videos
     if (
       !selectedFile.type.startsWith("image/") &&
       !selectedFile.type.startsWith("video/")
@@ -64,13 +61,11 @@ export default function StoryBar() {
     }
   };
 
-  // upload story
   const handleUpload = async () => {
     if (!file) return;
 
     setLoading(true);
 
-    // 1. upload to Cloudinary
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "lineone_cloudinary_preset");
@@ -85,7 +80,7 @@ export default function StoryBar() {
     const cloudData = await cloudRes.json();
     const mediaUrl = cloudData.secure_url;
 
-    // 2. send to backend
+  
     const res = await fetch("/api/stories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -110,13 +105,11 @@ export default function StoryBar() {
     setLoading(false);
   };
 
-  // get stories
   const fetchStories = async () => {
     setLoader(true);
     const res = await fetch(`/api/stories?userId=${currentLoggedInUser._id}`);
     const data = await res.json();
 
-    // group by user
     const grouped = data.stories.reduce((acc, story) => {
       const userId = story.user._id;
       if (!acc[userId]) {
@@ -138,9 +131,9 @@ export default function StoryBar() {
   return (
     <div className="flex w-full justify-center items-center">
       <div className="w-full mt-3 max-w-4xl rounded-2xl overflow-hidden flex p-2 gap-5">
-        {/* Story List */}
+      
         <div className="h-full w-full flex gap-3 overflow-x-auto scrollbar-hide">
-          {/* Story Add Box */}
+          
           <div className="h-[200px] w-[120px] flex-shrink-0 bg-black/20 flex items-center justify-center gap-2 flex-col rounded-xl p-3">
             {!file ? (
               <>
@@ -161,7 +154,7 @@ export default function StoryBar() {
               </>
             ) : (
               <>
-                {/* preview */}
+               
                 {preview &&
                   (file.type.startsWith("video") ? (
                     <video
@@ -176,7 +169,6 @@ export default function StoryBar() {
                     />
                   ))}
 
-                {/* description */}
                 <input
                   type="text"
                   value={description || ""}
@@ -185,7 +177,6 @@ export default function StoryBar() {
                   className="px-2 py-1 rounded-lg w-full text-sm"
                 />
 
-                {/* upload button */}
                 <button
                   onClick={handleUpload}
                   disabled={loading}
@@ -203,7 +194,7 @@ export default function StoryBar() {
             </div>
           ) : (
             stories.map((group, index) => {
-              // If it's grouped, pick first story, else use direct mediaUrl
+             
               const previewUrl = group.stories
                 ? group.stories[0]?.mediaUrl
                 : null;
@@ -285,7 +276,6 @@ export default function StoryBar() {
                 </div>
               )}
 
-              {/* Description overlay */}
               {viewer.stories[currentIndex].description && (
                 <p className="absolute h-[50px] bottom-0 w-full flex items-center justify-center filter: blur(80px) bg-black/40 text-white text-sm px-2">
                   {viewer.stories[currentIndex].description}

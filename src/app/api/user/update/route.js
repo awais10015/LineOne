@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 
 export async function PUT(req) {
   try {
-    const session = await auth(); // Change this according to your auth
+    const session = await auth(); 
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }

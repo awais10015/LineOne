@@ -11,7 +11,6 @@ const FollowUnfollowButton = ({ id, currentLoggedInUser, refresh }) => {
   );
   let initialVal = initiallyFollowing;
 
-  // Optimistic state ONLY tracks following
   const [isFollowing, setIsFollowing] = useOptimistic(
     initiallyFollowing,
     (_, newState) => newState
@@ -20,7 +19,6 @@ const FollowUnfollowButton = ({ id, currentLoggedInUser, refresh }) => {
   const toggleFollow = async () => {
     const newIsFollowing = !isFollowing;
 
-    // optimistic update
     startTransition(() => {
       setIsFollowing(newIsFollowing);
       setinitiallyFollowing(!initialVal);
@@ -53,12 +51,10 @@ const FollowUnfollowButton = ({ id, currentLoggedInUser, refresh }) => {
         });
       }
 
-      // re-sync with backend
       refresh?.();
     } catch (error) {
       console.error("Follow/Unfollow failed:", error);
 
-      // rollback UI
       startTransition(() => {
         setIsFollowing(!newIsFollowing);
         setinitiallyFollowing(!initiallyFollowing);

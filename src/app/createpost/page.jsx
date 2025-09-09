@@ -23,7 +23,6 @@ export default function CreatePostPage() {
 
   const router = useRouter();
 
-  // Search users from backend
   useEffect(() => {
     const fetchUsers = async () => {
       if (userQuery.trim().length > 1) {
@@ -37,7 +36,6 @@ export default function CreatePostPage() {
     fetchUsers();
   }, [userQuery]);
 
-  // Upload media to Cloudinary
   const handleMediaChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -59,7 +57,6 @@ export default function CreatePostPage() {
     setUploading(false);
   };
 
-  // Add hashtag on space or comma
   const handleTagInput = (e) => {
     if (e.key === " " || e.key === ",") {
       e.preventDefault();
@@ -76,12 +73,12 @@ export default function CreatePostPage() {
     }
   };
 
-  // Remove hashtag
+ 
   const removeHashtag = (tag) => {
     setHashtags(hashtags.filter((t) => t !== tag));
   };
 
-  // Add tagged user
+  
   const tagUser = (user) => {
     if (!taggedUsers.find((u) => u._id === user._id)) {
       setTaggedUsers([...taggedUsers, user]);
@@ -90,7 +87,7 @@ export default function CreatePostPage() {
     setUserResults([]);
   };
 
-  // Submit post
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -123,7 +120,6 @@ export default function CreatePostPage() {
       >
         <h2 className="text-2xl font-bold ">Create Post</h2>
 
-        {/* Description */}
         <textarea
           name="description"
           placeholder="Write your post description..."
@@ -134,7 +130,6 @@ export default function CreatePostPage() {
           required
         />
 
-        {/* Tag Users */}
         <div>
           <Input
             type="text"
@@ -204,7 +199,7 @@ export default function CreatePostPage() {
           )}
         </div>
 
-        {/* Hashtags */}
+      
         <div>
           <Input
             type="text"
@@ -229,7 +224,7 @@ export default function CreatePostPage() {
           </div>
         </div>
 
-        {/* Media Upload */}
+        
         <div className="flex flex-col items-center">
           {mediaUrl && (
             <div className="mb-3 w-full">
@@ -265,7 +260,7 @@ export default function CreatePostPage() {
             className="hidden"
             onChange={handleMediaChange}
           />
-          {/* Submit */}
+     
           <Button type="submit" className="flex-1 text-white dark:text-black h-10 text-md font-light cursor-pointer">
             Post
           </Button>

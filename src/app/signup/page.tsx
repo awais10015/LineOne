@@ -16,7 +16,13 @@ import { redirect } from "next/navigation";
 import { connect } from "@/lib/db";
 import GoogleSignInButton from "@/components/client/GoogleSignInButton";
 import { Mail, User as UserIcon } from "lucide-react";
-import PasswordInput from "@/components/client/PasswordInput"
+import PasswordInput from "@/components/client/PasswordInput";
+
+export const metadata = {
+  title: "LineOne-Signup",
+  description: "Signup",
+};
+
 const Page = () => {
   const signUp = async (formData: FormData) => {
     "use server";
@@ -27,7 +33,6 @@ const Page = () => {
     if (!name || !email || !password)
       throw new Error("Please provide all Fields");
 
-    //DB se connect krna ha
     await connect();
 
     const user = await User.findOne({ email });
@@ -45,12 +50,12 @@ const Page = () => {
     <div className="flex justify-center items-center h-dvh">
       <Card>
         <CardHeader className="flex flex-col items-center justify-center gap-3">
-          <Image src="/logo.svg" alt="LineOne" width={50} height={50}/>
+          <Image src="/logo.svg" alt="LineOne" width={50} height={50} />
           <CardTitle className="text-2xl font-light"> Sign up</CardTitle>
         </CardHeader>
         <CardContent>
           <form action={signUp} className="flex flex-col gap-4">
-             <div className="relative">
+            <div className="relative">
               <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 type="text"
@@ -60,7 +65,7 @@ const Page = () => {
                 className="pl-10"
               />
             </div>
-           <div className="relative">
+            <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 type="email"
@@ -70,8 +75,11 @@ const Page = () => {
                 className="pl-10"
               />
             </div>
-            <PasswordInput/>
-            <Button type="submit" className="w-full bg-[#ff6500] hover:bg-[#ff5f00] cursor-pointer">
+            <PasswordInput />
+            <Button
+              type="submit"
+              className="w-full bg-[#ff6500] hover:bg-[#ff5f00] cursor-pointer"
+            >
               Sign up
             </Button>
           </form>

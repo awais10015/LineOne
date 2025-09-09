@@ -8,7 +8,7 @@ export async function POST(req) {
     await connect();
     const { userId, mediaUrl, type, description } = await req.json();
 
-    //  Validate type
+  
     if (type !== "image" && type !== "video") {
       return NextResponse.json(
         {

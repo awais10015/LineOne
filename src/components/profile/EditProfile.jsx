@@ -1,6 +1,6 @@
 "use client";
 import { SquarePen } from "lucide-react";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,6 @@ const EditProfile = () => {
   const [coverPic, setCoverPic] = useState(userCoverPic || "");
   const [loading, setLoading] = useState(false);
 
-  // profile edit handler
   const handleImageChange = (e, type) => {
     const file = e.target.files[0];
     if (file) {
@@ -47,7 +46,7 @@ const EditProfile = () => {
   const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "lineone_cloudinary_preset"); // Cloudinary preset
+    formData.append("upload_preset", "lineone_cloudinary_preset");
     formData.append("cloud_name", "dahgq0lpy");
     const res = await fetch(
       "https://api.cloudinary.com/v1_1/dahgq0lpy/image/upload",
@@ -70,15 +69,13 @@ const EditProfile = () => {
     let username =
       e.target.changeusername.value?.toString().toLowerCase() || currentLoggedInUser?.username;
 
-    // Remove spaces completely
     username = username.replace(/\s+/g, "");
 
-    // Ensure it starts with @
     if (!username.startsWith("@")) {
       username = "@" + username;
     }
 
-    // If blob (new upload), send to Cloudinary
+
     if (profilePic.startsWith("blob:")) {
       profilePicUrl = await uploadImage(
         document.getElementById("profileUpload").files[0]
@@ -90,7 +87,7 @@ const EditProfile = () => {
       );
     }
 
-    // Send update request
+ 
     await fetch("/api/user/update", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -104,7 +101,7 @@ const EditProfile = () => {
     });
 
     setLoading(false);
-    window.location.reload(); // refresh UI
+    window.location.reload();
   };
 
   return (
@@ -126,7 +123,7 @@ const EditProfile = () => {
           </DialogHeader>
 
           <form onSubmit={handleSubmit}>
-            {/* Cover Pic */}
+
             <div
               style={{ backgroundImage: `url(${coverPic})` }}
               className="w-full h-48 relative bg-cover bg-center"
@@ -145,7 +142,6 @@ const EditProfile = () => {
                 <SquarePen className="text-black" />
               </label>
 
-              {/* Profile Pic */}
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
                 <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden">
                   <img
@@ -170,7 +166,6 @@ const EditProfile = () => {
               </div>
             </div>
 
-            {/* Inputs */}
             <div className="grid gap-4 mt-7">
               <div className="grid gap-3">
                 <Label>Name</Label>
@@ -201,7 +196,6 @@ const EditProfile = () => {
               </div>
             </div>
 
-            {/* Footer */}
             <DialogFooter className="mt-4">
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>

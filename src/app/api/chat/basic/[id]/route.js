@@ -10,7 +10,6 @@ export async function GET(req, { params }) {
   try {
     await connect();
 
-    // Query chats where this user is a participant
     const chats = await Chat.find({ participants: id })
       .populate("participants")
       .populate("lastMessage")

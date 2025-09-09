@@ -92,7 +92,7 @@ const Post = () => {
       setcommentText("");
       setparentId(null);
       setparentName("");
-      getComments(); // refresh list
+      getComments();
     } else {
       alert("Failed to add comment");
     }
@@ -105,7 +105,6 @@ const Post = () => {
           {postData ? (
             <>
               <div className="w-full rounded-xl pt-5 px-5 transition-shadow backdrop-blur-lg shadow-md border-none  relative">
-                {/* User Info */}
                 <Link href={`/userprofile/${postData.postBy._id}`}>
                   <div className="flex gap-3 w-full justify-start items-center">
                     <img
@@ -127,10 +126,8 @@ const Post = () => {
                   </div>
                 </Link>
 
-                {/* Post Description */}
                 <p className="text-base mt-5">{postData.description}</p>
 
-                {/* Tagged Users */}
                 {postData?.taggedUsers?.length > 0 && (
                   <div className="flex gap-1 text-gray-400 flex-wrap">
                     tagged
@@ -145,7 +142,6 @@ const Post = () => {
                   </div>
                 )}
 
-                {/* Hashtags */}
                 {postData.hashtags?.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {postData.hashtags.map((hashtag, i) => (
@@ -160,7 +156,6 @@ const Post = () => {
                 )}
 
                 <div className="flex flex-col gap-5">
-                  {/* Media */}
                   {postData.media && (
                     <>
                       <Link href={`/media/${postData._id}`}>
@@ -181,7 +176,6 @@ const Post = () => {
                     </>
                   )}
 
-                  {/* Actions */}
                   <div className="flex gap-5 mb-3">
                     <LikeDislike postId={postData._id} />
                     <button onClick={() => setIsCommentsOpen(!isCommentsOpen)}>
@@ -196,7 +190,6 @@ const Post = () => {
                     </button>
                   </div>
 
-                  {/* Comments Section */}
                   {isCommentsOpen && (
                     <div className="mt-4">
                       <div className="overflow-y-auto space-y-4">
@@ -213,7 +206,6 @@ const Post = () => {
                         ))}
                       </div>
 
-                      {/* Input Bar */}
                       <div className="sticky bottom-0 left-0 w-full px-2 py-2">
                         <form
                           onSubmit={postComment}
@@ -261,7 +253,7 @@ const Post = () => {
               </div>
             </>
           ) : (
-           <Loader/>
+            <Loader />
           )}
         </div>
       </div>

@@ -7,8 +7,10 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import NotificationContext from "@/context/NotificationContext";
 
 const Notifications = () => {
+  const {setnotificationCount} = useContext(NotificationContext)
   const { currentLoggedInUser } = useContext(CurrentUserContext);
   const [notifications, setNotifications] = useState([]);
   const [loader, setLoader] = useState(false);
@@ -19,7 +21,8 @@ const Notifications = () => {
     try {
       const res = await fetch(`/api/notification/${currentLoggedInUser?._id}`);
       const data = await res.json();
-      setNotifications(data.notifications || []);
+      setNotifications(data?.notifications || []);
+
     } catch (error) {
       console.log(error);
     } finally {
@@ -42,6 +45,7 @@ const Notifications = () => {
       if (res.ok) {
         toast.success("Notification Deleted");
         setNotifications((prev) => prev.filter((n) => n._id !== id));
+        setnotificationCount((prev)=>prev-1)
       } else {
         toast.error("Failed to delete notification");
       }
@@ -70,9 +74,8 @@ const Notifications = () => {
             {notifications.map((n) => (
               <li
                 key={n._id}
-                className="flex items-center gap-3 p-3 shadow-2xl rounded-xl hover:bg-gray-50 hover:text-black transition"
+                className="flex items-center gap-3 p-3 shadow-xl rounded-xl hover:bg-gray-50 hover:text-black transition"
               >
-                {/* Profile pic */}
                 <img
                   src={n.eventBy.profilePic || "/default-avatar.png"}
                   alt={n.eventBy.username}
@@ -80,7 +83,6 @@ const Notifications = () => {
                   onClick={() => handleProfileRedirect(n.eventBy._id)}
                 />
 
-                {/* Text */}
                 <div
                   className="flex-1 text-sm cursor-pointer"
                   onClick={() => handleProfileRedirect(n.eventBy._id)}
@@ -91,10 +93,9 @@ const Notifications = () => {
                   <strong>{n.eventBy.username}</strong>
                 </div>
 
-                {/* Delete button */}
                 <button
                   onClick={() => deleteNotification(n._id)}
-                  className="text-red-500 hover:text-red-700 transition"
+                  className="cursor-pointer text-red-500 hover:text-red-700 transition"
                 >
                   <RiDeleteBin6Line size={20} />
                 </button>

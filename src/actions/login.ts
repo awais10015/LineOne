@@ -12,14 +12,13 @@ const credentialsLogin = async (email: string, password: string) => {
     });
 
     if (res?.error) {
-      return res.error; // This will catch most authjs errors (like "Invalid email")
+      return res.error;
     }
 
-    return null; // Success
+    return null;
   } catch (err) {
-    // Handle thrown errors from your `authorize` function
     if (err instanceof CredentialsSignin) {
-      return err.message; // Custom message you threw in `authorize`
+      return err.message;
     }
 
     console.error("Unexpected error during login:", err);

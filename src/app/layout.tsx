@@ -3,8 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Layout from "@/components/layout/Layout";
 import CurrentUserContextProvider from "@/context/CurrentUserContextProvider";
-import AnotherUserContextProvider from "@/context/AnotherUserContextProvider"
-// import 'antd/dist/reset.css';
+import AnotherUserContextProvider from "@/context/AnotherUserContextProvider";
+import NotificationContextProvider from "@/context/NotificationContextProvider"
+import NewMessageContextProvider from "@/context/NewMessageContextProvider"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +29,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -36,7 +36,11 @@ export default async function RootLayout({
       >
         <CurrentUserContextProvider>
           <AnotherUserContextProvider>
-          <Layout>{children}</Layout>
+            <NewMessageContextProvider>
+              <NotificationContextProvider>
+                <Layout>{children}</Layout>
+              </NotificationContextProvider>
+            </NewMessageContextProvider>
           </AnotherUserContextProvider>
         </CurrentUserContextProvider>
       </body>

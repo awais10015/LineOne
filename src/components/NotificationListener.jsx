@@ -12,7 +12,7 @@ export default function NotificationListener({ userId }) {
     }
 
     socket.on("notification", (notif) => {
-      toast.info(notif.message); // 🔔 toast
+      toast.info(notif.message);
     });
 
     return () => {
@@ -20,5 +20,5 @@ export default function NotificationListener({ userId }) {
     };
   }, [userId]);
 
-  return null; // no UI
+  return null; 
 }

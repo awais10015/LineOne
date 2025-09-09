@@ -9,8 +9,6 @@ export async function GET(req, { params }) {
   try {
     await connect();
     const { id } = await params;
-
-    
     const post = await Post.findById(id)
       .populate("taggedUsers")
       .populate("postBy")
