@@ -1,9 +1,9 @@
 "use client";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
-import React, { useState, createContext, useContext } from "react";
 import { motion } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
+import React, { createContext, useContext, useState } from "react";
 
 interface Links {
   label: string;
@@ -31,8 +31,7 @@ export const useSidebar = () => {
 
 export const SidebarProvider = ({
   children,
-  open: openProp,
-  setOpen: setOpenProp,
+  
   animate = true,
 }: {
   children: React.ReactNode;

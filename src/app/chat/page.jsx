@@ -131,7 +131,7 @@ const page = () => {
   return (
     <>
       {/* Floating menu */}
-      <div className="absolute bottom-3 right-3">
+      <div className="absolute bottom-20 right-3">
         <DropdownMenu>
           <DropdownMenuTrigger>
             <div className="cursor-pointer flex items-center justify-center rounded-full w-12 h-12 bg-[#ff6500] hover:scale-105">

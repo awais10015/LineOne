@@ -1,19 +1,29 @@
 "use client";
-import Image from "next/image";
+import CurrentUserContext from "@/context/CurrentUserContext";
+import NewMessageContext from "@/context/NewMessageContext";
+import NotificationContext from "@/context/NotificationContext";
 import { cn } from "@/lib/utils";
-import React, {
-  useState,
-  createContext,
-  useContext,
-  useRef,
-  useEffect,
-} from "react";
-import { AnimatePresence, motion } from "motion/react";
-import { IconMenu2, IconX } from "@tabler/icons-react";
-import { ModeToggle } from "../ModeToggle";
+import {
+  IconBellRinging,
+  IconBrandLine,
+  IconHome,
+  IconSearch,
+  IconUsers,
+} from "@tabler/icons-react";
+import { motion } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconBrandLine, IconBellRinging, } from "@tabler/icons-react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { ModeToggle } from "../ModeToggle";
+
+import SignOutButton from "@/components/client/SimpleSignOutButton";
 
 interface Links {
   label: string;
@@ -123,6 +133,38 @@ export const MobileSidebar = ({
   const { open, setOpen } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const { notificationCount } = useContext(NotificationContext);
+  const { newMessages } = useContext(NewMessageContext);
+  const { currentLoggedInUser } = useContext(CurrentUserContext);
+
+  const profilePic =
+    currentLoggedInUser?.profilePic ||
+    (currentLoggedInUser?.gender === "male" ? "/Mdp.jpg" : "/Fdp.jpg");
+
+  const links = [
+    {
+      label: "Home",
+      href: "/home",
+      icon: (
+        <IconHome className="h-8 w-8 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    },
+    {
+      label: "Search",
+      href: "/search",
+      icon: (
+        <IconSearch className="h-8 w-8 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    },
+    {
+      label: "Users",
+      href: "/users",
+      icon: (
+        <IconUsers className="h-8 w-8 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    },
+  ];
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -149,51 +191,64 @@ export const MobileSidebar = ({
   }, [pathname]);
 
   return (
-    <div
-      className={cn(
-        "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between",
-        className
-      )}
-      {...props}
-    >
-      <div className="flex justify-between items-center z-20 w-full">
-        <div className="flex justify-center items-center gap-2">
-          <Image src="/logo.svg" alt="logo" width={30} height={30} />
-          <h1 className="font-medium text-lg">LineOne</h1>
-        </div>
-        <div className="flex items-center justify-center gap-2">
-          <ModeToggle />
-          <IconMenu2
-            className="text-neutral-800 dark:text-neutral-200"
-            onClick={() => setOpen(!open)}
-          />
+    <>
+      <div
+        className={cn(
+          "h-10 px-4 py-6 flex flex-row md:hidden items-center justify-between",
+          className
+        )}
+        {...props}
+      >
+        <div className="flex justify-between items-center z-20 w-full">
+          <div className="flex justify-center items-center gap-2">
+            <Image src="/logo.svg" alt="logo" width={30} height={30} />
+            <h1 className="font-medium text-lg">LineOne</h1>
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <NotificationLink
+              label={"Notifications"}
+              href={"/notifications"}
+              count={notificationCount}
+            />
+            <ModeToggle />
+            <SignOutButton />
+          </div>
         </div>
       </div>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            ref={sidebarRef}
-            initial={{ x: "-100%", opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: "-100%", opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className={cn(
-              "fixed h-full w-[200px] rounded-tr-2xl rounded-br-2xl border shadow-2xl inset-0 bg-white dark:bg-neutral-900 pl-4 pt-4 pb-2 z-[100] flex flex-col justify-start",
-              className
-            )}
+      <div className="absolute bottom-3 z-100 md:hidden w-full px-5">
+        <div className="h-15 w-full rounded-2xl border shadow-lg inset-1 bg-white dark:bg-black flex justify-evenly items-center">
+          {links.map((link, idx) => (
+            <SidebarLink key={idx} link={link} />
+          ))}
+          <Link
+            href={"/chat"}
+            
           >
-            <div
-              className="absolute right-2 top-2 z-50 text-neutral-800 dark:text-neutral-200"
-              onClick={() => setOpen(false)}
-            >
-              <IconX />
+            {/* Icon wrapper */}
+            <div className="relative">
+              <IconBrandLine className="h-8 w-8 shrink-0 text-neutral-700 dark:text-neutral-200" />
+
+              {/* Badge */}
+              {newMessages && Number(newMessages?.length) > 0 ? (
+                <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white shadow-md">
+                  {newMessages?.length}
+                </span>
+              ) : (
+                ""
+              )}
             </div>
-            {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+          </Link>
+          <Image
+            src={profilePic}
+            className="h-8 w-8 shrink-0 rounded-full object-cover object-top"
+            width={80}
+            height={80}
+            alt="Avatar"
+          />
+        </div>
+      </div>
+    </>
   );
 };
 
@@ -231,14 +286,12 @@ export const SidebarLink = ({
 };
 
 export const ChatLink = ({
-  
   label,
   href,
   count,
   className,
   ...props
 }: {
-  
   label: string;
   href: string;
   count?: number;
@@ -260,11 +313,13 @@ export const ChatLink = ({
         <IconBrandLine className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
 
         {/* Badge */}
-         {count && Number(count) > 0 ? (
+        {count && Number(count) > 0 ? (
           <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white shadow-md">
             {count}
           </span>
-        ):("")}
+        ) : (
+          ""
+        )}
       </div>
 
       {/* Label */}
@@ -281,16 +336,13 @@ export const ChatLink = ({
   );
 };
 
-
 export const NotificationLink = ({
-  
   label,
   href,
   count,
   className,
   ...props
 }: {
-  
   label: string;
   href: string;
   count?: number | string;
@@ -316,7 +368,9 @@ export const NotificationLink = ({
           <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white shadow-md">
             {count}
           </span>
-        ):("")}
+        ) : (
+          ""
+        )}
       </div>
 
       {/* Label */}

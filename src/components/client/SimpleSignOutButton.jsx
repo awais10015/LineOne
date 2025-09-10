@@ -8,7 +8,7 @@ const SignOutButton = () => {
   const { open, animate } = useSidebar();
   return (
     <Button
-      className="cursor-pointer w-full h-7 gap-0 p-0 m-0 rounded-full flex items-center justify-center"
+      className="cursor-pointer w-8 h-8 gap-0 p-0 m-0 rounded-full flex items-center justify-center"
       variant="ghost"
       onClick={() => {
         sessionStorage.removeItem("reloaded");
@@ -18,16 +18,6 @@ const SignOutButton = () => {
       <div className="w-7 h-7 flex items-center justify-center hover:scale-105 bg-[#ff6500] rounded-full">
         <Power />
       </div>
-
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className="ml-3 text-gray-900 dark:text-neutral-200 text-sm font-light group-hover/sidebar:translate-x-1 transition duration-150"
-      >
-        Logout
-      </motion.span>
     </Button>
   );
 };

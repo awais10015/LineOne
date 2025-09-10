@@ -159,7 +159,7 @@ export default function UserList() {
                   <img
                     src={user?.coverPic}
                     alt="cover pic"
-                    className="w-full h-32 bg-[#ff6500] flex justify-center items-center text-white font-bold rounded-t-3xl "
+                    className="w-full h-32  flex justify-center items-center text-white font-bold rounded-t-3xl "
                   />
 
                   {/* Profile Picture */}
