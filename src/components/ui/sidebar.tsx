@@ -239,6 +239,7 @@ export const MobileSidebar = ({
               )}
             </div>
           </Link>
+          <Link href={"/userprofile"}>
           <Image
             src={profilePic}
             className="h-8 w-8 shrink-0 rounded-full object-cover object-top"
@@ -246,6 +247,8 @@ export const MobileSidebar = ({
             height={80}
             alt="Avatar"
           />
+          </Link>
+          
         </div>
       </div>
     </>
