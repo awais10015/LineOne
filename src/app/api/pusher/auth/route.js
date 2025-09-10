@@ -1,9 +1,8 @@
 import { pusherServer } from "@/lib/pusher";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth"; // your NextAuth config
+import { auth } from "@/auth";
 
 export async function POST(req) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session?.user) {
     return new Response("Unauthorized", { status: 401 });
