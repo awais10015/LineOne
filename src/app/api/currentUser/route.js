@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { connect } from "@/lib/db";
 import { User } from "@/models/userModel";
 import { Post } from "@/models/postModel"; 
-import { Message } from "@/models/messageModel"; 
+import { Message } from "@/models/messageModel";
 
 export async function GET() {
   const session = await auth();
