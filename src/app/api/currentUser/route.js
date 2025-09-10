@@ -12,7 +12,7 @@ export async function GET() {
   await connect();
 
   try {
-    const user = await User.findOne({ email: currentUser?.email })
+    const user = await User.findOne({ email: currentUser?.email }).select("+password")
       .populate({
         path: "posts",
         options: { sort: { createdAt: -1 } },

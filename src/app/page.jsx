@@ -5,15 +5,18 @@ import Loader from "@/components/Loader";
 import { toast } from "sonner";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import { useTopLoader } from "nextjs-toploader";
-import { User, Calendar, ChevronDown } from "lucide-react";
+import { User, Calendar, ChevronDown, Lock } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
+// import { hash } from "bcryptjs";
+// import PasswordInput from "@/components/client/PasswordInput";
 
 export default function ProfileForm() {
   const loader = useTopLoader();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { currentLoggedInUser } = useContext(CurrentUserContext);
+  const [showPassword, setShowPassword] = useState(false);
 
-  
   useEffect(() => {
     if (currentLoggedInUser === null) {
       if (!sessionStorage.getItem("reloaded")) {
@@ -25,14 +28,14 @@ export default function ProfileForm() {
       router.push("/home");
       return;
     } else {
-      setLoading(false); 
+      setLoading(false);
     }
   }, [currentLoggedInUser]);
 
   useEffect(() => {
     console.log(currentLoggedInUser);
   }, [currentLoggedInUser]);
-  
+
   const navigateToHome = () => {
     router.push("/home");
   };
@@ -46,15 +49,16 @@ export default function ProfileForm() {
     let username = formData.get("username")?.toString().toLowerCase() || "";
     const dateOfBirth = formData.get("dateOfBirth");
     const gender = formData.get("gender");
-
-    if (!username.startsWith("@")) {
-      username = "@" + username;
-    }
+    // const planePassword = formData.get("password")?.toString();
+    const planePassword = formData.get("password")?.toString() || "";
+    // if (planePassword) {
+    //   const hashedPassword = await hash(planePassword, 10);
+    // }
 
     try {
       const res = await fetch("/api/profile", {
         method: "POST",
-        body: JSON.stringify({ username, dateOfBirth, gender }),
+        body: JSON.stringify({ username, dateOfBirth, gender, planePassword }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -65,12 +69,12 @@ export default function ProfileForm() {
       }
 
       toast.success("Credentials added successfully");
-      navigateToHome(); 
+      navigateToHome();
       return;
     } catch (err) {
       console.error(err);
       toast.error("Error updating profile.");
-      setLoading(false); 
+      setLoading(false);
     }
     loader.done();
   };
@@ -85,7 +89,6 @@ export default function ProfileForm() {
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 w-full max-w-md mx-auto p-6 rounded-2xl shadow-lg"
       >
-       
         <div className="flex flex-col gap-1">
           <label
             htmlFor="username"
@@ -105,7 +108,41 @@ export default function ProfileForm() {
           </div>
         </div>
 
-      
+        {currentLoggedInUser?.password ? (
+          ""
+        ) : (
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                placeholder="Enter password"
+                required
+                className="w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#ff6500] focus:border-transparent"
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col gap-1">
           <label
             htmlFor="dateOfBirth"
@@ -130,7 +167,6 @@ export default function ProfileForm() {
           </div>
         </div>
 
-       
         <div className="flex flex-col gap-1">
           <label htmlFor="gender" className="text-sm font-medium text-gray-700">
             Gender
@@ -161,7 +197,7 @@ export default function ProfileForm() {
 
         <button
           type="submit"
-          className="w-full bg-[#ff6500] text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-200"
+          className="cursor-pointer w-full bg-[#ff6500] text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-200"
         >
           Save Profile
         </button>
