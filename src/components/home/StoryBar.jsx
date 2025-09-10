@@ -4,6 +4,7 @@ import CurrentUserContext from "@/context/CurrentUserContext";
 import Image from "next/image";
 import Loader from "../Loader";
 import { CgAddR } from "react-icons/cg";
+import { toast } from "sonner";
 
 export default function StoryBar() {
   const [stories, setStories] = useState([]);
@@ -52,7 +53,8 @@ export default function StoryBar() {
       !selectedFile.type.startsWith("image/") &&
       !selectedFile.type.startsWith("video/")
     ) {
-      alert("Only images and videos are allowed for stories!");
+      toast.error("Only images and videos are allowed for stories!");
+     
       return;
     }
     if (selectedFile) {
@@ -93,13 +95,13 @@ export default function StoryBar() {
     });
 
     if (res.ok) {
-      alert("Story added!");
+    toast.success("Story added!");
       setFile(null);
       setPreview(null);
       setDescription("");
       fetchStories();
     } else {
-      alert("Failed to add story");
+      toast.error("Failed to add story");
     }
 
     setLoading(false);

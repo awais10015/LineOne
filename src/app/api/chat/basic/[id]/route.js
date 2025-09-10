@@ -17,7 +17,7 @@ export async function GET(req, { params }) {
     if (!chats || chats.length === 0) {
       return NextResponse.json(
         { message: "No chats found for this user" },
-        { status: 404 }
+        { status: 200 }
       );
     }
 

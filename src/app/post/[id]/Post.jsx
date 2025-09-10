@@ -10,6 +10,7 @@ import { Send } from "lucide-react";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import CommentItem from "@/components/post/CommentItem";
 import Loader from "@/components/Loader";
+import { toast } from "sonner";
 
 const Post = () => {
   const { id } = useParams();
@@ -94,7 +95,7 @@ const Post = () => {
       setparentName("");
       getComments();
     } else {
-      alert("Failed to add comment");
+      toast.error("Failed to add comment");
     }
   };
 

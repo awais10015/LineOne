@@ -21,6 +21,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaArrowLeft } from "react-icons/fa";
 import Pusher from "pusher-js";
+import { toast } from "sonner";
 
 import {
   DropdownMenu,
@@ -147,7 +148,7 @@ const Chat = () => {
       );
 
       if (!isParticipant) {
-        alert("❌ You are not part of this chat now.");
+        toast.error("You are not part of this chat now.");
         router.push("/chat");
         return;
       }

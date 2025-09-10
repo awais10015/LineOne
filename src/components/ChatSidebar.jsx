@@ -34,13 +34,18 @@ export function ChatSidebar({ children }) {
   }, []);
 
   const fetchChatsBasic = async () => {
-    if (!currentLoggedInUser) return;
-    setloader(true);
-    try {
-      const res = await fetch(`/api/chat/basic/${currentLoggedInUser._id}`);
-      const data = await res.json();
+  if (!currentLoggedInUser) return;
+  setloader(true);
 
-      const sortedChats = data.sort((a, b) => {
+  try {
+    const res = await fetch(`/api/chat/basic/${currentLoggedInUser._id}`);
+    const data = await res.json();
+    console.log(data);
+
+    let sortedChats = [];
+
+    if (Array.isArray(data)) {
+      sortedChats = data.sort((a, b) => {
         const aTime = a.lastMessage
           ? new Date(a.lastMessage.createdAt).getTime()
           : 0;
@@ -49,15 +54,17 @@ export function ChatSidebar({ children }) {
           : 0;
         return bTime - aTime;
       });
-
-      setchats(sortedChats.filter((c) => !c.isGroup));
-      setgroupChats(sortedChats.filter((c) => c.isGroup));
-      setloader(false);
-    } catch (err) {
-      console.error(err);
-      setloader(false);
     }
-  };
+
+    setchats(sortedChats.filter((c) => !c.isGroup));
+    setgroupChats(sortedChats.filter((c) => c.isGroup));
+    setloader(false);
+  } catch (err) {
+    console.error(err);
+    setloader(false);
+  }
+};
+
 
   const [open, setOpen] = useState(false);
   useEffect(() => {

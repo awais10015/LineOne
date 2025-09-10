@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const Page = () => {
   const [users, setusers] = useState([]);
@@ -92,7 +93,7 @@ const Page = () => {
 
       const data = await res.json();
       if (!res.ok) {
-        alert(data.message || "Error creating group");
+        toast.error(data.message || "Error creating group");
         
         return;
       }
