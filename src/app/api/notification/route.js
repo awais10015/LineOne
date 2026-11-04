@@ -1,30 +1,18 @@
-import { connect } from "@/lib/db";
-import { Notification } from "@/models/notificationModel";
 import { NextResponse } from "next/server";
-import { pusherServer } from "@/lib/pusher";
+import { requireAuth } from "@/lib/requireAuth";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(req) {
   try {
+    const authResult = await requireAuth();
+    if (authResult.error) return authResult.error;
+
     const body = await req.json();
-    await connect();
+    if (String(body.eventBy) !== String(authResult.user._id)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
-    // Save in DB
-    let newNotification = await Notification.create(body);
-    newNotification = await Notification.findById(newNotification._id)
-      .populate("eventBy")
-      .populate("eventFor");
-
-    // Send via Pusher
-    await pusherServer.trigger(
-      `private-user-${body.eventFor}`,
-      "notification",
-      {
-        type: body.event,
-        message: `You have a new ${newNotification.event} from ${newNotification.eventBy.username}`,
-        notification: newNotification,
-      }
-    );
-
+    const newNotification = await createNotification(body);
     return NextResponse.json(newNotification, { status: 201 });
   } catch (err) {
     console.error("Notification Error:", err.message);

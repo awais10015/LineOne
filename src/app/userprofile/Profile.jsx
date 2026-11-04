@@ -20,6 +20,7 @@ import {
 import CreatePost from "@/components/profile/CreatePost";
 import EditProfile from "@/components/profile/EditProfile";
 import Post from "@/components/profile/Post";
+import { parseJsonResponse } from "@/lib/parseJsonResponse";
 
 const Profile = () => {
   const router = useRouter();
@@ -33,8 +34,8 @@ const Profile = () => {
   const getUser = async () => {
     try {
       const res = await fetch("/api/currentUser");
-      const data = await res.json();
-      setCurrentLoggedInUser(data.user);
+      const data = await parseJsonResponse(res, { user: null });
+      setCurrentLoggedInUser(data.user ?? null);
     } catch (err) {
       console.error("Failed to fetch user in context:", err);
     }

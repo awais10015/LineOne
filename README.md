@@ -1,37 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LineOne
 
-## Getting Started
+Social platform built with Next.js App Router, NextAuth, MongoDB, Pusher, and Cloudinary.
 
-First, run the development server:
+## Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18+
+- MongoDB Atlas or local MongoDB
+- Google OAuth credentials (optional)
+- Pusher app (optional, for realtime chat/notifications)
+- Cloudinary account (optional, for media uploads)
+
+## Environment variables
+
+Create `.env` in the project root:
+
+```env
+MONGODB_URL=mongodb+srv://...
+AUTH_SECRET=generate_with_openssl_rand_base64_32
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+PUSHER_APP_ID=
+PUSHER_KEY=
+PUSHER_SECRET=
+NEXT_PUBLIC_PUSHER_KEY=
+NEXT_PUBLIC_PUSHER_CLUSTER=
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For local development, set `NEXT_PUBLIC_APP_URL` to `http://localhost:3000` so follow notifications and internal links work correctly.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Run locally
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+## Main flows
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Sign up** → **Log in** → complete profile at `/` (username, DOB, gender).
+2. **Home** (`/home`): **Following** feed (people you follow/follow you + your posts), **Discover** (public posts), and **Suggested users** when Following is empty.
+3. **Feed API**: `GET /api/feed?mode=following|discover|suggestedUsers` (authenticated).
+4. **Saved posts**: bookmark on post cards; view at `/saved`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
+- `npm run dev` — development server
+- `npm run build` — production build
+- `npm run start` — production server
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# lineone
+Deploy to Vercel or similar; set all env vars in the host dashboard. Ensure MongoDB network access allows your deployment IPs.

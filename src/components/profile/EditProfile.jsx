@@ -17,10 +17,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import CurrentUserContext from "@/context/CurrentUserContext";
+import { normalizeUsername } from "@/lib/formatUsername";
 
 const EditProfile = () => {
 
-    const {currentLoggedInUser} = useContext(CurrentUserContext)
+    const {currentLoggedInUser, setCurrentLoggedInUser} = useContext(CurrentUserContext)
 
   let userProfilePic =
     currentLoggedInUser?.profilePic ||
@@ -30,6 +31,9 @@ const EditProfile = () => {
   const [profilePic, setProfilePic] = useState(userProfilePic || "");
   const [coverPic, setCoverPic] = useState(userCoverPic || "");
   const [loading, setLoading] = useState(false);
+  const [privateAccount, setPrivateAccount] = useState(
+    !!currentLoggedInUser?.privateAccount
+  );
 
   const handleImageChange = (e, type) => {
     const file = e.target.files[0];
@@ -66,16 +70,11 @@ const EditProfile = () => {
     let profilePicUrl = profilePic;
     let coverPicUrl = coverPic;
 
-    let username =
-      e.target.changeusername.value?.toString().toLowerCase() || currentLoggedInUser?.username;
-
-    username = username.replace(/\s+/g, "");
-
-    if (!username.startsWith("@")) {
-      username = "@" + username;
-    }
-
-
+    let username = normalizeUsername(
+      e.target.changeusername.value?.toString() ||
+        currentLoggedInUser?.username ||
+        ""
+    );
     if (profilePic.startsWith("blob:")) {
       profilePicUrl = await uploadImage(
         document.getElementById("profileUpload").files[0]
@@ -88,7 +87,7 @@ const EditProfile = () => {
     }
 
  
-    await fetch("/api/user/update", {
+    const res = await fetch("/api/user/update", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -97,8 +96,16 @@ const EditProfile = () => {
         bio: e.target.changebio.value || currentLoggedInUser?.bio,
         profilePic: profilePicUrl,
         coverPic: coverPicUrl,
+        privateAccount,
       }),
     });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.user) {
+        setCurrentLoggedInUser((prev) => ({ ...prev, ...data.user }));
+      }
+    }
 
     setLoading(false);
     window.location.reload();
@@ -193,6 +200,16 @@ const EditProfile = () => {
                   placeholder={currentLoggedInUser?.bio}
                   defaultValue={currentLoggedInUser?.bio}
                 />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  id="privateAccount"
+                  type="checkbox"
+                  checked={privateAccount}
+                  onChange={(e) => setPrivateAccount(e.target.checked)}
+                  className="h-4 w-4"
+                />
+                <Label htmlFor="privateAccount">Private account</Label>
               </div>
             </div>
 

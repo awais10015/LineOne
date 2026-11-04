@@ -7,7 +7,7 @@ import {
   ChatLink,
   NotificationLink,
 } from "@/components/ui/sidebar";
-import { IconHome, IconSearch, IconUsers } from "@tabler/icons-react";
+import { IconHome, IconSearch, IconUsers, IconBookmark } from "@tabler/icons-react";
 
 import SignOutButton from "./client/SignOutButton";
 
@@ -52,6 +52,13 @@ export function AppSidebar({ children }) {
       href: "/users",
       icon: (
         <IconUsers className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    },
+    {
+      label: "Saved",
+      href: "/saved",
+      icon: (
+        <IconBookmark className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
   ];

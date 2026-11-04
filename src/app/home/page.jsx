@@ -1,5 +1,6 @@
-import React from 'react'
-import Home from "./Home"
+import React, { Suspense } from "react";
+import Home from "./Home";
+import Loader from "@/components/Loader";
 
 export const metadata = {
   title: "LineOne-Home",
@@ -8,8 +9,10 @@ export const metadata = {
 
 const page = () => {
   return (
-    <Home/>
-  )
-}
+    <Suspense fallback={<Loader />}>
+      <Home />
+    </Suspense>
+  );
+};
 
-export default page
+export default page;

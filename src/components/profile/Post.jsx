@@ -2,9 +2,7 @@
 import CurrentUserContext from "@/context/CurrentUserContext";
 import React, { useContext } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
-import LikeDislike from "@/components/post/LikeDislike";
-import { IoChatbox } from "react-icons/io5";
+import PostCard from "@/components/post/PostCard";
 
 const Post = () => {
   const { currentLoggedInUser } = useContext(CurrentUserContext);
@@ -16,97 +14,13 @@ const Post = () => {
         </div>
 
         {currentLoggedInUser?.posts?.length > 0 ? (
-          <div className="w-full px-2 flex flex-col items-center gap-2 max-w-4xl  rounded-2xl overflow-hidden srollbar-hide">
+          <div className="w-full px-2 flex flex-col items-center gap-3 max-w-4xl rounded-2xl overflow-hidden srollbar-hide">
             {currentLoggedInUser.posts.map((post) => (
-              <div
+              <PostCard
                 key={post._id}
-                className="w-full rounded-xl p-5 transition-shadow  backdrop-blur-lg bg-white/10  shadow-md bordershadow-lg  dark:bg-white/5 dark:border-white/10 light:border-gray-500"
-              >
-                <div className="flex gap-3 w-full justify-start items-center">
-                  <div className="">
-                    <img
-                      className="h-10 w-10 rounded-full object-cover object-top"
-                      src={
-                        currentLoggedInUser?.profilePic ||
-                        (currentLoggedInUser?.gender === "male"
-                          ? "/Mdp.jpg"
-                          : "/Fdp.jpg")
-                      }
-                      alt=""
-                    />
-                  </div>
-                  <div>
-                    <h1 className="">{currentLoggedInUser?.name}</h1>
-                    <p className="text-sm font-extralight">
-                      {currentLoggedInUser?.username}
-                    </p>
-                  </div>
-                </div>
-               
-                <p className="text-base mt-5">{post.description}</p>
-
-                
-                {post?.taggedUsers.length > 0 && (
-                  <div className="flex gap-1 text-gray-400 flex-wrap">
-                    tagged
-                    {post?.taggedUsers?.map((taggedUser) => (
-                      <div key={taggedUser._id}>
-                        <Link href={`/userprofile/${taggedUser._id}`}>
-                          <p>{taggedUser.username}</p>
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-               
-                {post.hashtags?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {post.hashtags.map((hashtag, i) => (
-                      <span
-                        key={i}
-                        className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-md"
-                      >
-                        #{hashtag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-              
-                {post.media && (
-                  <>
-                    {/\.(mp4|webm|ogg)$/i.test(post.media) ? (
-                      <video
-                        src={post.media}
-                        controls
-                        className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
-                      />
-                    ) : (
-                      <img
-                        src={post.media}
-                        alt="Post media"
-                        className="mt-4 rounded-2xl w-full object-cover max-h-96"
-                      />
-                    )}
-                  </>
-                )}
-                
-                <div className="flex gap-5 mt-5">
-                  <LikeDislike postId={post._id} />
-                  <Link href={`/post/${post._id}`}>
-                    <button className="flex items-center justify-center gap-2">
-                      <IoChatbox
-                        className={"text-gray-400 cursor-pointer"}
-                        size={22}
-                      />{" "}
-                      <span className="text-gray-400">
-                        {post?.comments.length}
-                      </span>
-                    </button>
-                  </Link>
-                </div>
-              </div>
+                post={post}
+                authorOverride={currentLoggedInUser}
+              />
             ))}
 
             <motion.div

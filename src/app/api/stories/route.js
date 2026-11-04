@@ -2,11 +2,19 @@ import { connect } from "@/lib/db";
 import Story from "@/models/storyModel";
 import { User } from "@/models/userModel";
 import { NextResponse } from "next/server";
+import { requireAuth } from "@/lib/requireAuth";
 
 export async function POST(req) {
   try {
+    const authResult = await requireAuth();
+    if (authResult.error) return authResult.error;
+
     await connect();
     const { userId, mediaUrl, type, description } = await req.json();
+
+    if (String(userId) !== String(authResult.user._id)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
   
     if (type !== "image" && type !== "video") {
@@ -57,6 +65,7 @@ export async function GET(req) {
     }
 
     const followingIds = user.following.map((f) => f._id);
+    followingIds.push(user._id);
 
     const stories = await Story.find({
       user: { $in: followingIds },

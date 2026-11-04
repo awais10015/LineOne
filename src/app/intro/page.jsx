@@ -13,12 +13,19 @@ import {
   Star,
   CheckCircle,
 } from "lucide-react";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect } from "react";
+import { useRouter } from "nextjs-toploader/app";
+import { useTopLoader } from "nextjs-toploader";
 import Image from "next/image";
 
 export default function LandingPage() {
   const router = useRouter();
+  const topLoader = useTopLoader();
+
+  const navigateToLogin = useCallback(() => {
+    topLoader.start();
+    router.push("/login");
+  }, [router, topLoader]);
   useEffect(() => {
     // Load GSAP
     const loadGSAP = async () => {
@@ -173,7 +180,7 @@ export default function LandingPage() {
               <Button
                 variant="outline"
                 className="mr-2 cursor-pointer text-black hover:text-[#ff6500] shadow-[#ff6500]/20 bg-transparent border-orange-200 hover:bg-orange-50 hover:border-[#ff9100] hover:scale-105 transition-all duration-300"
-                onClick={() => router.push("/login")}
+                onClick={navigateToLogin}
               >
                 Explore
               </Button>
@@ -287,7 +294,7 @@ export default function LandingPage() {
                 <Button
                   size="lg"
                   className="bg-[#ff6500] cursor-pointer hover:bg-[#ff6500] text-lg px-8 py-4 h-auto group hover:scale-105 transition-all duration-300 hover:shadow-xl hover:shadow-orange-200"
-                  onClick={() => router.push("/login")}
+                  onClick={navigateToLogin}
                 >
                   Join Us Now
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -296,7 +303,7 @@ export default function LandingPage() {
                   variant="outline"
                   size="lg"
                   className="text-lg px-8 text-black hover:text-black shadow-[#ff6500]/20 shadow-2xl cursor-pointer py-4 h-auto border-orange-300 hover:bg-orange-50 bg-transparent hover:border-orange-400 hover:scale-105 transition-all duration-300"
-                  onClick={() => router.push("/login")}
+                  onClick={navigateToLogin}
                 >
                   See Live Demo
                 </Button>
@@ -620,7 +627,7 @@ export default function LandingPage() {
               size="lg"
               variant="secondary"
               className="text-lg cursor-pointer px-8 py-4 h-auto bg-white text-[#ff6500] hover:bg-orange-50 group hover:scale-105 transition-all duration-300 hover:shadow-xl hover:shadow-orange-200"
-              onClick={() => router.push("/login")}
+              onClick={navigateToLogin}
             >
               Join LineOne
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />

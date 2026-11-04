@@ -66,6 +66,16 @@ const userSchema = new mongoose.Schema({
             },
           ],
   privateAccount: { type: Boolean, default: false },
+  followOnboardingCompleted: { type: Boolean, default: false },
+  blockedUsers: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    default: [],
+  },
   savedPosts: {
     type: [
       {

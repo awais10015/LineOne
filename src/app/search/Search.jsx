@@ -1,7 +1,9 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import Loader from "@/components/Loader";
+import PostCard from "@/components/post/PostCard";
+import { parseJsonResponse } from "@/lib/parseJsonResponse";
 import {
   Card,
   CardContent,
@@ -15,11 +17,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import Link from "next/link";
 import FollowUnfollowButton from "@/components/profile/FollowUnfollowButton";
-import LikeDislike from "@/components/post/LikeDislike";
-import { IoChatbox } from "react-icons/io5";
 
 const Search = () => {
-  const { currentLoggedInUser } = useContext(CurrentUserContext);
+  const { currentLoggedInUser, setCurrentLoggedInUser } =
+    useContext(CurrentUserContext);
   const [posts, setPosts] = useState([]);
   const [users, setUsers] = useState([]);
   const [hashtags, setHashtags] = useState([]);
@@ -41,9 +42,9 @@ const Search = () => {
   const fetchPosts = async () => {
     setloader(true);
     try {
-      const res = await fetch("/api/allposts");
+      const res = await fetch("/api/feed?mode=discover&limit=50");
       const data = await res.json();
-      setPosts(data?.posts);
+      setPosts(data?.posts ?? []);
       setloader(false);
     } catch (error) {
       console.log(error);
@@ -92,6 +93,13 @@ const Search = () => {
     fetchPosts();
     fetchUsers();
   }, []);
+
+  const refreshCurrentUser = useCallback(async () => {
+    const res = await fetch("/api/currentUser");
+    const data = await parseJsonResponse(res, { user: null });
+    if (data.user) setCurrentLoggedInUser(data.user);
+  }, [setCurrentLoggedInUser]);
+
   const wordToSearch = () => {
     if (!searchWord) {
       setSearchedUsers([...users]);
@@ -169,151 +177,24 @@ const Search = () => {
                     ) : !searchWord ? (
                       <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
                         {posts?.map((post) => (
-                          <div
+                          <PostCard
                             key={post._id}
-                            className="mb-6 break-inside-avoid rounded-xl p-5 transition-shadow backdrop-blur-lg bg-white/10 shadow-md dark:bg-white/5 dark:border-white/10 border border-gray-300"
-                          >
-                            <Link href={`/userprofile/${post?.postBy?._id}`}>
-                              <div className="flex gap-3 w-full items-center">
-                                <img
-                                  className="h-10 w-10 rounded-full object-cover object-top"
-                                  src={
-                                    post?.postBy?.profilePic ||
-                                    (post?.postBy?.gender === "male"
-                                      ? "/Mdp.jpg"
-                                      : "/Fdp.jpg")
-                                  }
-                                  alt="profile"
-                                />
-                                <div>
-                                  <h1>{post?.postBy?.name}</h1>
-                                  <p className="text-sm font-extralight">
-                                    {post?.postBy?.username}
-                                  </p>
-                                </div>
-                              </div>
-                            </Link>
-
-                            <Link href={`/post/${post?._id}`}>
-                              <p className="text-base mt-5">
-                                {post?.description}
-                              </p>
-                            </Link>
-
-                            {post.media && (
-                              <Link href={`/post/${post?._id}`}>
-                                {/\.(mp4|webm|ogg)$/i.test(post?.media) ? (
-                                  <video
-                                    src={post?.media}
-                                    controls
-                                    className="mt-4 rounded-2xl w-full max-h-72 object-contain bg-black"
-                                  />
-                                ) : (
-                                  <img
-                                    src={post?.media}
-                                    alt="Post media"
-                                    className="mt-4 rounded-2xl w-full object-cover max-h-72"
-                                  />
-                                )}
-                              </Link>
-                            )}
-                          </div>
+                            post={post}
+                            className="mb-6 break-inside-avoid"
+                            showAuthorFollow
+                            onFollowChange={refreshCurrentUser}
+                          />
                         ))}
                       </div>
                     ) : (
                       searchedPosts?.map((post) => (
-                        <div
+                        <PostCard
                           key={post._id}
-                          className="w-full rounded-xl p-5 transition-shadow  backdrop-blur-lg bg-white/10  shadow-md bordershadow-lg  dark:bg-white/5 dark:border-white/10 light:border-gray-500"
-                        >
-                          <Link href={`/userprofile/${post?.postBy?._id}`}>
-                            <div className="flex gap-3 w-full justify-start items-center">
-                              <div className="">
-                                <img
-                                  className="h-10 w-10 rounded-full object-cover object-top"
-                                  src={
-                                    post?.postBy?.profilePic ||
-                                    (post?.postBy?.gender === "male"
-                                      ? "/Mdp.jpg"
-                                      : "/Fdp.jpg")
-                                  }
-                                  alt=""
-                                />
-                              </div>
-                              <div>
-                                <h1 className="">{post?.postBy?.name}</h1>
-                                <p className="text-sm font-extralight">
-                                  {post?.postBy?.username}
-                                </p>
-                              </div>
-                            </div>
-                          </Link>
-
-                          <p className="text-base mt-5">{post?.description}</p>
-
-                          {post?.taggedUsers.length > 0 && (
-                            <div className="flex gap-1 text-gray-400 flex-wrap">
-                              tagged
-                              {post?.taggedUsers?.map((taggedUser) => (
-                                <div key={taggedUser?._id}>
-                                  <Link
-                                    href={`/userprofile/${taggedUser?._id}`}
-                                  >
-                                    <p>{taggedUser?.username}</p>
-                                  </Link>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
-                          {post?.hashtags?.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              {post?.hashtags.map((hashtag, i) => (
-                                <span
-                                  key={i}
-                                  className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-md"
-                                >
-                                  #{hashtag}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-
-                          {post.media && (
-                            <>
-                              <Link href={`/media/${post?._id}`}>
-                                {/\.(mp4|webm|ogg)$/i.test(post?.media) ? (
-                                  <video
-                                    src={post?.media}
-                                    controls
-                                    className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
-                                  />
-                                ) : (
-                                  <img
-                                    src={post?.media}
-                                    alt="Post media"
-                                    className="mt-4 rounded-2xl w-full object-cover max-h-96"
-                                  />
-                                )}
-                              </Link>
-                            </>
-                          )}
-
-                          <div className="flex gap-5 mt-5">
-                            <LikeDislike postId={post?._id} />
-                            <Link href={`/post/${post?._id}`}>
-                              <button className="flex items-center justify-center gap-2">
-                                <IoChatbox
-                                  className={"text-gray-400 cursor-pointer"}
-                                  size={22}
-                                />{" "}
-                                <span className="text-gray-400">
-                                  {post?.comments.length}
-                                </span>
-                              </button>
-                            </Link>
-                          </div>
-                        </div>
+                          post={post}
+                          className="mb-3"
+                          showAuthorFollow
+                          onFollowChange={refreshCurrentUser}
+                        />
                       ))
                     )}
                     {}
@@ -384,98 +265,13 @@ const Search = () => {
                       </ul>
                       {postsHavingSearchedHashtag.length > 0 &&
                         postsHavingSearchedHashtag?.map((post) => (
-                          <div
+                          <PostCard
                             key={post._id}
-                            className="w-full rounded-xl p-5 transition-shadow  backdrop-blur-lg bg-white/10  shadow-md bordershadow-lg  dark:bg-white/5 dark:border-white/10 light:border-gray-500"
-                          >
-                            <Link href={`/userprofile/${post?.postBy?._id}`}>
-                              <div className="flex gap-3 w-full justify-start items-center">
-                                <div className="">
-                                  <img
-                                    className="h-10 w-10 rounded-full object-cover object-top"
-                                    src={
-                                      post.postBy?.profilePic ||
-                                      (post.postBy?.gender === "male"
-                                        ? "/Mdp.jpg"
-                                        : "/Fdp.jpg")
-                                    }
-                                    alt=""
-                                  />
-                                </div>
-                                <div>
-                                  <h1 className="">{post.postBy?.name}</h1>
-                                  <p className="text-sm font-extralight">
-                                    {post.postBy?.username}
-                                  </p>
-                                </div>
-                              </div>
-                            </Link>
-
-                            <p className="text-base mt-5">{post.description}</p>
-
-                            {post?.taggedUsers.length > 0 && (
-                              <div className="flex gap-1 text-gray-400 flex-wrap">
-                                tagged
-                                {post?.taggedUsers?.map((taggedUser) => (
-                                  <div key={taggedUser._id}>
-                                    <Link
-                                      href={`/userprofile/${taggedUser._id}`}
-                                    >
-                                      <p>{taggedUser.username}</p>
-                                    </Link>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {post.hashtags?.length > 0 && (
-                              <div className="flex flex-wrap gap-2 mt-2">
-                                {post.hashtags.map((hashtag, i) => (
-                                  <span
-                                    key={i}
-                                    className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-md"
-                                  >
-                                    #{hashtag}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-
-                            {post.media && (
-                              <>
-                                <Link href={`/media/${post._id}`}>
-                                  {/\.(mp4|webm|ogg)$/i.test(post.media) ? (
-                                    <video
-                                      src={post.media}
-                                      controls
-                                      className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
-                                    />
-                                  ) : (
-                                    <img
-                                      src={post.media}
-                                      alt="Post media"
-                                      className="mt-4 rounded-2xl w-full object-cover max-h-96"
-                                    />
-                                  )}
-                                </Link>
-                              </>
-                            )}
-
-                            <div className="flex gap-5 mt-5">
-                              <LikeDislike postId={post._id} />
-                              <Link href={`/post/${post._id}`}>
-                                <button className="flex items-center justify-center gap-2">
-                                  <IoChatbox
-                                    className={"text-gray-400 cursor-pointer"}
-                                    size={22}
-                                  />{" "}
-                                  <span className="text-gray-400">
-                                    {post?.comments.length}
-                                  </span>
-                                </button>
-                              </Link>
-                            </div>
-                          </div>
+                            post={post}
+                            className="mb-3"
+                            showAuthorFollow
+                            onFollowChange={refreshCurrentUser}
+                          />
                         ))}
                     </CardContent>
                   </Card>

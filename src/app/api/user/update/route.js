@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connect } from "@/lib/db"; 
 import { User } from "@/models/userModel"; 
 import { auth } from "@/auth";
+import { normalizeUsername } from "@/lib/formatUsername";
 
 export async function PUT(req) {
   try {
@@ -12,11 +13,17 @@ export async function PUT(req) {
 
     await connect();
 
-    const { name, username, bio, profilePic, coverPic } = await req.json();
+    const { name, username, bio, profilePic, coverPic, privateAccount } =
+      await req.json();
+
+    const update = { name, bio, profilePic, coverPic, privateAccount };
+    if (username != null && String(username).trim() !== "") {
+      update.username = normalizeUsername(username);
+    }
 
     const updatedUser = await User.findOneAndUpdate(
       { email: session.user.email },
-      { name, username, bio, profilePic, coverPic },
+      update,
       { new: true }
     );
 

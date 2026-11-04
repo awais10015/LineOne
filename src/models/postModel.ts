@@ -8,12 +8,15 @@ const postSchema = new mongoose.Schema(
     },
     media: { type: String },
     description: { type: String },
-    taggedUsers: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    taggedUsers: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
+      default: [],
+    },
     hashtags: {
       type: [String],
       default: [],
@@ -30,12 +33,15 @@ const postSchema = new mongoose.Schema(
         ref: "User", 
       },
     ],
-    comments: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Comment", 
-      },
-    ],
+    comments: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Comment",
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true }
 );

@@ -1,182 +1,272 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
-import { motion } from "framer-motion";
+
+import React, { useContext, useEffect, useState, useCallback, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import StoryBar from "@/components/home/StoryBar";
-import Loader from "@/components/Loader";
-import LikeDislike from "@/components/post/LikeDislike";
-import { IoChatbox } from "react-icons/io5";
+import FollowOnboardingPanel from "@/components/home/FollowOnboardingPanel";
+import DiscoverFeed from "@/components/home/DiscoverFeed";
+import FeedPostList from "@/components/home/FeedPostList";
+import { parseJsonResponse } from "@/lib/parseJsonResponse";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Home = () => {
-  const { currentLoggedInUser } = useContext(CurrentUserContext);
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const getPosts = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch("/api/allposts");
-      const data = await res.json();
+  const { currentLoggedInUser, setCurrentLoggedInUser } =
+    useContext(CurrentUserContext);
+  const searchParams = useSearchParams();
+  const welcome = searchParams.get("welcome") === "1";
 
-      const filteredPosts = data?.posts.filter((post) => {
-        const postUserId = post?.postBy?._id; 
-        const followersIds = currentLoggedInUser?.followers.map(
-          (f) => f._id || f
-        );
-        const followingIds = currentLoggedInUser?.following.map(
-          (f) => f._id || f
-        );
+  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
+  const onboardingCompleteRef = useRef(false);
 
-        return (
-          followersIds.includes(postUserId) || followingIds.includes(postUserId)
-        );
-      });
+  const followingCount = currentLoggedInUser?.following?.length ?? 0;
+  const needsFollowOnboarding =
+    !!currentLoggedInUser &&
+    !onboardingDismissed &&
+    !currentLoggedInUser.followOnboardingCompleted;
 
-      setPosts(filteredPosts);
-      setLoading(false);
-    } catch (err) {
-      setLoading(false);
-      console.error("Failed to fetch posts:", err);
-    }
-  };
+  const [activeTab, setActiveTab] = useState("following");
+  const [followingPosts, setFollowingPosts] = useState([]);
+  const [discoverPosts, setDiscoverPosts] = useState([]);
+  const [suggestedUsers, setSuggestedUsers] = useState([]);
+  const [loadingFollowing, setLoadingFollowing] = useState(false);
+  const [loadingDiscover, setLoadingDiscover] = useState(false);
+  const [followingCursor, setFollowingCursor] = useState(null);
+  const [discoverCursor, setDiscoverCursor] = useState(null);
+  const [followingHasMore, setFollowingHasMore] = useState(false);
+  const [discoverHasMore, setDiscoverHasMore] = useState(false);
+  const [discoverLoaded, setDiscoverLoaded] = useState(false);
 
   useEffect(() => {
-    if (currentLoggedInUser) {
-      getPosts();
+    if (currentLoggedInUser?.followOnboardingCompleted) {
+      onboardingCompleteRef.current = true;
+      setOnboardingDismissed(true);
     }
-  }, [currentLoggedInUser]);
+  }, [currentLoggedInUser?.followOnboardingCompleted]);
+
+  useEffect(() => {
+    if (welcome) {
+      setActiveTab("following");
+    }
+  }, [welcome]);
+
+  const mergeUserIntoContext = useCallback(
+    (apiUser, { forceOnboardingComplete = false } = {}) => {
+      if (!apiUser) return;
+      setCurrentLoggedInUser((prev) => {
+        const completed =
+          forceOnboardingComplete ||
+          onboardingCompleteRef.current ||
+          Boolean(prev?.followOnboardingCompleted) ||
+          Boolean(apiUser.followOnboardingCompleted);
+        if (completed) {
+          onboardingCompleteRef.current = true;
+        }
+        return {
+          ...(prev || {}),
+          ...apiUser,
+          followOnboardingCompleted: completed,
+        };
+      });
+    },
+    [setCurrentLoggedInUser]
+  );
+
+  const loadSuggested = useCallback(async () => {
+    const res = await fetch("/api/feed?mode=suggestedUsers");
+    const data = await parseJsonResponse(res, { users: [] });
+    setSuggestedUsers(data.users ?? []);
+  }, []);
+
+  const loadFollowing = useCallback(async (cursor, append = false) => {
+    setLoadingFollowing(true);
+    try {
+      const qs = new URLSearchParams({ mode: "following", limit: "20" });
+      if (cursor) qs.set("cursor", cursor);
+      const res = await fetch(`/api/feed?${qs}`);
+      const data = await parseJsonResponse(res, {
+        posts: [],
+        nextCursor: null,
+        hasMore: false,
+      });
+      setFollowingPosts((prev) =>
+        append ? [...prev, ...(data.posts ?? [])] : data.posts ?? []
+      );
+      setFollowingCursor(data.nextCursor ?? null);
+      setFollowingHasMore(!!data.hasMore);
+    } catch (err) {
+      console.error("Failed to fetch following feed:", err);
+    } finally {
+      setLoadingFollowing(false);
+    }
+  }, []);
+
+  const loadDiscover = useCallback(async (cursor, append = false) => {
+    setLoadingDiscover(true);
+    try {
+      const qs = new URLSearchParams({ mode: "discover", limit: "20" });
+      if (cursor) qs.set("cursor", cursor);
+      const res = await fetch(`/api/feed?${qs}`);
+      const data = await parseJsonResponse(res, {
+        posts: [],
+        nextCursor: null,
+        hasMore: false,
+      });
+      setDiscoverPosts((prev) =>
+        append ? [...prev, ...(data.posts ?? [])] : data.posts ?? []
+      );
+      setDiscoverCursor(data.nextCursor ?? null);
+      setDiscoverHasMore(!!data.hasMore);
+      setDiscoverLoaded(true);
+    } catch (err) {
+      console.error("Failed to fetch discover feed:", err);
+    } finally {
+      setLoadingDiscover(false);
+    }
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    const userRes = await fetch("/api/currentUser");
+    const userData = await parseJsonResponse(userRes, { user: null });
+    mergeUserIntoContext(userData.user);
+    return userData.user;
+  }, [mergeUserIntoContext]);
+
+  const refreshDuringOnboarding = useCallback(async () => {
+    await loadSuggested();
+    const userRes = await fetch("/api/currentUser");
+    const userData = await parseJsonResponse(userRes, { user: null });
+    mergeUserIntoContext(userData.user);
+  }, [loadSuggested, mergeUserIntoContext]);
+
+  const refreshFeeds = useCallback(async () => {
+    await Promise.all([loadFollowing(null, false), loadSuggested()]);
+    if (discoverLoaded || activeTab === "discover") {
+      await loadDiscover(null, false);
+    }
+    await refreshUser();
+  }, [
+    loadFollowing,
+    loadDiscover,
+    loadSuggested,
+    refreshUser,
+    discoverLoaded,
+    activeTab,
+  ]);
+
+  const handleOnboardingComplete = useCallback(async () => {
+    onboardingCompleteRef.current = true;
+    setOnboardingDismissed(true);
+    setCurrentLoggedInUser((prev) =>
+      prev ? { ...prev, followOnboardingCompleted: true } : prev
+    );
+    setActiveTab("following");
+    await Promise.all([
+      loadFollowing(null, false),
+      loadDiscover(null, false),
+    ]);
+    const userRes = await fetch("/api/currentUser");
+    const userData = await parseJsonResponse(userRes, { user: null });
+    mergeUserIntoContext(userData.user, { forceOnboardingComplete: true });
+  }, [loadFollowing, loadDiscover, mergeUserIntoContext, setCurrentLoggedInUser]);
+
+  useEffect(() => {
+    if (!currentLoggedInUser?._id) return;
+    loadSuggested();
+    if (needsFollowOnboarding) {
+      return;
+    }
+    loadFollowing(null, false);
+  }, [
+    currentLoggedInUser?._id,
+    needsFollowOnboarding,
+    loadFollowing,
+    loadSuggested,
+  ]);
+
+  useEffect(() => {
+    if (!currentLoggedInUser?._id || needsFollowOnboarding) return;
+    if (activeTab === "discover" && !discoverLoaded && !loadingDiscover) {
+      loadDiscover(null, false);
+    }
+  }, [
+    activeTab,
+    currentLoggedInUser?._id,
+    needsFollowOnboarding,
+    discoverLoaded,
+    loadingDiscover,
+    loadDiscover,
+  ]);
+
+  const followingEmptyState = (
+    <p className="text-muted-foreground py-12 text-center w-full px-2">
+      No posts yet from people you follow.{" "}
+      <button
+        type="button"
+        className="text-[#ff6500] hover:underline"
+        onClick={() => setActiveTab("discover")}
+      >
+        Browse Discover
+      </button>{" "}
+      or{" "}
+      <Link href="/users" className="text-[#ff6500] hover:underline">
+        find people to follow
+      </Link>
+      .
+    </p>
+  );
+
+  if (needsFollowOnboarding) {
+    return (
+      <div className="w-full flex flex-col items-center justify-start min-h-[60vh] pt-6 pb-12">
+        <FollowOnboardingPanel
+          followingCount={followingCount}
+          suggestedUsers={suggestedUsers}
+          currentLoggedInUser={currentLoggedInUser}
+          onFollowChange={refreshDuringOnboarding}
+          onComplete={handleOnboardingComplete}
+          setCurrentLoggedInUser={setCurrentLoggedInUser}
+        />
+      </div>
+    );
+  }
 
   return (
     <>
       <StoryBar />
       <div className="w-full flex items-center justify-center">
         <div className="w-full mt-3 max-w-4xl rounded-2xl overflow-hidden srollbar-hide">
-          <div className="px-2 pb-3">
-            <h2 className="text-xl font-bold">Posts</h2>
-          </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="px-2">
+            <TabsList className="mb-3">
+              <TabsTrigger value="following">Following</TabsTrigger>
+              <TabsTrigger value="discover">Discover</TabsTrigger>
+            </TabsList>
 
-          {posts.length === 0 && loading ? (
-            <div className="w-full h-full flex items-start justify-start p-10">
-              <Loader height="full"/>
-            </div>
-          ) : posts?.length > 0 ? (
-            <div className="w-full px-2 flex flex-col items-center gap-2 max-w-4xl  rounded-2xl overflow-hidden srollbar-hide">
-              {posts.map((post) => (
-                <div
-                  key={post._id}
-                  className="w-full rounded-2xl p-3 transition-shadow  backdrop-blur-lg bg-white/10  shadow-md bordershadow-lg  dark:bg-white/5 dark:border-white/10 light:border-gray-500"
-                >
-                  <Link href={`/userprofile/${post?.postBy?._id}`}>
-                    <div className="flex gap-3 w-full justify-start items-center">
-                      <div className="">
-                        <img
-                          className="h-10 w-10 rounded-2xl object-cover object-top"
-                          src={
-                            post?.postBy?.profilePic ||
-                            (post?.postBy?.gender === "male"
-                              ? "/Mdp.jpg"
-                              : "/Fdp.jpg")
-                          }
-                          alt=""
-                        />
-                      </div>
-                      <div>
-                        <h1 className="">{post?.postBy?.name}</h1>
-                        <p className="text-sm font-extralight">
-                          {post?.postBy?.username}
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
-              
-                  <p className="text-base mt-5">{post?.description}</p>
- 
+            <TabsContent value="following" className="mt-0">
+              <FeedPostList
+                posts={followingPosts}
+                loading={loadingFollowing}
+                hasMore={followingHasMore}
+                cursor={followingCursor}
+                onLoadMore={loadFollowing}
+                emptyState={followingEmptyState}
+              />
+            </TabsContent>
 
-                  {post?.taggedUsers.length > 0 && (
-                    <div className="flex gap-1 text-gray-400 flex-wrap">
-                      tagged
-                      {post?.taggedUsers?.map((taggedUser) => (
-                        <Link
-                          key={taggedUser?._id}
-                          href={`/userprofile/${taggedUser?._id}`}
-                        >
-                          <div>
-                            <p>{taggedUser?.username}</p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-               
-                  {post?.hashtags?.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {post?.hashtags.map((hashtag, i) => (
-                        <span
-                          key={i}
-                          className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-md"
-                        >
-                          #{hashtag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-               
-                  {post?.media && (
-                    <>
-                      <Link href={`/media/${post?._id}`}>
-                        {/\.(mp4|webm|ogg)$/i.test(post?.media) ? (
-                          <video
-                            src={post?.media}
-                            controls
-                            className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
-                          />
-                        ) : (
-                          <img
-                            src={post?.media}
-                            alt="Post media"
-                            className="mt-4 rounded-2xl w-full object-cover max-h-96"
-                          />
-                        )}
-                      </Link>
-                    </>
-                  )}
-
-             
-                  <div className="flex gap-5 mt-5">
-                    <LikeDislike postId={post?._id} />
-                    <Link href={`/post/${post?._id}`}>
-                      <button className="flex items-center justify-center gap-2">
-                        <IoChatbox
-                          className={"text-gray-400 cursor-pointer"}
-                          size={22}
-                        />{" "}
-                        <span className="text-gray-400">
-                          {post?.comments.length}
-                        </span>
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              ))}
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4 }}
-                className="my-8 inline-flex items-center gap-2 px-4 py-2 bg-neutral-200 dark:bg-neutral-800 rounded-full text-neutral-600 dark:text-neutral-300"
-              >
-                <span>🚀 That’s all for now!</span>
-              </motion.div>
-            </div>
-          ) : (
-            <div className="w-full flex h-[300px] justify-center items-center">
-              <p className="text-gray-500">
-                Follow Users to see what they post
-              </p>
-            </div>
-          )}
-          {}
+            <TabsContent value="discover" className="mt-0">
+              <DiscoverFeed
+                posts={discoverPosts}
+                loading={loadingDiscover}
+                hasMore={discoverHasMore}
+                cursor={discoverCursor}
+                onLoadMore={loadDiscover}
+                onGoToFollowing={() => setActiveTab("following")}
+                suggestedUsers={suggestedUsers}
+                onFollowChange={refreshUser}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </>

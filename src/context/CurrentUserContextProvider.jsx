@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import CurrentUserContext from "./CurrentUserContext";
 import Loader from "@/components/Loader";
+import { parseJsonResponse } from "@/lib/parseJsonResponse";
 
 const CurrentUserContextProvider = ({ children }) => {
   const [currentLoggedInUser, setCurrentLoggedInUser] = useState(null);
@@ -12,8 +13,8 @@ const CurrentUserContextProvider = ({ children }) => {
       if(currentLoggedInUser) return;
       try {
         const res = await fetch("/api/currentUser");
-        const data = await res.json();
-        setCurrentLoggedInUser(data.user);
+        const data = await parseJsonResponse(res, { user: null });
+        setCurrentLoggedInUser(data.user ?? null);
       } catch (err) {
         console.error("Failed to fetch user in context:", err);
       } finally {

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Loader from "../Loader";
 import { CgAddR } from "react-icons/cg";
 import { toast } from "sonner";
+import { parseJsonResponse } from "@/lib/parseJsonResponse";
 
 export default function StoryBar() {
   const [stories, setStories] = useState([]);
@@ -64,7 +65,7 @@ export default function StoryBar() {
   };
 
   const handleUpload = async () => {
-    if (!file) return;
+    if (!file || !currentLoggedInUser?._id) return;
 
     setLoading(true);
 
@@ -108,27 +109,37 @@ export default function StoryBar() {
   };
 
   const fetchStories = async () => {
+    if (!currentLoggedInUser?._id) return;
+
     setLoader(true);
-    const res = await fetch(`/api/stories?userId=${currentLoggedInUser._id}`);
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `/api/stories?userId=${currentLoggedInUser._id}`
+      );
+      const data = await parseJsonResponse(res, { stories: [] });
+      const storiesList = data.stories ?? [];
 
-    const grouped = data.stories.reduce((acc, story) => {
-      const userId = story.user._id;
-      if (!acc[userId]) {
-        acc[userId] = { user: story.user, stories: [] };
-      }
-      acc[userId].stories.push(story);
+      const grouped = storiesList.reduce((acc, story) => {
+        const userId = story.user._id;
+        if (!acc[userId]) {
+          acc[userId] = { user: story.user, stories: [] };
+        }
+        acc[userId].stories.push(story);
 
-      return acc;
-    }, {});
+        return acc;
+      }, {});
 
-    setStories(Object.values(grouped));
-    setLoader(false);
+      setStories(Object.values(grouped));
+    } catch (err) {
+      console.error("Failed to fetch stories:", err);
+    } finally {
+      setLoader(false);
+    }
   };
 
   useEffect(() => {
     fetchStories();
-  }, []);
+  }, [currentLoggedInUser?._id]);
 
   return (
     <div className="flex w-full justify-center items-center">

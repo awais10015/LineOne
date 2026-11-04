@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { parseJsonResponse } from "@/lib/parseJsonResponse";
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
@@ -52,11 +53,13 @@ export default function UserList() {
   const getUsers = async () => {
     try {
       const currentUserRes = await fetch("/api/currentUser");
-      const currentUserData = await currentUserRes.json();
-      setCurrentLoggedInUser(currentUserData.user);
+      const currentUserData = await parseJsonResponse(currentUserRes, {
+        user: null,
+      });
+      setCurrentLoggedInUser(currentUserData.user ?? null);
 
       const usersRes = await fetch("/api/users");
-      const usersData = await usersRes.json();
+      const usersData = await parseJsonResponse(usersRes, { users: [] });
       const filteredUsers = usersData?.users?.filter(
         (user) => user._id !== currentUserData.user?._id
       );

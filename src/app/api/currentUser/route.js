@@ -2,38 +2,61 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import { connect } from "@/lib/db";
 import { User } from "@/models/userModel";
-import { Post } from "@/models/postModel"; 
-import { Message } from "@/models/messageModel";
+import "@/models/postModel";
+import "@/models/commentModel";
+import "@/models/messageModel";
 
 export async function GET() {
   const session = await auth();
-  const currentUser = session?.user;
+  const email = session?.user?.email;
 
-  await connect();
+  if (!email) {
+    return NextResponse.json({ user: null });
+  }
 
   try {
-    const user = await User.findOne({ email: currentUser?.email }).select("+password")
-      .populate({
-        path: "posts",
-        options: { sort: { createdAt: -1 } },
-        populate: {
-          path: "taggedUsers",
-          select: "name username profilePic",
-        },
-      })
+    await connect();
+
+    const user = await User.findOne({ email })
+      .select("+password")
       .populate({
         path: "followers",
-        select: "name username profilePic followers following posts",
+        select: "name username profilePic",
       })
       .populate({
         path: "following",
-        select: "name username profilePic followers following posts",
+        select: "name username profilePic",
       })
       .populate("newMessages")
-      
-    return NextResponse.json({ user: user || null });
+      .populate({
+        path: "posts",
+        populate: [
+          { path: "taggedUsers", select: "name username profilePic" },
+          { path: "comments" },
+        ],
+      })
+      .populate({
+        path: "savedPosts",
+        populate: [
+          { path: "postBy", select: "name username profilePic gender" },
+          { path: "taggedUsers", select: "name username profilePic" },
+          { path: "comments" },
+        ],
+      });
+
+    if (!user) {
+      return NextResponse.json({ user: null });
+    }
+
+    const userObject = user.toObject({ virtuals: true });
+    userObject.followOnboardingCompleted = !!userObject.followOnboardingCompleted;
+
+    return NextResponse.json({ user: userObject });
   } catch (error) {
-    console.log(error);
-    return;
+    console.error("GET /api/currentUser:", error);
+    return NextResponse.json(
+      { user: null, error: "Failed to load user" },
+      { status: 503 }
+    );
   }
 }

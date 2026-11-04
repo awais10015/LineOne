@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { connect } from "@/lib/db";
 import { User } from "@/models/userModel";
 import { hash } from "bcryptjs";
+import { normalizeUsername } from "@/lib/formatUsername";
 
 export async function POST(req: Request) {
   try {
@@ -14,6 +15,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { username, dateOfBirth, gender, planePassword } = await req.json();
+    const normalizedUsername = normalizeUsername(username);
 
     
     if (planePassword) {
@@ -21,7 +23,7 @@ export async function POST(req: Request) {
       const updatedUser = await User.findOneAndUpdate(
         { email: currentUserEmail },
         {
-          username,
+          username: normalizedUsername,
           dateOfBirth,
           gender,
           password: hashedPassword,
@@ -33,7 +35,7 @@ export async function POST(req: Request) {
       const updatedUser = await User.findOneAndUpdate(
         { email: currentUserEmail },
         {
-          username,
+          username: normalizedUsername,
           dateOfBirth,
           gender,
         },

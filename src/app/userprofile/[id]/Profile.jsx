@@ -1,6 +1,6 @@
 "use client";
 import Loader from "@/components/Loader";
-import LikeDislike from "@/components/post/LikeDislike";
+import PostCard from "@/components/post/PostCard";
 import FollowUnfollowButton from "@/components/profile/FollowUnfollowButton";
 import MessageButton from "@/components/profile/MessageButton";
 import {
@@ -18,14 +18,15 @@ import CurrentUserContext from "@/context/CurrentUserContext";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
-import { IoChatbox } from "react-icons/io5";
+import { useContext, useEffect, useState, useCallback } from "react";
+import { parseJsonResponse } from "@/lib/parseJsonResponse";
 
 const Profile = () => {
  
   const { id } = useParams();
   const { AnotherUser, setAnotherUser } = useContext(AnotherUserContext);
-  const { currentLoggedInUser } = useContext(CurrentUserContext);
+  const { currentLoggedInUser, setCurrentLoggedInUser } =
+    useContext(CurrentUserContext);
   const [posts, setPosts] = useState(null);
   const [loader, setloader] = useState(false);
   const [postloader, setpostloader] = useState(false);
@@ -78,6 +79,15 @@ const Profile = () => {
     getPosts();
   }, [id]);
 
+  const refreshCurrentUser = useCallback(async () => {
+    const res = await fetch("/api/currentUser");
+    const data = await parseJsonResponse(res, { user: null });
+    if (data.user) setCurrentLoggedInUser(data.user);
+  }, [setCurrentLoggedInUser]);
+
+  const isViewingSelf =
+    String(id) === String(currentLoggedInUser?._id);
+
   return (
     <>
      
@@ -109,9 +119,22 @@ const Profile = () => {
               <div className="mt-20  pb-6 text-center">
                 <h1 className="text-2xl font-bold ">{AnotherUser?.name}</h1>
                 <p className="">{AnotherUser?.username}</p>
-                <p className="mt-3">{AnotherUser?.bio || "no bio added"}</p>
+                <p className="mt-3">
+                  {AnotherUser?.isLimitedProfile
+                    ? "This account is private."
+                    : AnotherUser?.bio || "no bio added"}
+                </p>
 
-         
+                {AnotherUser?.isLimitedProfile ? (
+                  <div className="mt-5 flex gap-5 w-full justify-center items-center">
+                    <FollowUnfollowButton
+                      currentLoggedInUser={currentLoggedInUser}
+                      id={AnotherUser?._id}
+                      refresh={getUsers}
+                    />
+                  </div>
+                ) : (
+                  <>
                 <div className="mt-6 w-full h-12 flex justify-center items-center gap-5">
                   <div>
                     <p className="font-bold ">{AnotherUser?.posts?.length}</p>
@@ -249,6 +272,8 @@ const Profile = () => {
                   />
                   <MessageButton id={AnotherUser?._id} />
                 </div>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -256,105 +281,22 @@ const Profile = () => {
    
           {postloader ? (
             <Loader />
-          ) : (
+          ) : AnotherUser?.isLimitedProfile ? null : (
             <div className="w-full mt-15 max-w-4xl rounded-2xl overflow-hidden srollbar-hide">
               <div className="px-2 pb-3">
                 <h2 className="text-xl font-bold">Posts</h2>
               </div>
 
               {posts?.length > 0 ? (
-                <div className="w-full px-2 flex flex-col items-center gap-2 max-w-4xl  rounded-2xl overflow-hidden srollbar-hide">
+                <div className="w-full px-2 flex flex-col items-center gap-3 max-w-4xl rounded-2xl overflow-hidden srollbar-hide">
                   {posts?.map((post) => (
-                    <div
+                    <PostCard
                       key={post._id}
-                      className="w-full rounded-xl p-5 transition-shadow  backdrop-blur-lg bg-white/10  shadow-md bordershadow-lg  dark:bg-white/5 dark:border-white/10 light:border-gray-500"
-                    >
-                      <div className="flex gap-3 w-full justify-start items-center">
-                        <div className="">
-                          <img
-                            className="h-10 w-10 rounded-full object-cover object-top"
-                            src={
-                              AnotherUser?.profilePic ||
-                              (AnotherUser?.gender === "male"
-                                ? "/Mdp.jpg"
-                                : "/Fdp.jpg")
-                            }
-                            alt=""
-                          />
-                        </div>
-                        <div>
-                          <h1 className="">{AnotherUser?.name}</h1>
-                          <p className="text-sm font-extralight">
-                            {AnotherUser?.username}
-                          </p>
-                        </div>
-                      </div>
-                  
-                      <p className="text-base mt-5">{post.description}</p>
-
-                      {post?.taggedUsers?.length > 0 && (
-                        <div className="flex gap-1 text-gray-400 flex-wrap">
-                          tagged
-                          {post?.taggedUsers?.map((taggedUser) => (
-                            <Link
-                              key={taggedUser?._id} 
-                              href={`/userprofile/${taggedUser._id}`}
-                            >
-                              <p>{taggedUser.username}</p>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-
-                    
-                      {post.hashtags?.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {post.hashtags.map((hashtag, i) => (
-                            <span
-                              key={i}
-                              className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-md"
-                            >
-                              #{hashtag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                     
-                      {post.media && (
-                        <Link href={`/media/${post._id}`}>
-                          {/\.(mp4|webm|ogg)$/i.test(post.media) ? (
-                            <video
-                              src={post.media}
-                              className="mt-4 rounded-2xl w-full max-h-96 object-contain bg-black"
-                              muted
-                              playsInline
-                            />
-                          ) : (
-                            <img
-                              src={post.media}
-                              alt="Post media"
-                              className="mt-4 rounded-2xl w-full object-cover max-h-96"
-                            />
-                          )}
-                        </Link>
-                      )}
-
-                      <div className="flex gap-5 mt-5">
-                        <LikeDislike postId={post._id} />
-                        <Link href={`/post/${post._id}`}>
-                          <button className="flex items-center justify-center gap-2">
-                            <IoChatbox
-                              className={"text-gray-400 cursor-pointer"}
-                              size={22}
-                            />{" "}
-                            <span className="text-gray-400">
-                              {post?.comments.length}
-                            </span>
-                          </button>
-                        </Link>
-                      </div>
-                    </div>
+                      post={post}
+                      authorOverride={AnotherUser}
+                      showAuthorFollow={!isViewingSelf}
+                      onFollowChange={refreshCurrentUser}
+                    />
                   ))}
 
                   <motion.div

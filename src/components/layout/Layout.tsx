@@ -17,7 +17,12 @@ const Layout = ({
   children: React.ReactNode;
 }>) => {
   const pathname = usePathname();
-  const isAuthPage = pathname === "/login" || pathname === "/signup" || pathname === "/intro";
+  const isOnboarding = pathname === "/";
+  const isAuthPage =
+    isOnboarding ||
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname === "/intro";
   const {currentLoggedInUser} = useContext(CurrentUserContext)
   const userId = currentLoggedInUser?._id;
   return (

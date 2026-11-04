@@ -1,20 +1,44 @@
 "use client";
 
-import { useOptimistic, startTransition, useState } from "react";
+import { useOptimistic, startTransition, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { CheckCircle, XCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const FollowUnfollowButton = ({ id, currentLoggedInUser, refresh }) => {
-  const [initiallyFollowing, setinitiallyFollowing] = useState(
-    currentLoggedInUser.following.some((user) => user._id === id)
+const FollowUnfollowButton = ({
+  id,
+  currentLoggedInUser,
+  refresh,
+  followLabel = "Follow Me",
+  unfollowLabel = "Unfollow",
+  followOnly = false,
+  variant = "default",
+  size = "default",
+  className = "",
+}) => {
+  const followingFromContext = (currentLoggedInUser?.following ?? []).some(
+    (user) => String(user?._id ?? user) === String(id)
   );
+
+  const [initiallyFollowing, setinitiallyFollowing] = useState(
+    followingFromContext
+  );
+
+  useEffect(() => {
+    setinitiallyFollowing(followingFromContext);
+  }, [followingFromContext]);
+
   let initialVal = initiallyFollowing;
 
   const [isFollowing, setIsFollowing] = useOptimistic(
     initiallyFollowing,
     (_, newState) => newState
   );
+
+  if (followOnly && (isFollowing || followingFromContext)) {
+    return null;
+  }
 
   const toggleFollow = async () => {
     const newIsFollowing = !isFollowing;
@@ -64,16 +88,38 @@ const FollowUnfollowButton = ({ id, currentLoggedInUser, refresh }) => {
     }
   };
 
+  if (variant === "outline") {
+    return (
+      <Button
+        type="button"
+        variant="outline"
+        size={size}
+        onClick={toggleFollow}
+        className={cn(
+          "border-[#ff6500]/40 text-[#ff6500] hover:bg-[#ff6500]/10 hover:text-[#ff6500]",
+          isFollowing &&
+            "border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+          className
+        )}
+      >
+        {isFollowing ? unfollowLabel : followLabel}
+      </Button>
+    );
+  }
+
   return (
     <Button
+      type="button"
+      size={size}
       onClick={toggleFollow}
-      className={
+      className={cn(
         isFollowing
           ? "cursor-pointer text-white bg-gray-600 hover:scale-105 hover:bg-gray-400"
-          : "bg-[#ff6500] hover:bg-[#ff5f00] hover:scale-105 cursor-pointer"
-      }
+          : "bg-[#ff6500] hover:bg-[#ff5f00] hover:scale-105 cursor-pointer",
+        className
+      )}
     >
-      {isFollowing ? "Unfollow" : "Follow Me"}
+      {isFollowing ? unfollowLabel : followLabel}
     </Button>
   );
 };
