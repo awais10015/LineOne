@@ -1,34 +1,37 @@
 "use client";
 import { signOut } from "next-auth/react";
-import { Button } from "@/components/ui/button";
 import { Power } from "lucide-react";
-import { motion } from "motion/react";
-import { useSidebar } from "../ui/sidebar";
+import {
+  getSidebarLinkClasses,
+  sidebarIconWrapClass,
+  SidebarNavLabel,
+  useSidebarExpanded,
+} from "../ui/sidebar";
+import { cn } from "@/lib/utils";
+
 const SignOutButton = () => {
-  const { open, animate } = useSidebar();
+  const expanded = useSidebarExpanded();
+
   return (
-    <Button
-      className="cursor-pointer w-full h-7 gap-0 p-0 m-0 rounded-full flex items-center justify-center"
-      variant="ghost"
+    <button
+      type="button"
+      className={cn(
+        getSidebarLinkClasses(false, expanded),
+        "group/logout cursor-pointer border-0 bg-transparent text-left hover:[&_svg]:text-red-500"
+      )}
       onClick={() => {
         sessionStorage.removeItem("reloaded");
         signOut({ callbackUrl: "/" });
       }}
     >
-      <div className="w-7 h-7 flex items-center justify-center hover:scale-105 bg-[#ff6500] rounded-full">
-        <Power />
+      <div className={sidebarIconWrapClass}>
+        <Power className="h-6 w-6 text-neutral-700 transition-colors dark:text-neutral-200" />
       </div>
 
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className="ml-3 text-gray-900 dark:text-neutral-200 text-sm font-light group-hover/sidebar:translate-x-1 transition duration-150"
-      >
+      <SidebarNavLabel className="flex min-w-0 items-center self-center text-sm font-normal leading-none whitespace-nowrap text-neutral-700 dark:text-neutral-200">
         Logout
-      </motion.span>
-    </Button>
+      </SidebarNavLabel>
+    </button>
   );
 };
 

@@ -35,6 +35,8 @@ interface SidebarContextProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   animate: boolean;
+  showLabels: boolean;
+  setShowLabels: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SidebarContext = createContext<SidebarContextProps | undefined>(
@@ -49,6 +51,74 @@ export const useSidebar = () => {
   return context;
 };
 
+function isNavLinkActive(pathname: string, href: string) {
+  if (pathname === href) return true;
+  if (href !== "/" && pathname.startsWith(`${href}/`)) return true;
+  return false;
+}
+
+export function getSidebarLinkClasses(isActive: boolean, expanded: boolean) {
+  return cn(
+    "group/sidebar relative flex items-center transition-all duration-200 outline-none",
+    expanded
+      ? cn(
+          "min-h-[44px] w-full gap-3 rounded-xl border-l-2 py-2 pl-2.5 pr-3",
+          isActive
+            ? "border-l-[#ff6500] bg-neutral-100 dark:bg-neutral-800/95"
+            : "border-l-transparent hover:bg-neutral-100/80 dark:hover:bg-neutral-800/60"
+        )
+      : cn(
+          "mx-auto h-11 w-11 shrink-0 justify-center rounded-xl",
+          isActive
+            ? "bg-neutral-100 dark:bg-neutral-800/95"
+            : "hover:bg-neutral-100/80 dark:hover:bg-neutral-800/60"
+        )
+  );
+}
+
+export function useSidebarExpanded() {
+  const { animate, open, showLabels } = useSidebar();
+  return !animate || (open && showLabels);
+}
+
+export const sidebarIconWrapClass =
+  "flex h-6 w-6 shrink-0 items-center justify-center [&_svg]:h-6 [&_svg]:w-6";
+
+function sidebarLabelClass(isActive: boolean) {
+  return cn(
+    "flex min-w-0 items-center self-center text-sm leading-none whitespace-nowrap",
+    isActive
+      ? "font-semibold text-[#ff6500]"
+      : "font-normal text-neutral-700 dark:text-neutral-200"
+  );
+}
+
+export function SidebarNavLabel({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const { animate, open, showLabels } = useSidebar();
+  if (!animate) {
+    return <span className={className}>{children}</span>;
+  }
+  if (!open || !showLabels) {
+    return null;
+  }
+  return (
+    <motion.span
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.12 }}
+      className={className}
+    >
+      {children}
+    </motion.span>
+  );
+}
+
 export const SidebarProvider = ({
   children,
   open: openProp,
@@ -61,12 +131,15 @@ export const SidebarProvider = ({
   animate?: boolean;
 }) => {
   const [openState, setOpenState] = useState(false);
+  const [showLabels, setShowLabels] = useState(!animate);
 
   const open = openProp !== undefined ? openProp : openState;
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
 
   return (
-    <SidebarContext.Provider value={{ open, setOpen, animate: animate }}>
+    <SidebarContext.Provider
+      value={{ open, setOpen, animate, showLabels, setShowLabels }}
+    >
       {children}
     </SidebarContext.Provider>
   );
@@ -104,19 +177,40 @@ export const DesktopSidebar = ({
   children,
   ...props
 }: React.ComponentProps<typeof motion.div>) => {
-  const { open, setOpen, animate } = useSidebar();
+  const { open, setOpen, animate, setShowLabels, showLabels } = useSidebar();
+  const iconOnlyLayout = animate && (!open || !showLabels);
+
+  const handleMouseEnter = () => {
+    if (animate) {
+      setShowLabels(false);
+    }
+    setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowLabels(false);
+    setOpen(false);
+  };
+
   return (
     <>
       <motion.div
         className={cn(
-          "h-full px-4 py-4 hidden md:flex md:flex-col w-[180px] shrink-0",
+          "hidden h-full shrink-0 flex-col overflow-hidden py-4 md:flex",
+          animate && iconOnlyLayout ? "items-center px-2" : "items-stretch px-3",
           className
         )}
         animate={{
-          width: animate ? (open ? "180px" : "60px") : "180px",
+          width: animate ? (open ? "220px" : "72px") : "220px",
         }}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
+        onAnimationComplete={() => {
+          if (open && animate) {
+            setShowLabels(true);
+          }
+        }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         {...props}
       >
         {children}
@@ -223,11 +317,26 @@ export const MobileSidebar = ({
           ))}
           <Link
             href={"/chat"}
-            
+            className={cn(
+              "relative flex size-11 shrink-0 items-center justify-center rounded-xl transition-all",
+              isNavLinkActive(pathname, "/chat")
+                ? "bg-neutral-100 dark:bg-neutral-800/95"
+                : "hover:bg-neutral-100/80 dark:hover:bg-neutral-800/60"
+            )}
+            aria-current={
+              isNavLinkActive(pathname, "/chat") ? "page" : undefined
+            }
           >
             {/* Icon wrapper */}
             <div className="relative">
-              <IconBrandLine className="h-8 w-8 shrink-0 text-neutral-700 dark:text-neutral-200" />
+              <IconBrandLine
+                className={cn(
+                  "h-8 w-8 shrink-0",
+                  isNavLinkActive(pathname, "/chat")
+                    ? "text-[#ff6500]"
+                    : "text-neutral-700 dark:text-neutral-200"
+                )}
+              />
 
               {/* Badge */}
               {newMessages && Number(newMessages?.length) > 0 ? (
@@ -239,7 +348,17 @@ export const MobileSidebar = ({
               )}
             </div>
           </Link>
-          <Link href={"/userprofile"}>
+          <Link
+            href={"/userprofile"}
+            className={cn(
+              "rounded-full ring-2 ring-transparent transition-colors",
+              isNavLinkActive(pathname, "/userprofile") &&
+                "ring-[#ff6500]/60"
+            )}
+            aria-current={
+              isNavLinkActive(pathname, "/userprofile") ? "page" : undefined
+            }
+          >
           <Image
             src={profilePic}
             className="h-8 w-8 shrink-0 rounded-full object-cover object-top"
@@ -263,27 +382,27 @@ export const SidebarLink = ({
   link: Links;
   className?: string;
 }) => {
-  const { open, animate } = useSidebar();
+  const expanded = useSidebarExpanded();
+  const pathname = usePathname();
+  const isActive = isNavLinkActive(pathname, link.href);
+
   return (
     <Link
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-2  group/sidebar py-2",
+        getSidebarLinkClasses(isActive, expanded),
+        isActive && "[&_svg]:!text-[#ff6500]",
+        !isActive && "[&_svg]:text-neutral-700 dark:[&_svg]:text-neutral-200",
         className
       )}
+      aria-current={isActive ? "page" : undefined}
       {...props}
     >
-      {link.icon}
+      <div className={sidebarIconWrapClass}>{link.icon}</div>
 
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
-      >
+      <SidebarNavLabel className={sidebarLabelClass(isActive)}>
         {link.label}
-      </motion.span>
+      </SidebarNavLabel>
     </Link>
   );
 };
@@ -300,20 +419,27 @@ export const ChatLink = ({
   count?: number;
   className?: string;
 }) => {
-  const { open, animate } = useSidebar();
+  const expanded = useSidebarExpanded();
+  const pathname = usePathname();
+  const isActive = isNavLinkActive(pathname, href);
 
   return (
     <Link
       href={href}
-      className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2",
-        className
-      )}
+      className={cn(getSidebarLinkClasses(isActive, expanded), className)}
+      aria-current={isActive ? "page" : undefined}
       {...props}
     >
       {/* Icon wrapper */}
-      <div className="relative">
-        <IconBrandLine className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      <div className={cn(sidebarIconWrapClass, "relative")}>
+        <IconBrandLine
+          className={cn(
+            "h-6 w-6 shrink-0",
+            isActive
+              ? "text-[#ff6500]"
+              : "text-neutral-700 dark:text-neutral-200"
+          )}
+        />
 
         {/* Badge */}
         {count && Number(count) > 0 ? (
@@ -325,16 +451,9 @@ export const ChatLink = ({
         )}
       </div>
 
-      {/* Label */}
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
-      >
+      <SidebarNavLabel className={sidebarLabelClass(isActive)}>
         {label}
-      </motion.span>
+      </SidebarNavLabel>
     </Link>
   );
 };
@@ -351,20 +470,27 @@ export const NotificationLink = ({
   count?: number | string;
   className?: string;
 }) => {
-  const { open, animate } = useSidebar();
+  const expanded = useSidebarExpanded();
+  const pathname = usePathname();
+  const isActive = isNavLinkActive(pathname, href);
 
   return (
     <Link
       href={href}
-      className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2",
-        className
-      )}
+      className={cn(getSidebarLinkClasses(isActive, expanded), className)}
+      aria-current={isActive ? "page" : undefined}
       {...props}
     >
       {/* Icon wrapper */}
-      <div className="relative">
-        <IconBellRinging className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      <div className={cn(sidebarIconWrapClass, "relative")}>
+        <IconBellRinging
+          className={cn(
+            "h-6 w-6 shrink-0",
+            isActive
+              ? "text-[#ff6500]"
+              : "text-neutral-700 dark:text-neutral-200"
+          )}
+        />
 
         {/* Badge with count */}
         {count && Number(count) > 0 ? (
@@ -376,16 +502,9 @@ export const NotificationLink = ({
         )}
       </div>
 
-      {/* Label */}
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
-      >
+      <SidebarNavLabel className={sidebarLabelClass(isActive)}>
         {label}
-      </motion.span>
+      </SidebarNavLabel>
     </Link>
   );
 };

@@ -82,7 +82,7 @@ const Home = () => {
   const loadFollowing = useCallback(async (cursor, append = false) => {
     setLoadingFollowing(true);
     try {
-      const qs = new URLSearchParams({ mode: "following", limit: "20" });
+      const qs = new URLSearchParams({ mode: "following", limit: "5" });
       if (cursor) qs.set("cursor", cursor);
       const res = await fetch(`/api/feed?${qs}`);
       const data = await parseJsonResponse(res, {
@@ -105,7 +105,7 @@ const Home = () => {
   const loadDiscover = useCallback(async (cursor, append = false) => {
     setLoadingDiscover(true);
     try {
-      const qs = new URLSearchParams({ mode: "discover", limit: "20" });
+      const qs = new URLSearchParams({ mode: "discover", limit: "5" });
       if (cursor) qs.set("cursor", cursor);
       const res = await fetch(`/api/feed?${qs}`);
       const data = await parseJsonResponse(res, {
@@ -219,7 +219,13 @@ const Home = () => {
 
   if (needsFollowOnboarding) {
     return (
-      <div className="w-full flex flex-col items-center justify-start min-h-[60vh] pt-6 pb-12">
+      <div className="w-full flex flex-col items-center justify-start min-h-[60vh] px-2 pt-8 pb-12">
+        <div className="w-full max-w-4xl mb-6 text-center sm:text-left">
+          <h1 className="text-2xl font-bold tracking-tight">Almost there</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Follow a few people to personalize your home feed.
+          </p>
+        </div>
         <FollowOnboardingPanel
           followingCount={followingCount}
           suggestedUsers={suggestedUsers}
@@ -236,11 +242,27 @@ const Home = () => {
     <>
       <StoryBar />
       <div className="w-full flex items-center justify-center">
-        <div className="w-full mt-3 max-w-4xl rounded-2xl overflow-hidden srollbar-hide">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="px-2">
-            <TabsList className="mb-3">
-              <TabsTrigger value="following">Following</TabsTrigger>
-              <TabsTrigger value="discover">Discover</TabsTrigger>
+        <div className="w-full mt-3 max-w-4xl rounded-2xl overflow-hidden srollbar-hide px-2">
+          <div className="mb-4 px-1">
+            <h1 className="text-2xl font-bold tracking-tight">Home</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Posts from people you follow — or explore Discover for everyone.
+            </p>
+          </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="mb-4 w-full sm:w-auto grid grid-cols-2 sm:inline-flex h-auto p-1 bg-muted/50 rounded-full">
+              <TabsTrigger
+                value="following"
+                className="rounded-full data-[state=active]:bg-[#ff6500] data-[state=active]:text-white"
+              >
+                Following
+              </TabsTrigger>
+              <TabsTrigger
+                value="discover"
+                className="rounded-full data-[state=active]:bg-[#ff6500] data-[state=active]:text-white"
+              >
+                Discover
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="following" className="mt-0">

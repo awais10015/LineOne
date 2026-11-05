@@ -1,9 +1,9 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Loader from "@/components/Loader";
 import PostCard from "@/components/post/PostCard";
-import { Button } from "@/components/ui/button";
 
 export default function FeedPostList({
   posts,
@@ -15,7 +15,39 @@ export default function FeedPostList({
   loadMoreClassName = "my-4",
   showAuthorFollow = false,
   onFollowChange,
+  infiniteScroll = true,
 }) {
+  const sentinelRef = useRef(null);
+  const loadingMoreRef = useRef(false);
+
+  useEffect(() => {
+    if (!infiniteScroll || !hasMore) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (
+          !entry?.isIntersecting ||
+          loading ||
+          loadingMoreRef.current ||
+          !hasMore
+        ) {
+          return;
+        }
+        loadingMoreRef.current = true;
+        Promise.resolve(onLoadMore(cursor, true)).finally(() => {
+          loadingMoreRef.current = false;
+        });
+      },
+      { root: null, rootMargin: "120px", threshold: 0 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [infiniteScroll, hasMore, loading, cursor, onLoadMore]);
+
   if (loading && posts.length === 0) {
     return (
       <div className="w-full p-10">
@@ -29,7 +61,7 @@ export default function FeedPostList({
   }
 
   return (
-    <div className="w-full px-2 flex flex-col items-center gap-2 max-w-4xl rounded-2xl overflow-hidden srollbar-hide">
+    <div className="w-full px-2 flex flex-col items-center gap-3 max-w-4xl rounded-2xl overflow-hidden srollbar-hide">
       {posts.map((post) => (
         <PostCard
           key={post._id}
@@ -38,16 +70,32 @@ export default function FeedPostList({
           onFollowChange={onFollowChange}
         />
       ))}
-      {hasMore && (
-        <Button
-          variant="outline"
+
+      {infiniteScroll && hasMore && (
+        <div
+          ref={sentinelRef}
+          className={`w-full flex justify-center py-4 ${loadMoreClassName}`}
+          aria-hidden
+        >
+          {loading && (
+            <div className="py-2">
+              <Loader height="auto" size={10} />
+            </div>
+          )}
+        </div>
+      )}
+
+      {!infiniteScroll && hasMore && (
+        <button
+          type="button"
           className={loadMoreClassName}
           disabled={loading}
           onClick={() => onLoadMore(cursor, true)}
         >
           {loading ? "Loading…" : "Load more"}
-        </Button>
+        </button>
       )}
+
       {!hasMore && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}

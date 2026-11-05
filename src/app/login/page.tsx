@@ -1,49 +1,46 @@
-import React from "react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import Link from "next/link";
-import { auth } from "@/auth";
-import LoginForm from "@/components/client/Form";
 import { redirect } from "next/navigation";
+import { auth } from "@/auth";
+import { connect } from "@/lib/db";
+import { User } from "@/models/userModel";
+import AuthShell from "@/components/auth/AuthShell";
+import LoginForm from "@/components/client/Form";
 import GoogleSignInButton from "@/components/client/GoogleSignInButton";
-import Image from "next/image";
 
 export const metadata = {
-  title: "LineOne-Login",
-  description: "Login",
+  title: "LineOne — Log in",
+  description: "Log in to LineOne",
 };
 
-const Page = async () => {
+export default async function LoginPage() {
   const session = await auth();
-  if (session?.user) redirect("/");
+  if (session?.user?.email) {
+    await connect();
+    const user = await User.findOne({ email: session.user.email }).select(
+      "username"
+    );
+    redirect(user?.username ? "/home" : "/");
+  }
+
   return (
-    <div className="flex justify-center items-center h-dvh">
-      <Card>
-        <CardHeader className="flex flex-col items-center justify-center gap-3">
-          <Image src="/logo.svg" alt="LineOne" width={50} height={50}/>
-          <CardTitle className="text-2xl font-light">Log In</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <LoginForm />
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <span className="text-sm text-gray-500">Or</span>
+    <AuthShell
+      title="Welcome back"
+      subtitle="Log in to see your feed and messages."
+      badge="Welcome back"
+      footer={
+        <>
+          <span className="text-center text-sm text-muted-foreground">Or</span>
           <GoogleSignInButton />
           <Link
             href="/signup"
             className="text-sm text-[#ff6500] hover:underline text-center"
           >
-            Don&apos;t have an Account? Signup
+            Don&apos;t have an account? Sign up
           </Link>
-        </CardFooter>
-      </Card>
-    </div>
+        </>
+      }
+    >
+      <LoginForm />
+    </AuthShell>
   );
-};
-
-export default Page;
+}

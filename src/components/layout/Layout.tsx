@@ -3,7 +3,6 @@
 import React, { useContext } from "react";
 import { usePathname } from "next/navigation";
 import { Toaster } from "@/components/ui/sonner";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import NextTopLoader from "nextjs-toploader";
@@ -43,14 +42,12 @@ const Layout = ({
         </>
       ) : (
         <SocketProvider userId={userId}>
-        <SidebarProvider>
           <NotificationListener userId={userId} />
           <div className="flex h-screen w-full overflow-hidden srollbar-hide">
             <NextTopLoader color="#ff6500" showSpinner={false} />
             <AppSidebar>{children}</AppSidebar>
           </div>
           <Toaster />
-        </SidebarProvider>
         </SocketProvider>
       )}
       

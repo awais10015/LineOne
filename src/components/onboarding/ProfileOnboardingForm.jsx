@@ -64,21 +64,26 @@ export default function ProfileOnboardingForm() {
     let username = normalizeUsername(
       formData.get("username")?.toString() || ""
     );
-    const dateOfBirth = formData.get("dateOfBirth");
-    const gender = formData.get("gender");
+    const dateOfBirth = formData.get("dateOfBirth")?.toString() || "";
+    const gender = formData.get("gender")?.toString() || "";
     const planePassword = formData.get("password")?.toString() || "";
+
+    const payload = { username };
+    if (dateOfBirth) payload.dateOfBirth = dateOfBirth;
+    if (gender) payload.gender = gender;
+    if (planePassword) payload.planePassword = planePassword;
 
     try {
       const res = await fetch("/api/profile", {
         method: "POST",
-        body: JSON.stringify({ username, dateOfBirth, gender, planePassword }),
+        body: JSON.stringify(payload),
         headers: { "Content-Type": "application/json" },
       });
 
       if (!res.ok) throw new Error("Failed to update profile");
 
       toast.success("Profile saved — welcome to LineOne!");
-      router.push("/home?welcome=1");
+      router.push("/home");
     } catch (err) {
       console.error(err);
       toast.error("Could not save profile. Please try again.");
@@ -97,6 +102,8 @@ export default function ProfileOnboardingForm() {
 
   const firstName = currentLoggedInUser?.name?.split(" ")[0] || "there";
   const needsPassword = !currentLoggedInUser?.password;
+  const needsDateOfBirth = !currentLoggedInUser?.dateOfBirth;
+  const needsGender = !currentLoggedInUser?.gender;
 
   return (
     <div className="relative min-h-dvh overflow-hidden bg-background">
@@ -126,14 +133,14 @@ export default function ProfileOnboardingForm() {
               variant="secondary"
               className="bg-[#ff6500]/15 text-[#ff6500] border-[#ff6500]/30"
             >
-              Step 1 · Set up your profile
+              Step 1 · Complete your profile
             </Badge>
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Hi {firstName}, let&apos;s finish your profile
+              Hi {firstName}, one more step
             </h1>
             <p className="text-muted-foreground text-base leading-relaxed">
-              Choose a username so people can find you. Then jump into your
-              feed, discover posts, and follow friends.
+              Choose a username so people can find you, then follow creators to
+              fill your feed.
             </p>
           </div>
 
@@ -205,15 +212,23 @@ export default function ProfileOnboardingForm() {
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="dateOfBirth">Date of birth</Label>
-                  <DateOfBirthPicker name="dateOfBirth" required minAgeYears={10} />
-                </div>
+                {needsDateOfBirth && (
+                  <div className="space-y-2">
+                    <Label htmlFor="dateOfBirth">Date of birth</Label>
+                    <DateOfBirthPicker
+                      name="dateOfBirth"
+                      required
+                      minAgeYears={10}
+                    />
+                  </div>
+                )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="gender">Gender</Label>
-                  <GenderSelect name="gender" required />
-                </div>
+                {needsGender && (
+                  <div className="space-y-2">
+                    <Label htmlFor="gender">Gender</Label>
+                    <GenderSelect name="gender" required />
+                  </div>
+                )}
 
                 <Button
                   type="submit"

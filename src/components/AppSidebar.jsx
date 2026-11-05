@@ -6,18 +6,17 @@ import {
   SidebarLink,
   ChatLink,
   NotificationLink,
+  useSidebarExpanded,
 } from "@/components/ui/sidebar";
 import { IconHome, IconSearch, IconUsers, IconBookmark } from "@tabler/icons-react";
 
 import SignOutButton from "./client/SignOutButton";
 
-import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { ModeToggle } from "./ModeToggle";
 import CurrentUserContext from "@/context/CurrentUserContext";
 import Link from "next/link";
-import { useSidebar } from "@/components/ui/sidebar";
 import NotificationContext from "@/context/NotificationContext";
 import NewMessageContext from "@/context/NewMessageContext";
 
@@ -63,7 +62,6 @@ export function AppSidebar({ children }) {
     },
   ];
   const [open, setOpen] = useState(false);
-  const { animate } = useSidebar();
 
   const getNotifications = async () => {
     try {
@@ -90,15 +88,11 @@ export function AppSidebar({ children }) {
           "h-screen"
         )}
       >
-        <Sidebar
-          open={open}
-          setOpen={setOpen}
-          className={cn(open ? "w-64" : "w-20", "transition-all duration-300")}
-        >
-          <SidebarBody className="justify-between gap-10">
-            <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto scrollbar-hide">
-              {open ? <Logo /> : <LogoIcon />}
-              <div className="mt-8 flex flex-col gap-2">
+        <Sidebar open={open} setOpen={setOpen}>
+          <SidebarBody className="justify-between gap-8">
+            <div className="flex w-full flex-1 flex-col overflow-x-hidden overflow-y-auto scrollbar-hide">
+              <SidebarBrand />
+              <div className="mt-8 flex w-full flex-col gap-1">
                 {links.map((link, idx) => (
                   <SidebarLink key={idx} link={link} />
                 ))}
@@ -111,12 +105,10 @@ export function AppSidebar({ children }) {
               </div>
             </div>
 
-            <div className=" flex flex-col items-start justify-center">
+            <div className="flex w-full flex-col gap-1">
               <ModeToggle />
 
-              <div className="mt-2">
-                <SignOutButton />
-              </div>
+              <SignOutButton />
 
               <SidebarLink
                 link={{
@@ -125,9 +117,9 @@ export function AppSidebar({ children }) {
                   icon: (
                     <img
                       src={profilePic}
-                      className="h-7 w-7 shrink-0 rounded-full object-cover object-top"
-                      width={50}
-                      height={50}
+                      className="h-6 w-6 shrink-0 rounded-full object-cover object-top"
+                      width={24}
+                      height={24}
                       alt="Avatar"
                     />
                   ),
@@ -141,33 +133,33 @@ export function AppSidebar({ children }) {
     </div>
   );
 }
-export const Logo = () => {
+function SidebarBrand() {
+  const expanded = useSidebarExpanded();
   return (
     <Link
       href="/home"
-      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
+      className={cn(
+        "relative z-20 flex min-h-[44px] shrink-0 items-center py-1 text-sm font-normal text-black",
+        expanded
+          ? "w-full gap-2"
+          : "mx-auto h-11 w-11 justify-center rounded-xl"
+      )}
     >
-      <Image src="/logo.svg" width={30} height={30} alt="logo" />
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="font-medium whitespace-pre text-black dark:text-white"
-      >
-        LINEONE
-      </motion.span>
+      <Image
+        src="/logo.svg"
+        width={30}
+        height={30}
+        alt="logo"
+        className="shrink-0"
+      />
+      {expanded ? (
+        <span className="font-medium whitespace-pre text-black dark:text-white">
+          LINEONE
+        </span>
+      ) : null}
     </Link>
   );
-};
-export const LogoIcon = () => {
-  return (
-    <Link
-      href="/home"
-      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
-    >
-      <Image src="/logo.svg" width={30} height={30} alt="logo" />
-    </Link>
-  );
-};
+}
 
 const Dashboard = ({ children }) => {
   return (
